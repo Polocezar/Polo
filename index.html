@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -37,148 +36,77 @@
             min-height: 100vh;
         }
 
-       /* ============================================= */
-/* ===== NAVBAR COMPLÈTE AVEC LOGO ===== */
-/* ============================================= */
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: linear-gradient(135deg, var(--violet-dark), var(--violet-mid));
+            padding: 10px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            height: 70px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
 
-.navbar {
-    background: linear-gradient(135deg, var(--violet-dark), var(--violet-mid));
-    padding: 10px 30px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    height: 70px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
+        .navbar-logo img {
+            height: 55px;
+            width: auto;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+            transition: transform 0.3s ease;
+        }
 
-.navbar-logo img {
-    height: 55px;
-    width: auto;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
-    transition: transform 0.3s ease;
-}
+        .navbar-logo img:hover {
+            transform: scale(1.1) rotate(-5deg);
+        }
 
-.navbar-logo img:hover {
-    transform: scale(1.1) rotate(-5deg);
-}
+        .navbar-brand {
+            color: var(--gold);
+            font-size: 1.1em;
+            font-weight: 900;
+            text-decoration: none;
+            letter-spacing: 1px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
 
-.navbar-brand {
-    color: var(--gold);
-    font-size: 1.1em;
-    font-weight: 900;
-    text-decoration: none;
-    letter-spacing: 1px;
-    cursor: pointer;
-    white-space: nowrap;
-}
+        .navbar-links {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
 
-.navbar-links {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-left: auto;
-}
+        .navbar-links a {
+            color: var(--white);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
 
-.navbar-links a {
-    color: var(--white);
-    text-decoration: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 0.9em;
-    transition: all 0.3s;
-    cursor: pointer;
-}
+        .navbar-links a:hover, .navbar-links a.active {
+            background: rgba(255,255,255,0.15);
+            color: var(--gold);
+        }
 
-.navbar-links a:hover, .navbar-links a.active {
-    background: rgba(255,255,255,0.15);
-    color: var(--gold);
-}
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+        }
 
-.hamburger {
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-    cursor: pointer;
-    margin-left: auto;
-}
-
-.hamburger span {
-    width: 25px;
-    height: 3px;
-    background: var(--gold);
-    border-radius: 2px;
-}
-
-/* Mobile */
-@media (max-width: 900px) {
-    .navbar {
-        padding: 10px 15px;
-        height: auto;
-        flex-wrap: wrap;
-    }
-    
-    .navbar-logo img {
-        height: 45px;
-    }
-    
-    .navbar-brand {
-        font-size: 1em;
-    }
-    
-    .hamburger {
-        display: flex;
-    }
-    
-    .navbar-links {
-        display: none;
-        width: 100%;
-        flex-direction: column;
-        gap: 5px;
-        padding: 15px 0;
-    }
-    
-    .navbar-links.open {
-        display: flex;
-    }
-    
-    .navbar-links a {
-        width: 100%;
-        text-align: center;
-    }
-}
-        /* ============================================= */
-/* ===== LOGO DANS LA NAVBAR ===== */
-/* ============================================= */
-
-.navbar-logo img {
-    height: 50px;
-    width: auto;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
-    transition: transform 0.3s ease;
-}
-
-.navbar-logo img:hover {
-    transform: scale(1.1) rotate(-5deg);
-}
-
-/* Ajustement mobile */
-@media (max-width: 768px) {
-    .navbar-logo img {
-        height: 40px;
-    }
-    
-    .navbar {
-        padding: 0 15px;
-    }
-    
-    .navbar-brand {
-        font-size: 1em;
-    }
-}
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 2px;
+        }
 
         .btn-nav {
             padding: 8px 18px !important;
@@ -197,163 +125,155 @@
             border-radius: 15px;
         }
 
-     /* HERO - LOGO GAUCHE | TEXTE CENTRE | PHOTO DROITE */
-.hero {
-    background: linear-gradient(135deg, var(--violet-dark) 0%, var(--violet-mid) 50%, var(--violet-light) 100%);
-    padding: 60px 40px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 40px;
-    min-height: 500px;
-    position: relative;
-    overflow: hidden;
-    flex-wrap: wrap;
-}
+        /* ===== HERO - LOGO GAUCHE | TEXTE CENTRE | PHOTO DROITE ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--violet-dark) 0%, var(--violet-mid) 50%, var(--violet-light) 100%);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            min-height: 500px;
+            position: relative;
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-}
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
 
-/* LOGO À GAUCHE */
-.hero-logo {
-    flex: 0 0 auto;
-    z-index: 1;
-}
+        .hero-logo {
+            flex: 0 0 auto;
+            z-index: 1;
+        }
 
-.hero-logo img {
-    width: 180px;
-    height: auto;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
-}
+        .hero-logo img {
+            width: 180px;
+            height: auto;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+        }
 
-/* TEXTE AU CENTRE */
-.hero-content {
-    flex: 1 1 400px;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
+        .hero-content {
+            flex: 1 1 400px;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
 
-.hero-badge {
-    display: inline-block;
-    background: rgba(245,166,35,0.2);
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    padding: 8px 20px;
-    border-radius: 25px;
-    font-size: 0.85em;
-    font-weight: 600;
-    margin-bottom: 20px;
-    letter-spacing: 1px;
-}
+        .hero-badge {
+            display: inline-block;
+            background: rgba(245,166,35,0.2);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
 
-.hero h1 { 
-    color: var(--white); 
-    font-size: 2.5em; 
-    line-height: 1.2; 
-    margin-bottom: 15px; 
-}
+        .hero h1 {
+            color: var(--white);
+            font-size: 2.5em;
+            line-height: 1.2;
+            margin-bottom: 15px;
+        }
 
-.hero h1 .highlight { color: var(--gold); }
+        .hero h1 .highlight { color: var(--gold); }
 
-.hero p {
-    color: rgba(255,255,255,0.8);
-    font-size: 1.1em;
-    margin: 10px 0 20px;
-    line-height: 1.6;
-}
+        .hero p {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1em;
+            margin: 10px 0 20px;
+            line-height: 1.6;
+        }
 
-.hero-tags { 
-    display: flex; 
-    gap: 10px; 
-    flex-wrap: wrap; 
-    margin: 15px 0; 
-    justify-content: center; 
-}
+        .hero-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+            justify-content: center;
+        }
 
-.hero-tags span {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: var(--white);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85em;
-}
+        .hero-tags span {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--white);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
 
-.hero-buttons {
-    display: flex;
-    gap: 15px;
-    margin: 20px 0;
-    flex-wrap: wrap;
-    justify-content: center;
-}
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
 
-.next-match-banner {
-    background: linear-gradient(90deg, var(--gold-dark), var(--gold));
-    color: var(--violet-dark);
-    padding: 15px 25px;
-    border-radius: 12px;
-    font-weight: 600;
-    text-align: center;
-    margin-top: 20px;
-}
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            color: var(--white);
+            border: 2px solid var(--white);
+        }
 
-.next-match-banner .label { 
-    color: var(--danger); 
-    font-weight: 800; 
-    font-size: 0.9em; 
-    margin-bottom: 5px;
-}
+        .btn-secondary:hover { background: rgba(255,255,255,0.25); }
 
-/* PHOTO ÉQUIPE À DROITE */
-.hero-image { 
-    flex: 0 0 auto;
-    z-index: 1; 
-    text-align: center;
-}
+        .next-match-banner {
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+            color: var(--violet-dark);
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 20px;
+            max-width: 500px;
+        }
 
-.hero-image img {
-    width: 220px;
-    border-radius: 15px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    object-fit: cover;
-    border: 3px solid var(--gold);
-}
+        .next-match-banner .label {
+            color: var(--danger);
+            font-weight: 800;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
 
-.hero-image .caption {
-    color: rgba(255,255,255,0.7);
-    text-align: center;
-    margin-top: 10px;
-    font-size: 0.85em;
-}
+        .hero-image {
+            flex: 0 0 auto;
+            z-index: 1;
+            text-align: center;
+        }
 
-/* RESPONSIVE MOBILE */
-@media (max-width: 900px) {
-    .hero {
-        flex-direction: column;
-        padding: 40px 20px;
-        gap: 25px;
-    }
-    
-    .hero-logo img { width: 140px; }
-    .hero h1 { font-size: 1.8em; }
-    .hero-image img { width: 90%; max-width: 280px; }
-}
+        .hero-image img {
+            width: 220px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            object-fit: cover;
+            border: 3px solid var(--gold);
+        }
 
+        .hero-image .caption {
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
 
-        /* SECTIONS */
+        /* ===== SECTIONS ===== */
         .section {
             padding: 50px 40px;
             max-width: 1200px;
@@ -363,7 +283,7 @@
         .section-title { text-align: center; font-size: 2em; color: var(--violet-dark); margin-bottom: 10px; }
         .section-subtitle { text-align: center; color: var(--gray-dark); margin-bottom: 40px; }
 
-        /* MENU CARDS */
+        /* ===== MENU CARDS ===== */
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -396,7 +316,7 @@
         .menu-item h4 { color: var(--text-dark); margin-bottom: 3px; }
         .menu-item p { color: var(--gray-dark); font-size: 0.85em; }
 
-        /* PAGES */
+        /* ===== PAGES ===== */
         .page { display: none; }
         .page.active { display: block; }
 
@@ -421,7 +341,7 @@
             margin: 0 auto;
         }
 
-        /* TABLES */
+        /* ===== TABLES ===== */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -453,7 +373,7 @@
             font-weight: 700;
         }
 
-        /* PLAYER CARDS - AVEC PHOTO */
+        /* ===== PLAYER CARDS ===== */
         .players-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
@@ -488,39 +408,39 @@
             font-size: 1.1em;
         }
 
-     .player-photo {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    object-position: top;
-    margin: 0 auto 15px;
-    display: block;
-    border: 4px solid var(--gold);
-    box-shadow: 0 0 0 6px #f0e6ff, 0 5px 20px rgba(0,0,0,0.15);
-    background-color: #f0e6ff;
-}
+        .player-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: top;
+            margin: 0 auto 15px;
+            display: block;
+            border: 4px solid var(--gold);
+            box-shadow: 0 0 0 6px #f0e6ff, 0 5px 20px rgba(0,0,0,0.15);
+            background-color: #f0e6ff;
+        }
 
-
-      .player-avatar {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--violet-light), var(--violet-dark));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gold);
-    font-size: 3em;
-    font-weight: 900;
-    margin: 0 auto 15px;
-    border: 4px solid var(--violet-light);
-}
+        .player-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--violet-light), var(--violet-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 3em;
+            font-weight: 900;
+            margin: 0 auto 15px;
+            border: 4px solid var(--violet-light);
+        }
 
         .player-card h4 { color: var(--violet-dark); margin-bottom: 5px; font-size: 1.15em; }
         .player-card .position { color: var(--gold-dark); font-weight: 600; font-size: 0.9em; }
         .player-card .details { color: var(--gray-dark); font-size: 0.85em; margin-top: 8px; }
-        
+        .player-contact { font-size: 0.85em; margin-top: 5px; }
+        .player-contact a { color: var(--violet-mid); text-decoration: none; }
 
         .player-actions {
             margin-top: 12px;
@@ -529,7 +449,7 @@
             justify-content: center;
         }
 
-        /* MESSAGES */
+        /* ===== MESSAGES ===== */
         .messages-container { max-width: 800px; margin: 0 auto; }
 
         .message-card {
@@ -547,7 +467,7 @@
         .message-text { color: var(--text-dark); line-height: 1.6; }
         .message-actions { margin-top: 10px; display: flex; gap: 5px; }
 
-        /* INFO CARDS */
+        /* ===== INFO CARDS ===== */
         .info-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -565,7 +485,7 @@
         .info-card p { color: var(--gray-dark); line-height: 1.6; font-size: 0.95em; }
         .info-actions { margin-top: 10px; display: flex; gap: 5px; }
 
-        /* STATS */
+        /* ===== STATS ===== */
         .stats-overview {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -593,7 +513,7 @@
             display: inline-block;
         }
 
-        /* BUTTONS */
+        /* ===== BUTTONS ===== */
         .btn {
             padding: 10px 20px;
             border: none;
@@ -605,6 +525,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
         }
 
         .btn-primary { background: var(--violet-mid); color: var(--white); }
@@ -616,7 +537,7 @@
         .btn-success { background: var(--success); color: var(--white); }
         .btn-small { padding: 5px 12px; font-size: 0.8em; }
 
-        /* MODAL */
+        /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -679,7 +600,7 @@
             margin-top: 5px;
         }
 
-        /* LOGIN */
+        /* ===== LOGIN ===== */
         .login-container {
             max-width: 400px;
             margin: 60px auto;
@@ -693,7 +614,7 @@
         .login-container h2 { color: var(--violet-dark); margin-bottom: 30px; }
         .login-container .emoji { font-size: 3em; margin-bottom: 15px; }
 
-        /* TOAST */
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -714,309 +635,174 @@
         .toast.error { background: var(--danger); }
         .toast.info { background: var(--info); }
 
-        /* ADMIN */
+        /* ===== ADMIN ===== */
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: inline-flex !important; }
 
-        /* EMPTY */
+        /* ===== EMPTY ===== */
         .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-dark); }
         .empty-state .emoji { font-size: 3em; margin-bottom: 15px; display: block; }
 
-        /* HAMBURGER */
-        .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; }
-        .hamburger span { width: 25px; height: 3px; background: white; border-radius: 3px; }
+        /* ===== VENUE CARD ===== */
+        .venue-card {
+            max-width: 380px;
+            margin: 20px auto;
+        }
 
-        /* RESPONSIVE */
+        .venue-card a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background-color: #f8f5ff;
+            padding: 16px 20px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: inherit;
+            border: 2px solid #e0d4f5;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(147, 51, 234, 0.1);
+        }
+
+        .venue-card a:hover {
+            background-color: white;
+            border-color: var(--violet-mid);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.18);
+        }
+
+        .venue-icon { font-size: 1.8em; }
+
+        .venue-text strong {
+            display: block;
+            color: var(--violet-mid);
+            font-size: 1.1em;
+            margin-bottom: 3px;
+        }
+
+        .venue-address {
+            font-size: 0.87em;
+            color: var(--gray-dark);
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
-            .hamburger { display: flex; }
+            .navbar { padding: 10px 15px; height: auto; flex-wrap: wrap; }
+            .navbar-logo img { height: 45px; }
+            .navbar-brand { font-size: 1em; }
+            .hamburger { display: flex; margin-left: auto; }
             .navbar-links {
                 display: none;
-                position: absolute;
-                top: 65px;
-                left: 0; right: 0;
-                background: var(--violet-dark);
+                width: 100%;
                 flex-direction: column;
-                padding: 15px;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+                gap: 5px;
+                padding: 15px 0;
             }
             .navbar-links.open { display: flex; }
+            .navbar-links a { width: 100%; text-align: center; }
+
+            .hero {
+                flex-direction: column;
+                padding: 40px 20px;
+                gap: 25px;
+            }
+            .hero-logo img { width: 140px; }
+            .hero h1 { font-size: 1.8em; }
+            .hero-image img { width: 90%; max-width: 280px; }
         }
 
         @media (max-width: 768px) {
-            .navbar { padding: 10px 15px; height: auto; flex-wrap: wrap; gap: 10px; }
-            .hero { padding: 30px 20px; }
-            .hero h1 { font-size: 2em; }
-            .hero-image img { width: 280px; max-height: 220px; }
-            .hero-bottom { flex-direction: column; }
             .section, .page-header, .page-content { padding-left: 15px; padding-right: 15px; }
             .menu-grid { grid-template-columns: 1fr; }
             .modal { padding: 20px; margin: 10px; }
             .data-table { font-size: 0.8em; }
             .data-table th, .data-table td { padding: 8px 6px; }
         }
-       /* ============================================= */
-/* ===== VENUE CARD - SALLE GM4 FIRMINY V2 ===== */
-/* ============================================= */
-
-.venue-card {
-    max-width: 380px;
-    margin: 20px auto;           /* Centré + un peu d'espace */
-}
-
-.venue-card a {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    background-color: #f8f5ff;
-    padding: 16px 20px;
-    border-radius: 16px;
-    text-decoration: none;
-    color: inherit;
-    border: 2px solid #e0d4f5;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.1);
-}
-
-.venue-card a:hover {
-    background-color: white;
-    border-color: var(--violet-mid);
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(147, 51, 234, 0.18);
-}
-
-.venue-icon {
-    font-size: 1.8em;
-}
-
-.venue-text strong {
-    display: block;
-    color: var(--violet-mid);
-    font-size: 1.1em;
-    margin-bottom: 3px;
-}
-
-.venue-address {
-    font-size: 0.87em;
-    color: var(--gray-dark);
-}
-
     </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-<nav class="navbar">
-    <!-- LOGO DU CLUB -->
-    <div class="navbar-logo">
-        <img src="logo.png" alt="Logo BB Ghazeau Favol">
-    </div>
-    
-    <span class="navbar-brand" onclick="showPage('accueil')">🏀 AL CHAZEAU FAYOL BASKET</span>
-    
-    <div class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">
-        <span></span><span></span><span></span>
-    </div>
-    
-    <div class="navbar-links" id="navLinks">
-        <a onclick="showPage('accueil')" class="active" id="nav-accueil">Accueil</a>
-        <a onclick="showPage('calendrier')" id="nav-calendrier">Calendrier</a>
-        <a onclick="showPage('resultats')" id="nav-resultats">Résultats</a>
-        <a onclick="showPage('classement')" id="nav-classement">Classement</a>
-        <a onclick="showPage('effectif')" id="nav-effectif">Effectif</a>
-        <a onclick="showPage('stats')" id="nav-stats">Stats</a>
-        <a onclick="showPage('infos')" id="nav-infos">Infos</a>
-        <a onclick="showPage('messagerie')" id="nav-messagerie">Messagerie</a>
-        <span class="user-info" id="userInfo" style="display:none"></span>
-        <a class="btn-nav btn-connexion" onclick="showPage('login')" id="btnLogin">Connexion</a>
-        <a class="btn-nav btn-logout" onclick="dologout()" id="btnLogout" style="display:none">Déconnexion</a>
-    </div>
-</nav>
-<!-- FIN NAVBAR -->
-
-
-/* HERO - LOGO GAUCHE | TEXTE CENTRE | PHOTO DROITE */
-.hero {
-    background: linear-gradient(135deg, var(--violet-dark) 0%, var(--violet-mid) 50%, var(--violet-light) 100%);
-    padding: 60px 40px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 40px;
-    min-height: 500px;
-    position: relative;
-    overflow: hidden;
-    flex-wrap: wrap;
-}
-
-.hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-/* LOGO À GAUCHE */
-.hero-logo {
-    flex: 0 0 auto;
-    z-index: 1;
-}
-
-.hero-logo img {
-    width: 180px;
-    height: auto;
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
-}
-
-/* TEXTE AU CENTRE */
-.hero-content {
-    flex: 1 1 400px;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.hero-badge {
-    display: inline-block;
-    background: rgba(245,166,35,0.2);
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    padding: 8px 20px;
-    border-radius: 25px;
-    font-size: 0.85em;
-    font-weight: 600;
-    margin-bottom: 20px;
-    letter-spacing: 1px;
-}
-
-.hero h1 { 
-    color: var(--white); 
-    font-size: 2.5em; 
-    line-height: 1.2; 
-    margin-bottom: 15px; 
-}
-
-.hero h1 .highlight { color: var(--gold); }
-
-.hero p {
-    color: rgba(255,255,255,0.8);
-    font-size: 1.1em;
-    margin: 10px 0 20px;
-    line-height: 1.6;
-}
-
-.hero-tags { 
-    display: flex; 
-    gap: 10px; 
-    flex-wrap: wrap; 
-    margin: 15px 0; 
-    justify-content: center; 
-}
-
-.hero-tags span {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: var(--white);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85em;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 15px;
-    margin: 20px 0;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.next-match-banner {
-    background: linear-gradient(90deg, var(--gold-dark), var(--gold));
-    color: var(--violet-dark);
-    padding: 15px 25px;
-    border-radius: 12px;
-    font-weight: 600;
-    text-align: center;
-    margin-top: 20px;
-}
-
-.next-match-banner .label { 
-    color: var(--danger); 
-    font-weight: 800; 
-    font-size: 0.9em; 
-    margin-bottom: 5px;
-}
-
-/* PHOTO ÉQUIPE À DROITE */
-.hero-image { 
-    flex: 0 0 auto;
-    z-index: 1; 
-    text-align: center;
-}
-
-.hero-image img {
-    width: 220px;
-    border-radius: 15px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    object-fit: cover;
-    border: 3px solid var(--gold);
-}
-
-.hero-image .caption {
-    color: rgba(255,255,255,0.7);
-    text-align: center;
-    margin-top: 10px;
-    font-size: 0.85em;
-}
-
-/* RESPONSIVE MOBILE */
-@media (max-width: 900px) {
-    .hero {
-        flex-direction: column;
-        padding: 40px 20px;
-        gap: 25px;
-    }
-    
-    .hero-logo img { width: 140px; }
-    .hero h1 { font-size: 1.8em; }
-    .hero-image img { width: 90%; max-width: 280px; }
-}
-
-            <!-- Boutons d'action -->
-            <div class="hero-buttons">
-                <a onclick="showPage('effectif')" class="btn btn-primary">Voir l'effectif</a>
-                <a onclick="showPage('calendrier')" class="btn btn-secondary">Calendrier</a>
-            </div>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img src="logo.png" alt="Logo AL Chazeau Fayol">
         </div>
-    </div>
-</div>
+        
+        <span class="navbar-brand" onclick="showPage('accueil')">🏀 AL CHAZEAU FAYOL BASKET</span>
+        
+        <div class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">
+            <span></span><span></span><span></span>
+        </div>
+        
+        <div class="navbar-links" id="navLinks">
+            <a onclick="showPage('accueil')" class="active" id="nav-accueil">Accueil</a>
+            <a onclick="showPage('calendrier')" id="nav-calendrier">Calendrier</a>
+            <a onclick="showPage('resultats')" id="nav-resultats">Résultats</a>
+            <a onclick="showPage('classement')" id="nav-classement">Classement</a>
+            <a onclick="showPage('effectif')" id="nav-effectif">Effectif</a>
+            <a onclick="showPage('stats')" id="nav-stats">Stats</a>
+            <a onclick="showPage('infos')" id="nav-infos">Infos</a>
+            <a onclick="showPage('messagerie')" id="nav-messagerie">Messagerie</a>
+            <span class="user-info" id="userInfo" style="display:none"></span>
+            <a class="btn-nav btn-connexion" onclick="showPage('login')" id="btnLogin">Connexion</a>
+            <a class="btn-nav btn-logout" onclick="doLogout()" id="btnLogout" style="display:none">Déconnexion</a>
+        </div>
+    </nav>
 
+    <!-- PAGE ACCUEIL -->
+    <div id="page-accueil" class="page active">
+
+        <!-- SECTION HERO -->
+        <section class="hero">
+            <!-- Logo à GAUCHE -->
+            <div class="hero-logo">
+                <img src="logo.png" alt="Logo AL Chazeau Fayol">
+            </div>
+
+            <!-- Texte au CENTRE -->
+            <div class="hero-content">
+                <span class="hero-badge">ÉQUIPE PNM 🏆 LIGUE AUVERGNE RHÔNE-ALPES</span>
+                <h1>BIENVENUE SUR<br>L'ESPACE <span class="highlight">PNM ALCF BASKET</span></h1>
+                <p>Site officiel de l'équipe</p>
+
+                <div class="hero-tags">
                     <span>👕 Maillot violet</span>
                     <span>🏀 Club officiel</span>
                 </div>
-            </div>
-            <div class="hero-bottom">
+
+                <div class="hero-buttons">
+                    <a onclick="showPage('effectif')" class="btn btn-primary">Voir l'effectif</a>
+                    <a onclick="showPage('calendrier')" class="btn btn-secondary">Calendrier</a>
+                </div>
+
                 <div class="next-match-banner">
                     <div class="label">🔴 Prochain match :</div>
                     <div id="nextMatchText">Chargement...</div>
                 </div>
-                <div class="hero-image">
-                    <img src="https://i.imgur.com/6wbziFS.png" alt="Équipe PNM">
-                    <div class="caption">Équipe PNM – AL Chazeau Fayol Basket</div>
-                </div>
             </div>
-        </div>
 
+            <!-- Photo équipe à DROITE -->
+            <div class="hero-image">
+                <img src="equipe-2025-2026.png" alt="Équipe PNM 2025-2026" onerror="this.src='photo équipe 2025_2026.png'">
+                <div class="caption">Équipe PNM – AL Chazeau Fayol Basket</div>
+            </div>
+        </section>
+
+        <!-- MENU PRINCIPAL -->
         <div class="section">
             <h2 class="section-title">Menu principal</h2>
             <p class="section-subtitle">Choisis une rubrique pour accéder rapidement aux informations de l'équipe.</p>
+
+            <!-- CARTE SALLE GM4 FIRMINY -->
+            <div class="venue-card">
+                <a href="https://www.google.com/maps/search/?api=1&query=Salle+GM4+Firminy" target="_blank" rel="noopener">
+                    <div class="venue-icon">📍</div>
+                    <div class="venue-text">
+                        <strong>Salle GM4 Firminy</strong>
+                        <div class="venue-address">Voir l'itinéraire sur Google Maps</div>
+                    </div>
+                </a>
+            </div>
+
             <div class="menu-grid">
                 <div class="menu-card">
                     <h3>🏆 Compétition</h3>
@@ -1083,7 +869,7 @@
         </div>
     </div>
 
-    <!-- PAGE EFFECTIF - AVEC PHOTOS -->
+    <!-- PAGE EFFECTIF -->
     <div id="page-effectif" class="page">
         <div class="page-header">
             <h2>👥 Effectif PNM</h2>
@@ -1094,7 +880,7 @@
         </div>
     </div>
 
-    <!-- PAGE STATS - AVEC STATS INDIVIDUELLES -->
+    <!-- PAGE STATS -->
     <div id="page-stats" class="page">
         <div class="page-header">
             <h2>📈 Statistiques</h2>
@@ -1120,12 +906,12 @@
                         <th>📊 Total pts</th>
                         <th>🟥 Fautes</th>
                         <th>🏀 Matchs</th>
-                        <th>⏱️ Temps de jeu</th>
+                        <th>⏱️ Temps</th>
                         <th class="admin-only">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="statsIndivBody">
-                    <tr><td colspan="8"><div class="empty-state"><span class="emoji">📈</span>Aucune stat individuelle</div></td></tr>
+                    <tr><td colspan="9"><div class="empty-state"><span class="emoji">📈</span>Aucune stat individuelle</div></td></tr>
                 </tbody>
             </table>
         </div>
@@ -1171,9 +957,7 @@
         </div>
     </div>
 
-    <!-- ============================================
-         MODALS
-         ============================================ -->
+    <!-- ============================================ MODALS ============================================ -->
 
     <!-- Modal Match -->
     <div class="modal-overlay" id="modal-match">
@@ -1208,32 +992,32 @@
         </div>
     </div>
 
-    <!-- Modal Joueur - AVEC PHOTO -->
+    <!-- Modal Joueur -->
     <div class="modal-overlay" id="modal-joueur">
-    <div class="modal">
-        <h3>👤 Joueur</h3>
-        <input type="hidden" id="joueurId">
-        <div class="form-group"><label>Prénom</label><input type="text" id="joueurPrenom" placeholder="Prénom"></div>
-        <div class="form-group"><label>Nom</label><input type="text" id="joueurNom" placeholder="Nom"></div>
-        <div class="form-group"><label>Numéro de maillot</label><input type="number" id="joueurNumero" placeholder="7"></div>
-        <div class="form-group"><label>Poste</label><select id="joueurPoste"><option value="Meneur">Meneur Poste 1</option><option value="Arrière">Arrière (SG)</option><option value="Ailier">Ailier (SF)</option><option value="Ailier fort">Ailier fort (PF)</option><option value="Pivot">Pivot (C)</option></select></div>
-        <div class="form-group"><label>📅 Date de naissance</label><input type="date" id="joueurDateNaissance"></div>
-        <div class="form-group"><label>Taille (cm)</label><input type="number" id="joueurTaille" placeholder="185"></div>
-        <div class="form-group"><label>🪪 Numéro de licence</label><input type="text" id="joueurLicence" placeholder="Ex: 1234567"></div>
-        <div class="form-group"><label>📱 Numéro de téléphone</label><input type="tel" id="joueurTel" placeholder="Ex: 06 12 34 56 78"></div>
-        <div class="form-group"><label>📧 Adresse email</label><input type="email" id="joueurEmail" placeholder="Ex: romario@gmail.com"></div>
-        <div class="form-group">
-            <label>📸 Photo du joueur (URL)</label>
-            <input type="url" id="joueurPhoto" placeholder="https://i.imgur.com/xxxxx.png" oninput="previewPhoto(this.value)">
-            <p class="photo-help">Colle le lien direct de la photo (BBCode depuis Imgur)</p>
-            <img id="photoPreview" class="photo-preview" style="display:none">
-        </div>
-        <div class="form-actions">
-            <button class="btn btn-danger" onclick="closeModal('joueur')">Annuler</button>
-            <button class="btn btn-gold" onclick="saveJoueur()">💾 Enregistrer</button>
+        <div class="modal">
+            <h3>👤 Joueur</h3>
+            <input type="hidden" id="joueurId">
+            <div class="form-group"><label>Prénom</label><input type="text" id="joueurPrenom" placeholder="Prénom"></div>
+            <div class="form-group"><label>Nom</label><input type="text" id="joueurNom" placeholder="Nom"></div>
+            <div class="form-group"><label>Numéro de maillot</label><input type="number" id="joueurNumero" placeholder="7"></div>
+            <div class="form-group"><label>Poste</label><select id="joueurPoste"><option value="Meneur">Meneur Poste 1</option><option value="Arrière">Arrière (SG)</option><option value="Ailier">Ailier (SF)</option><option value="Ailier fort">Ailier fort (PF)</option><option value="Pivot">Pivot (C)</option></select></div>
+            <div class="form-group"><label>📅 Date de naissance</label><input type="date" id="joueurDateNaissance"></div>
+            <div class="form-group"><label>Taille (cm)</label><input type="number" id="joueurTaille" placeholder="185"></div>
+            <div class="form-group"><label>🪪 Numéro de licence</label><input type="text" id="joueurLicence" placeholder="Ex: 1234567"></div>
+            <div class="form-group"><label>📱 Numéro de téléphone</label><input type="tel" id="joueurTel" placeholder="Ex: 06 12 34 56 78"></div>
+            <div class="form-group"><label>📧 Adresse email</label><input type="email" id="joueurEmail" placeholder="Ex: romario@gmail.com"></div>
+            <div class="form-group">
+                <label>📸 Photo du joueur (URL)</label>
+                <input type="url" id="joueurPhoto" placeholder="https://i.imgur.com/xxxxx.png" oninput="previewPhoto(this.value)">
+                <p class="photo-help">Colle le lien direct de la photo</p>
+                <img id="photoPreview" class="photo-preview" style="display:none">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-danger" onclick="closeModal('joueur')">Annuler</button>
+                <button class="btn btn-gold" onclick="saveJoueur()">💾 Enregistrer</button>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- Modal Classement -->
     <div class="modal-overlay" id="modal-classement">
@@ -1293,7 +1077,7 @@
             <div class="form-group"><label>☝️ Lancers francs (1 point)</label><input type="number" id="statsIndiv1pt" placeholder="0" value="0"></div>
             <div class="form-group"><label>🟥 Fautes commises</label><input type="number" id="statsIndivFautes" placeholder="0" value="0"></div>
             <div class="form-group"><label>🏀 Nombre de matchs</label><input type="number" id="statsIndivMatchs" placeholder="0" value="0"></div>
-            <div class="form-group"><label>🏀 Nombre de matchs</label><input type="number" id="statsIndivMatchs" placeholder="0" value="0"></div>
+            <div class="form-group"><label>⏱️ Temps de jeu (minutes)</label><input type="number" id="statsIndivTemps" placeholder="0" value="0"></div>
             <div class="form-actions">
                 <button class="btn btn-danger" onclick="closeModal('statsIndiv')">Annuler</button>
                 <button class="btn btn-gold" onclick="saveStatsIndiv()">💾 Enregistrer</button>
@@ -1393,9 +1177,6 @@
             window.scrollTo(0, 0);
         }
 
-        // ============================================
-        // LOAD DATA
-        // ============================================
         function loadData(id) {
             switch(id) {
                 case 'accueil': loadNextMatch(); break;
@@ -1459,42 +1240,40 @@
             });
         }
 
-        // EFFECTIF - AVEC PHOTOS
         function loadEffectif() {
-    db.collection('joueurs').orderBy('numero', 'asc').onSnapshot(snap => {
-        const grid = document.getElementById('effectifGrid');
-        if (snap.empty) { grid.innerHTML = '<div class="empty-state"><span class="emoji">👥</span>Aucun joueur</div>'; return; }
-        grid.innerHTML = snap.docs.map(doc => {
-            const j = doc.data();
-            const ini = ((j.prenom||'')[0]||'') + ((j.nom||'')[0]||'');
-            const photoHTML = j.photo
-                ? '<img src="'+j.photo+'" class="player-photo" alt="'+j.prenom+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="player-avatar" style="display:none">'+ini.toUpperCase()+'</div>'
-                : '<div class="player-avatar">'+ini.toUpperCase()+'</div>';
-            
-            let age = '';
-            if (j.dateNaissance) {
-                const birth = new Date(j.dateNaissance);
-                const today = new Date();
-                let a = today.getFullYear() - birth.getFullYear();
-                if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) a--;
-                age = a + ' ans';
-            }
+            db.collection('joueurs').orderBy('numero', 'asc').onSnapshot(snap => {
+                const grid = document.getElementById('effectifGrid');
+                if (snap.empty) { grid.innerHTML = '<div class="empty-state"><span class="emoji">👥</span>Aucun joueur</div>'; return; }
+                grid.innerHTML = snap.docs.map(doc => {
+                    const j = doc.data();
+                    const ini = ((j.prenom||'')[0]||'') + ((j.nom||'')[0]||'');
+                    const photoHTML = j.photo
+                        ? '<img src="'+j.photo+'" class="player-photo" alt="'+j.prenom+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="player-avatar" style="display:none">'+ini.toUpperCase()+'</div>'
+                        : '<div class="player-avatar">'+ini.toUpperCase()+'</div>';
 
-            let details = '';
-            if (j.taille) details += j.taille + ' cm';
-            if (age) details += (details ? ' · ' : '') + age;
-            if (j.licence) details += (details ? '<br>' : '') + '🪪 ' + j.licence;
+                    let age = '';
+                    if (j.dateNaissance) {
+                        const birth = new Date(j.dateNaissance);
+                        const today = new Date();
+                        let a = today.getFullYear() - birth.getFullYear();
+                        if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) a--;
+                        age = a + ' ans';
+                    }
 
-            let contact = '';
-            if (j.telephone) contact += '<div class="player-contact">📱 <a href="tel:'+j.telephone+'">' + j.telephone + '</a></div>';
-            if (j.email) contact += '<div class="player-contact">📧 <a href="mailto:'+j.email+'">' + j.email + '</a></div>';
+                    let details = '';
+                    if (j.taille) details += j.taille + ' cm';
+                    if (age) details += (details ? ' · ' : '') + age;
+                    if (j.licence) details += (details ? '<br>' : '') + '🪪 ' + j.licence;
 
-            return '<div class="player-card"><div class="player-number">'+(j.numero||'?')+'</div>'+photoHTML+'<h4>'+j.prenom+' '+j.nom+'</h4><div class="position">'+(j.poste||'-')+'</div><div class="details">'+details+'</div>'+contact+'<div class="player-actions admin-only"><button class="btn btn-small btn-primary" onclick="editJoueur(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'joueurs\',\''+doc.id+'\')">🗑️</button></div></div>';
-        }).join('');
-    });
-}
+                    let contact = '';
+                    if (j.telephone) contact += '<div class="player-contact">📱 <a href="tel:'+j.telephone+'">' + j.telephone + '</a></div>';
+                    if (j.email) contact += '<div class="player-contact">📧 <a href="mailto:'+j.email+'">' + j.email + '</a></div>';
 
-        // STATS ÉQUIPE
+                    return '<div class="player-card"><div class="player-number">'+(j.numero||'?')+'</div>'+photoHTML+'<h4>'+j.prenom+' '+j.nom+'</h4><div class="position">'+(j.poste||'-')+'</div><div class="details">'+details+'</div>'+contact+'<div class="player-actions admin-only"><button class="btn btn-small btn-primary" onclick="editJoueur(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'joueurs\',\''+doc.id+'\')">🗑️</button></div></div>';
+                }).join('');
+            });
+        }
+
         function loadStats() {
             db.collection('resultats').get().then(snap => {
                 let v=0, d=0, pts=0;
@@ -1506,12 +1285,11 @@
             });
         }
 
-        // STATS INDIVIDUELLES
         function loadStatsIndiv() {
             db.collection('statsIndiv').orderBy('totalPts', 'desc').onSnapshot(snap => {
                 const body = document.getElementById('statsIndivBody');
                 if (snap.empty) {
-                    body.innerHTML = '<tr><td colspan="8"><div class="empty-state"><span class="emoji">📈</span>Aucune stat individuelle.<br>Clique sur "+ Ajouter stats joueur"</div></td></tr>';
+                    body.innerHTML = '<tr><td colspan="9"><div class="empty-state"><span class="emoji">📈</span>Aucune stat individuelle.<br>Clique sur "+ Ajouter stats joueur"</div></td></tr>';
                     return;
                 }
                 body.innerHTML = snap.docs.map(doc => {
@@ -1520,7 +1298,6 @@
                 }).join('');
             });
 
-            // Charger la liste des joueurs dans le select
             db.collection('joueurs').orderBy('nom').get().then(snap => {
                 const sel = document.getElementById('statsIndivJoueur');
                 sel.innerHTML = '<option value="">-- Choisir un joueur --</option>';
@@ -1555,9 +1332,7 @@
             });
         }
 
-        // ============================================
-        // SAVE
-        // ============================================
+        // ============================================ SAVE ============================================
         async function saveMatch() {
             if (!isAdmin) return showToast('Accès admin requis', 'error');
             const id = document.getElementById('matchId').value;
@@ -1583,27 +1358,27 @@
         }
 
         async function saveJoueur() {
-    if (!isAdmin) return showToast('Accès admin requis', 'error');
-    const id = document.getElementById('joueurId').value;
-    const data = {
-        prenom: document.getElementById('joueurPrenom').value,
-        nom: document.getElementById('joueurNom').value,
-        numero: parseInt(document.getElementById('joueurNumero').value)||0,
-        poste: document.getElementById('joueurPoste').value,
-        dateNaissance: document.getElementById('joueurDateNaissance').value || null,
-        taille: parseInt(document.getElementById('joueurTaille').value)||null,
-        licence: document.getElementById('joueurLicence').value || null,
-        telephone: document.getElementById('joueurTel').value || null,
-        email: document.getElementById('joueurEmail').value || null,
-        photo: document.getElementById('joueurPhoto').value || null
-    };
-    if (!data.prenom || !data.nom) return showToast('Prénom et nom requis', 'error');
-    try {
-        if (id) await db.collection('joueurs').doc(id).update(data);
-        else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('joueurs').add(data); }
-        closeModal('joueur'); showToast('Joueur enregistré ✅', 'success');
-    } catch(e) { showToast('Erreur: '+e.message, 'error'); }
-}
+            if (!isAdmin) return showToast('Accès admin requis', 'error');
+            const id = document.getElementById('joueurId').value;
+            const data = {
+                prenom: document.getElementById('joueurPrenom').value,
+                nom: document.getElementById('joueurNom').value,
+                numero: parseInt(document.getElementById('joueurNumero').value)||0,
+                poste: document.getElementById('joueurPoste').value,
+                dateNaissance: document.getElementById('joueurDateNaissance').value || null,
+                taille: parseInt(document.getElementById('joueurTaille').value)||null,
+                licence: document.getElementById('joueurLicence').value || null,
+                telephone: document.getElementById('joueurTel').value || null,
+                email: document.getElementById('joueurEmail').value || null,
+                photo: document.getElementById('joueurPhoto').value || null
+            };
+            if (!data.prenom || !data.nom) return showToast('Prénom et nom requis', 'error');
+            try {
+                if (id) await db.collection('joueurs').doc(id).update(data);
+                else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('joueurs').add(data); }
+                closeModal('joueur'); showToast('Joueur enregistré ✅', 'success');
+            } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+        }
 
         async function saveClassement() {
             if (!isAdmin) return showToast('Accès admin requis', 'error');
@@ -1640,35 +1415,32 @@
             } catch(e) { showToast('Erreur: '+e.message, 'error'); }
         }
 
-        // SAVE STATS INDIVIDUELLES
         async function saveStatsIndiv() {
-    if (!isAdmin) return showToast('Accès admin requis', 'error');
-    const id = document.getElementById('statsIndivId').value;
-    const pts3 = parseInt(document.getElementById('statsIndiv3pts').value)||0;
-    const pts2 = parseInt(document.getElementById('statsIndiv2pts').value)||0;
-    const pts1 = parseInt(document.getElementById('statsIndiv1pt').value)||0;
-    const totalPts = (pts3 * 3) + (pts2 * 2) + pts1;
+            if (!isAdmin) return showToast('Accès admin requis', 'error');
+            const id = document.getElementById('statsIndivId').value;
+            const pts3 = parseInt(document.getElementById('statsIndiv3pts').value)||0;
+            const pts2 = parseInt(document.getElementById('statsIndiv2pts').value)||0;
+            const pts1 = parseInt(document.getElementById('statsIndiv1pt').value)||0;
+            const totalPts = (pts3 * 3) + (pts2 * 2) + pts1;
 
-    const data = {
-        joueurNom: document.getElementById('statsIndivJoueur').value,
-        pts3, pts2, pts1, totalPts,
-        fautes: parseInt(document.getElementById('statsIndivFautes').value)||0,
-        matchs: parseInt(document.getElementById('statsIndivMatchs').value)||0,
-        tempsJeu: parseInt(document.getElementById('statsIndivTemps').value)||0
-    };
+            const data = {
+                joueurNom: document.getElementById('statsIndivJoueur').value,
+                pts3, pts2, pts1, totalPts,
+                fautes: parseInt(document.getElementById('statsIndivFautes').value)||0,
+                matchs: parseInt(document.getElementById('statsIndivMatchs').value)||0,
+                tempsJeu: parseInt(document.getElementById('statsIndivTemps').value)||0
+            };
 
-    if (!data.joueurNom) return showToast('Choisis un joueur', 'error');
+            if (!data.joueurNom) return showToast('Choisis un joueur', 'error');
 
-    try {
-        if (id) await db.collection('statsIndiv').doc(id).update(data);
-        else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('statsIndiv').add(data); }
-        closeModal('statsIndiv'); showToast('Stats enregistrées ✅', 'success');
-    } catch(e) { showToast('Erreur: '+e.message, 'error'); }
-}
+            try {
+                if (id) await db.collection('statsIndiv').doc(id).update(data);
+                else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('statsIndiv').add(data); }
+                closeModal('statsIndiv'); showToast('Stats enregistrées ✅', 'success');
+            } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+        }
 
-        // ============================================
-        // EDIT
-        // ============================================
+        // ============================================ EDIT ============================================
         async function editMatch(id) {
             const d = (await db.collection('matchs').doc(id).get()).data();
             document.getElementById('matchId').value = id;
@@ -1691,21 +1463,21 @@
         }
 
         async function editJoueur(id) {
-    const d = (await db.collection('joueurs').doc(id).get()).data();
-    document.getElementById('joueurId').value = id;
-    document.getElementById('joueurPrenom').value = d.prenom;
-    document.getElementById('joueurNom').value = d.nom;
-    document.getElementById('joueurNumero').value = d.numero;
-    document.getElementById('joueurPoste').value = d.poste;
-    document.getElementById('joueurDateNaissance').value = d.dateNaissance||'';
-    document.getElementById('joueurTaille').value = d.taille||'';
-    document.getElementById('joueurLicence').value = d.licence||'';
-    document.getElementById('joueurTel').value = d.telephone||'';
-    document.getElementById('joueurEmail').value = d.email||'';
-    document.getElementById('joueurPhoto').value = d.photo||'';
-    previewPhoto(d.photo||'');
-    openModal('joueur');
-}
+            const d = (await db.collection('joueurs').doc(id).get()).data();
+            document.getElementById('joueurId').value = id;
+            document.getElementById('joueurPrenom').value = d.prenom;
+            document.getElementById('joueurNom').value = d.nom;
+            document.getElementById('joueurNumero').value = d.numero;
+            document.getElementById('joueurPoste').value = d.poste;
+            document.getElementById('joueurDateNaissance').value = d.dateNaissance||'';
+            document.getElementById('joueurTaille').value = d.taille||'';
+            document.getElementById('joueurLicence').value = d.licence||'';
+            document.getElementById('joueurTel').value = d.telephone||'';
+            document.getElementById('joueurEmail').value = d.email||'';
+            document.getElementById('joueurPhoto').value = d.photo||'';
+            previewPhoto(d.photo||'');
+            openModal('joueur');
+        }
 
         async function editClassement(id) {
             const d = (await db.collection('classement').doc(id).get()).data();
@@ -1728,7 +1500,6 @@
         }
 
         async function editStatsIndiv(id) {
-            await loadStatsIndiv(); // Refresh joueurs list
             const d = (await db.collection('statsIndiv').doc(id).get()).data();
             document.getElementById('statsIndivId').value = id;
             document.getElementById('statsIndivJoueur').value = d.joueurNom;
@@ -1741,18 +1512,14 @@
             openModal('statsIndiv');
         }
 
-        // ============================================
-        // DELETE
-        // ============================================
+        // ============================================ DELETE ============================================
         async function deleteDoc(col, id) {
             if (!confirm('Supprimer ?')) return;
             try { await db.collection(col).doc(id).delete(); showToast('Supprimé ✅', 'success'); }
             catch(e) { showToast('Erreur: '+e.message, 'error'); }
         }
 
-        // ============================================
-        // MODALS
-        // ============================================
+        // ============================================ MODALS ============================================
         function openModal(type) {
             const idField = document.getElementById(type+'Id');
             if (idField && !idField.value) {
@@ -1764,7 +1531,6 @@
                 modal.querySelectorAll('select').forEach(s => s.selectedIndex=0);
             }
             if (type === 'statsIndiv') {
-                // Charger les joueurs
                 db.collection('joueurs').orderBy('nom').get().then(snap => {
                     const sel = document.getElementById('statsIndivJoueur');
                     const currentVal = sel.value;
@@ -1777,7 +1543,6 @@
                 });
             }
             document.getElementById('modal-'+type).classList.add('active');
-            // Reset photo preview
             if (type === 'joueur' && !document.getElementById('joueurId').value) {
                 document.getElementById('photoPreview').style.display = 'none';
             }
@@ -1793,9 +1558,7 @@
             o.addEventListener('click', e => { if(e.target===o) o.classList.remove('active'); });
         });
 
-        // ============================================
-        // PHOTO PREVIEW
-        // ============================================
+        // ============================================ PHOTO PREVIEW ============================================
         function previewPhoto(url) {
             const preview = document.getElementById('photoPreview');
             if (url && url.startsWith('http')) {
@@ -1807,9 +1570,7 @@
             }
         }
 
-        // ============================================
-        // TOAST
-        // ============================================
+        // ============================================ TOAST ============================================
         function showToast(msg, type='info') {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -1817,9 +1578,7 @@
             setTimeout(() => t.classList.remove('show'), 3500);
         }
 
-        // ============================================
-        // UTILS
-        // ============================================
+        // ============================================ UTILS ============================================
         function formatDate(s) {
             if (!s) return '-';
             const d = new Date(s+'T00:00:00');
