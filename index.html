@@ -36,6 +36,28 @@
             min-height: 100vh;
         }
 
+        /* ===== ANIMATIONS GLOBALES ===== */
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
         /* ===== NAVBAR ===== */
         .navbar {
             background: linear-gradient(135deg, var(--violet-dark), var(--violet-mid));
@@ -57,9 +79,7 @@
             transition: transform 0.3s ease;
         }
 
-        .navbar-logo img:hover {
-            transform: scale(1.1) rotate(-5deg);
-        }
+        .navbar-logo img:hover { transform: scale(1.1) rotate(-5deg); }
 
         .navbar-brand {
             color: var(--gold);
@@ -125,199 +145,235 @@
             border-radius: 15px;
         }
 
-/* ===== HERO - LOGO GAUCHE | TEXTE CENTRE | PHOTO DROITE ===== */
-.hero {
-    background: linear-gradient(135deg, var(--violet-dark) 0%, var(--violet-mid) 50%, var(--violet-light) 100%);
-    padding: 60px 40px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 50px;
-    min-height: 500px;
-    position: relative;
-    overflow: hidden;
-    flex-wrap: wrap;
-    max-width: 1400px;
-    margin: 0 auto;
-}
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--violet-dark) 0%, var(--violet-mid) 50%, var(--violet-light) 100%);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            min-height: 500px;
+            position: relative;
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-}
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
 
-/* LOGO À GAUCHE - SANS FOND */
-.hero-logo {
-    flex: 0 0 auto;
-    z-index: 1;
-}
+        .hero-logo {
+            flex: 0 0 auto;
+            z-index: 1;
+            animation: fadeInLeft 1s ease-out;
+        }
 
-.hero-logo img {
-    width: 240px;
-    height: auto;
-    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(245,166,35,0.3));
-    /* Mélange le fond du logo avec celui de la page */
-    background: transparent;
-}
+        .hero-logo img {
+            width: 240px;
+            height: auto;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+            mix-blend-mode: multiply;
+            transition: transform 0.4s ease;
+            cursor: pointer;
+        }
 
-/* Alternative si mix-blend-mode ne fonctionne pas bien */
-.hero-logo img:hover {
-    transform: scale(1.05);
-    transition: transform 0.3s ease;
-}
+        .hero-logo img:hover {
+            transform: scale(1.1) rotate(-5deg);
+        }
 
-/* TEXTE AU CENTRE */
-.hero-content {
-    flex: 0 1 600px;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
+        .hero-content {
+            flex: 0 1 600px;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
 
-.hero-badge {
-    display: inline-block;
-    background: rgba(245,166,35,0.2);
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    padding: 8px 20px;
-    border-radius: 25px;
-    font-size: 0.85em;
-    font-weight: 600;
-    margin-bottom: 20px;
-    letter-spacing: 1px;
-}
+        .hero-badge {
+            display: inline-block;
+            background: rgba(245,166,35,0.2);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
 
-.hero h1 {
-    color: var(--white);
-    font-size: 2.5em;
-    line-height: 1.2;
-    margin-bottom: 15px;
-}
+        .hero h1 {
+            color: var(--white);
+            font-size: 2.5em;
+            line-height: 1.2;
+            margin-bottom: 15px;
+        }
 
-.hero h1 .highlight { color: var(--gold); }
+        .hero h1 .highlight { color: var(--gold); }
 
-.hero p {
-    color: rgba(255,255,255,0.8);
-    font-size: 1.1em;
-    margin: 10px 0 20px;
-    line-height: 1.6;
-}
+        .hero p {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1em;
+            margin: 10px 0 20px;
+            line-height: 1.6;
+        }
 
-.hero-tags {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 15px 0;
-    justify-content: center;
-}
+        .hero-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+            justify-content: center;
+        }
 
-.hero-tags span {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: var(--white);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85em;
-}
+        .hero-tags span {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--white);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
 
-.hero-buttons {
-    display: flex;
-    gap: 15px;
-    margin: 20px 0;
-    flex-wrap: wrap;
-    justify-content: center;
-}
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
 
-.btn-secondary {
-    background: rgba(255,255,255,0.15);
-    color: var(--white);
-    border: 2px solid var(--white);
-}
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            color: var(--white);
+            border: 2px solid var(--white);
+        }
 
-.btn-secondary:hover { background: rgba(255,255,255,0.25); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.25); }
 
-.next-match-banner {
-    background: linear-gradient(90deg, var(--gold-dark), var(--gold));
-    color: var(--violet-dark);
-    padding: 15px 25px;
-    border-radius: 12px;
-    font-weight: 600;
-    text-align: center;
-    margin-top: 20px;
-    max-width: 500px;
-}
+        .next-match-banner {
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+            color: var(--violet-dark);
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 20px;
+            max-width: 500px;
+        }
 
-.next-match-banner .label {
-    color: var(--danger);
-    font-weight: 800;
-    font-size: 0.9em;
-    margin-bottom: 5px;
-}
+        .next-match-banner .label {
+            color: var(--danger);
+            font-weight: 800;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
 
-/* PHOTO ÉQUIPE À DROITE - PLUS GRANDE */
-.hero-image {
-    flex: 0 0 auto;
-    z-index: 1;
-    text-align: center;
-}
+        /* ===== COMPTE À REBOURS ===== */
+        .countdown-banner {
+            background: linear-gradient(90deg, var(--violet-dark), var(--violet-light));
+            color: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: center;
+            border: 2px solid var(--gold);
+            animation: pulse 2s infinite;
+        }
 
-.hero-image img {
-    width: 340px;
-    border-radius: 15px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    object-fit: cover;
-    border: 3px solid var(--gold);
-}
+        .countdown-banner .countdown-label {
+            font-size: 0.9em;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
 
-.hero-image .caption {
-    color: rgba(255,255,255,0.7);
-    text-align: center;
-    margin-top: 10px;
-    font-size: 0.85em;
-}
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
 
-/* RESPONSIVE - GRAND ÉCRAN */
-@media (min-width: 1400px) {
-    .hero-logo img { width: 280px; }
-    .hero-image img { width: 380px; }
-    .hero h1 { font-size: 3em; }
-}
+        .countdown-unit {
+            background: rgba(255,255,255,0.15);
+            padding: 10px 15px;
+            border-radius: 10px;
+            min-width: 70px;
+        }
 
-/* RESPONSIVE - TABLETTE */
-@media (max-width: 1100px) {
-    .hero { gap: 30px; padding: 50px 30px; }
-    .hero-logo img { width: 200px; }
-    .hero-image img { width: 280px; }
-}
+        .countdown-unit .number {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: var(--gold);
+            display: block;
+        }
 
-/* RESPONSIVE - MOBILE */
-@media (max-width: 900px) {
-    .hero {
-        flex-direction: column;
-        padding: 40px 20px;
-        gap: 25px;
-    }
-    .hero-logo img { width: 160px; }
-    .hero h1 { font-size: 1.8em; }
-    .hero-image img { width: 90%; max-width: 320px; }
-}
+        .countdown-unit .unit {
+            font-size: 0.75em;
+            opacity: 0.9;
+        }
 
+        .hero-image {
+            flex: 0 0 auto;
+            z-index: 1;
+            text-align: center;
+            animation: fadeInRight 1s ease-out;
+        }
+
+        .hero-image img {
+            width: 340px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            object-fit: cover;
+            border: 3px solid var(--gold);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: pointer;
+        }
+
+        .hero-image img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 25px 50px rgba(245,166,35,0.5);
+        }
+
+        .hero-image .caption {
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+
+        @media (min-width: 1400px) {
+            .hero-logo img { width: 280px; }
+            .hero-image img { width: 380px; }
+            .hero h1 { font-size: 3em; }
+        }
+
+        @media (max-width: 1100px) {
+            .hero { gap: 30px; padding: 50px 30px; }
+            .hero-logo img { width: 200px; }
+            .hero-image img { width: 280px; }
+        }
 
         /* ===== SECTIONS ===== */
         .section {
             padding: 50px 40px;
             max-width: 1200px;
             margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out;
         }
 
         .section-title { text-align: center; font-size: 2em; color: var(--violet-dark); margin-bottom: 10px; }
@@ -352,13 +408,13 @@
             border-left: 4px solid transparent;
         }
 
-        .menu-item:hover { background: #ede0f5; border-left-color: var(--violet-light); }
+        .menu-item:hover { background: #ede0f5; border-left-color: var(--violet-light); transform: translateX(5px); }
         .menu-item h4 { color: var(--text-dark); margin-bottom: 3px; }
         .menu-item p { color: var(--gray-dark); font-size: 0.85em; }
 
         /* ===== PAGES ===== */
         .page { display: none; }
-        .page.active { display: block; }
+        .page.active { display: block; animation: fadeInUp 0.5s ease-out; }
 
         .page-header {
             display: flex;
@@ -489,6 +545,124 @@
             justify-content: center;
         }
 
+        /* ===== STAFF CARDS ===== */
+        .staff-card {
+            background: linear-gradient(135deg, var(--violet-mid), var(--violet-dark));
+            color: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .staff-card:hover { transform: translateY(-5px); }
+        .staff-card h4 { color: var(--gold); margin-bottom: 5px; font-size: 1.15em; }
+        .staff-card .role { color: var(--white); font-weight: 600; font-size: 0.9em; }
+        .staff-card .details { color: rgba(255,255,255,0.8); font-size: 0.85em; margin-top: 8px; }
+        .staff-photo {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            display: block;
+            border: 4px solid var(--gold);
+            background-color: #f0e6ff;
+        }
+
+        /* ===== GALERIE ===== */
+        .galerie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .galerie-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+            aspect-ratio: 4/3;
+        }
+
+        .galerie-item:hover { transform: scale(1.03); }
+
+        .galerie-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .galerie-item:hover img { transform: scale(1.1); }
+
+        .galerie-item .caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 30px 15px 15px;
+            font-size: 0.9em;
+        }
+
+        .galerie-item .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(231,76,60,0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1em;
+            display: none;
+        }
+
+        body.is-admin .galerie-item .delete-btn { display: flex; align-items: center; justify-content: center; }
+
+        /* Modal galerie en grand */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lightbox.active { display: flex; }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(245,166,35,0.4);
+        }
+
+        .lightbox .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
         /* ===== MESSAGES ===== */
         .messages-container { max-width: 800px; margin: 0 auto; }
 
@@ -569,9 +743,9 @@
         }
 
         .btn-primary { background: var(--violet-mid); color: var(--white); }
-        .btn-primary:hover { background: var(--violet-dark); }
+        .btn-primary:hover { background: var(--violet-dark); transform: translateY(-2px); }
         .btn-gold { background: var(--gold); color: var(--violet-dark); }
-        .btn-gold:hover { background: var(--gold-dark); }
+        .btn-gold:hover { background: var(--gold-dark); transform: translateY(-2px); }
         .btn-danger { background: var(--danger); color: var(--white); }
         .btn-danger:hover { background: #c0392b; }
         .btn-success { background: var(--success); color: var(--white); }
@@ -600,6 +774,7 @@
             max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.3s ease-out;
         }
 
         .modal h3 { color: var(--violet-dark); margin-bottom: 25px; font-size: 1.5em; }
@@ -634,11 +809,7 @@
             margin-top: 10px;
         }
 
-        .photo-help {
-            font-size: 0.8em;
-            color: var(--gray-dark);
-            margin-top: 5px;
-        }
+        .photo-help { font-size: 0.8em; color: var(--gray-dark); margin-top: 5px; }
 
         /* ===== LOGIN ===== */
         .login-container {
@@ -684,10 +855,7 @@
         .empty-state .emoji { font-size: 3em; margin-bottom: 15px; display: block; }
 
         /* ===== VENUE CARD ===== */
-        .venue-card {
-            max-width: 380px;
-            margin: 20px auto;
-        }
+        .venue-card { max-width: 380px; margin: 20px auto; }
 
         .venue-card a {
             display: flex;
@@ -711,20 +879,86 @@
         }
 
         .venue-icon { font-size: 1.8em; }
-
         .venue-text strong {
             display: block;
             color: var(--violet-mid);
             font-size: 1.1em;
             margin-bottom: 3px;
         }
+        .venue-address { font-size: 0.87em; color: var(--gray-dark); }
 
-        .venue-address {
-            font-size: 0.87em;
-            color: var(--gray-dark);
+        /* ===== FOOTER ===== */
+        .footer {
+            background: linear-gradient(135deg, var(--violet-dark), var(--violet-mid));
+            color: var(--white);
+            padding: 50px 40px 20px;
+            margin-top: 60px;
         }
 
-        /* ===== RESPONSIVE ===== */
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-column h4 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+
+        .footer-column p, .footer-column a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            line-height: 1.8;
+            font-size: 0.9em;
+            display: block;
+        }
+
+        .footer-column a:hover { color: var(--gold); padding-left: 5px; transition: all 0.2s; }
+
+        .social-icons {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .social-icons a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            transition: all 0.3s;
+        }
+
+        .social-icons a:hover {
+            background: var(--gold);
+            color: var(--violet-dark);
+            transform: translateY(-3px) scale(1.1);
+            padding-left: 0;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            font-size: 0.85em;
+        }
+
+        .footer-bottom .heart { color: var(--danger); }
+
+        /* ===== RESPONSIVE MOBILE ===== */
         @media (max-width: 900px) {
             .navbar { padding: 10px 15px; height: auto; flex-wrap: wrap; }
             .navbar-logo img { height: 45px; }
@@ -745,9 +979,9 @@
                 padding: 40px 20px;
                 gap: 25px;
             }
-            .hero-logo img { width: 140px; }
+            .hero-logo img { width: 160px; }
             .hero h1 { font-size: 1.8em; }
-            .hero-image img { width: 90%; max-width: 280px; }
+            .hero-image img { width: 90%; max-width: 320px; }
         }
 
         @media (max-width: 768px) {
@@ -756,6 +990,9 @@
             .modal { padding: 20px; margin: 10px; }
             .data-table { font-size: 0.8em; }
             .data-table th, .data-table td { padding: 8px 6px; }
+            .footer { padding: 30px 20px 15px; }
+            .countdown-unit .number { font-size: 1.4em; }
+            .countdown-unit { padding: 8px 12px; min-width: 60px; }
         }
     </style>
 </head>
@@ -766,19 +1003,18 @@
         <div class="navbar-logo">
             <img src="logo.png" alt="Logo AL Chazeau Fayol">
         </div>
-        
         <span class="navbar-brand" onclick="showPage('accueil')">🏀 AL CHAZEAU FAYOL BASKET</span>
-        
         <div class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">
             <span></span><span></span><span></span>
         </div>
-        
         <div class="navbar-links" id="navLinks">
             <a onclick="showPage('accueil')" class="active" id="nav-accueil">Accueil</a>
             <a onclick="showPage('calendrier')" id="nav-calendrier">Calendrier</a>
             <a onclick="showPage('resultats')" id="nav-resultats">Résultats</a>
             <a onclick="showPage('classement')" id="nav-classement">Classement</a>
             <a onclick="showPage('effectif')" id="nav-effectif">Effectif</a>
+            <a onclick="showPage('staff')" id="nav-staff">Staff</a>
+            <a onclick="showPage('galerie')" id="nav-galerie">Galerie</a>
             <a onclick="showPage('stats')" id="nav-stats">Stats</a>
             <a onclick="showPage('infos')" id="nav-infos">Infos</a>
             <a onclick="showPage('messagerie')" id="nav-messagerie">Messagerie</a>
@@ -790,49 +1026,46 @@
 
     <!-- PAGE ACCUEIL -->
     <div id="page-accueil" class="page active">
-
-        <!-- SECTION HERO -->
         <section class="hero">
-            <!-- Logo à GAUCHE -->
             <div class="hero-logo">
                 <img src="logo.png" alt="Logo AL Chazeau Fayol">
             </div>
-
-            <!-- Texte au CENTRE -->
             <div class="hero-content">
                 <span class="hero-badge">ÉQUIPE PNM 🏆 LIGUE AUVERGNE RHÔNE-ALPES</span>
                 <h1>BIENVENUE SUR<br>L'ESPACE <span class="highlight">PNM ALCF BASKET</span></h1>
                 <p>Site officiel de l'équipe</p>
-
                 <div class="hero-tags">
                     <span>👕 Maillot violet</span>
                     <span>🏀 Club officiel</span>
                 </div>
-
                 <div class="hero-buttons">
                     <a onclick="showPage('effectif')" class="btn btn-primary">Voir l'effectif</a>
                     <a onclick="showPage('calendrier')" class="btn btn-secondary">Calendrier</a>
                 </div>
-
                 <div class="next-match-banner">
                     <div class="label">🔴 Prochain match :</div>
                     <div id="nextMatchText">Chargement...</div>
                 </div>
+                <!-- COMPTE À REBOURS -->
+                <div class="countdown-banner" id="countdownBanner" style="display:none">
+                    <div class="countdown-label">⏰ PROCHAIN MATCH DANS :</div>
+                    <div class="countdown-display">
+                        <div class="countdown-unit"><span class="number" id="cdDays">0</span><span class="unit">Jours</span></div>
+                        <div class="countdown-unit"><span class="number" id="cdHours">0</span><span class="unit">Heures</span></div>
+                        <div class="countdown-unit"><span class="number" id="cdMinutes">0</span><span class="unit">Minutes</span></div>
+                        <div class="countdown-unit"><span class="number" id="cdSeconds">0</span><span class="unit">Secondes</span></div>
+                    </div>
+                </div>
             </div>
-
-            <!-- Photo équipe à DROITE -->
             <div class="hero-image">
                 <img src="equipe-2025-2026.png" alt="Équipe PNM 2025-2026" onerror="this.src='photo équipe 2025_2026.png'">
                 <div class="caption">Équipe PNM – AL Chazeau Fayol Basket</div>
             </div>
         </section>
 
-        <!-- MENU PRINCIPAL -->
         <div class="section">
             <h2 class="section-title">Menu principal</h2>
             <p class="section-subtitle">Choisis une rubrique pour accéder rapidement aux informations de l'équipe.</p>
-
-            <!-- CARTE SALLE GM4 FIRMINY -->
             <div class="venue-card">
                 <a href="https://www.google.com/maps/search/?api=1&query=Salle+GM4+Firminy" target="_blank" rel="noopener">
                     <div class="venue-icon">📍</div>
@@ -842,7 +1075,6 @@
                     </div>
                 </a>
             </div>
-
             <div class="menu-grid">
                 <div class="menu-card">
                     <h3>🏆 Compétition</h3>
@@ -856,18 +1088,20 @@
                     <p>Centralise les messages importants de l'équipe PNM.</p>
                     <div class="menu-item" onclick="showPage('infos')"><h4>📌 Infos du club</h4><p>Horaires, salle, annonces, documents.</p></div>
                     <div class="menu-item" onclick="showPage('messagerie')"><h4>💬 Messagerie</h4><p>Messages staff, dirigeants, groupe PNM.</p></div>
+                    <div class="menu-item" onclick="showPage('galerie')"><h4>📸 Galerie photos</h4><p>Photos des matchs et événements.</p></div>
                 </div>
                 <div class="menu-card">
-                    <h3>👥 Effectif & statistiques</h3>
+                    <h3>👥 Équipe & statistiques</h3>
                     <p>Consulte les joueurs et les performances.</p>
                     <div class="menu-item" onclick="showPage('effectif')"><h4>🧑‍🤝‍🧑 Effectif PNM</h4><p>Fiches joueurs, contacts, maillots.</p></div>
+                    <div class="menu-item" onclick="showPage('staff')"><h4>👔 Staff</h4><p>Entraîneur, dirigeants, coach.</p></div>
                     <div class="menu-item" onclick="showPage('stats')"><h4>📈 Statistiques</h4><p>Points, rebonds, victoires, défaites.</p></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PAGE CALENDRIER -->
+    <!-- PAGES SECONDAIRES -->
     <div id="page-calendrier" class="page">
         <div class="page-header">
             <h2>📅 Calendrier des matchs</h2>
@@ -881,7 +1115,6 @@
         </div>
     </div>
 
-    <!-- PAGE RÉSULTATS -->
     <div id="page-resultats" class="page">
         <div class="page-header">
             <h2>📊 Résultats des matchs</h2>
@@ -895,7 +1128,6 @@
         </div>
     </div>
 
-    <!-- PAGE CLASSEMENT -->
     <div id="page-classement" class="page">
         <div class="page-header">
             <h2>🥇 Classement PNM</h2>
@@ -909,7 +1141,6 @@
         </div>
     </div>
 
-    <!-- PAGE EFFECTIF -->
     <div id="page-effectif" class="page">
         <div class="page-header">
             <h2>👥 Effectif PNM</h2>
@@ -920,7 +1151,28 @@
         </div>
     </div>
 
-    <!-- PAGE STATS -->
+    <!-- PAGE STAFF -->
+    <div id="page-staff" class="page">
+        <div class="page-header">
+            <h2>👔 Staff & Dirigeants</h2>
+            <button class="btn btn-gold admin-only" onclick="openModal('staff')">+ Ajouter membre staff</button>
+        </div>
+        <div class="page-content">
+            <div class="players-grid" id="staffGrid"><div class="empty-state"><span class="emoji">👔</span>Chargement du staff...</div></div>
+        </div>
+    </div>
+
+    <!-- PAGE GALERIE -->
+    <div id="page-galerie" class="page">
+        <div class="page-header">
+            <h2>📸 Galerie photos</h2>
+            <button class="btn btn-gold admin-only" onclick="openModal('photo')">+ Ajouter une photo</button>
+        </div>
+        <div class="page-content">
+            <div class="galerie-grid" id="galerieGrid"><div class="empty-state"><span class="emoji">📸</span>Aucune photo pour le moment</div></div>
+        </div>
+    </div>
+
     <div id="page-stats" class="page">
         <div class="page-header">
             <h2>📈 Statistiques</h2>
@@ -934,30 +1186,14 @@
                 <div class="stat-card"><div class="value" id="statMatchs">-</div><div class="label">Matchs joués</div></div>
                 <div class="stat-card"><div class="value" id="statPtsMoy">-</div><div class="label">Points/match</div></div>
             </div>
-
             <h3 class="stats-section-title">🏀 Stats individuelles</h3>
             <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Joueur</th>
-                        <th>🎯 3pts</th>
-                        <th>✌️ 2pts</th>
-                        <th>☝️ 1pt (LF)</th>
-                        <th>📊 Total pts</th>
-                        <th>🟥 Fautes</th>
-                        <th>🏀 Matchs</th>
-                        <th>⏱️ Temps</th>
-                        <th class="admin-only">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="statsIndivBody">
-                    <tr><td colspan="9"><div class="empty-state"><span class="emoji">📈</span>Aucune stat individuelle</div></td></tr>
-                </tbody>
+                <thead><tr><th>Joueur</th><th>🎯 3pts</th><th>✌️ 2pts</th><th>☝️ 1pt</th><th>📊 Total</th><th>🟥 Fautes</th><th>🏀 Matchs</th><th>⏱️ Temps</th><th class="admin-only">Actions</th></tr></thead>
+                <tbody id="statsIndivBody"><tr><td colspan="9"><div class="empty-state"><span class="emoji">📈</span>Aucune stat individuelle</div></td></tr></tbody>
             </table>
         </div>
     </div>
 
-    <!-- PAGE INFOS -->
     <div id="page-infos" class="page">
         <div class="page-header">
             <h2>📌 Infos du club</h2>
@@ -968,7 +1204,6 @@
         </div>
     </div>
 
-    <!-- PAGE MESSAGERIE -->
     <div id="page-messagerie" class="page">
         <div class="page-header">
             <h2>💬 Messagerie</h2>
@@ -979,7 +1214,6 @@
         </div>
     </div>
 
-    <!-- PAGE LOGIN -->
     <div id="page-login" class="page">
         <div class="login-container">
             <div class="emoji">🏀</div>
@@ -990,16 +1224,54 @@
                 <button class="btn btn-primary" onclick="doLogin()" style="width:100%">Se connecter</button>
                 <button class="btn btn-gold" onclick="doRegister()" style="width:100%">Créer un compte</button>
             </div>
-            <p style="margin-top:15px; font-size:0.85em; color:var(--gray-dark);">
-                Crée un compte pour accéder à la messagerie.<br>
-                Demande les droits admin au responsable.
-            </p>
+            <p style="margin-top:15px; font-size:0.85em; color:var(--gray-dark);">Crée un compte pour accéder à la messagerie.<br>Demande les droits admin au responsable.</p>
         </div>
     </div>
 
-    <!-- ============================================ MODALS ============================================ -->
+    <!-- ============== FOOTER ============== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>🏀 AL Chazeau Fayol</h4>
+                <p>Club de basketball passionné, basé à Firminy. Équipe PNM en Ligue Auvergne-Rhône-Alpes.</p>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/" target="_blank" title="Facebook">📘</a>
+                    <a href="https://www.instagram.com/" target="_blank" title="Instagram">📷</a>
+                    <a href="https://www.youtube.com/" target="_blank" title="YouTube">📺</a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h4>📍 Notre salle</h4>
+                <p><strong>Salle GM4 Firminy</strong></p>
+                <a href="https://www.google.com/maps/search/?api=1&query=Salle+GM4+Firminy" target="_blank">🗺️ Voir sur Google Maps</a>
+            </div>
+            <div class="footer-column">
+                <h4>🔗 Liens rapides</h4>
+                <a onclick="showPage('calendrier')" style="cursor:pointer">📅 Calendrier</a>
+                <a onclick="showPage('effectif')" style="cursor:pointer">👥 Effectif</a>
+                <a onclick="showPage('classement')" style="cursor:pointer">🥇 Classement</a>
+                <a onclick="showPage('galerie')" style="cursor:pointer">📸 Galerie</a>
+            </div>
+            <div class="footer-column">
+                <h4>✉️ Contact</h4>
+                <a href="mailto:contact@alcf-basket.fr">📧 contact@alcf-basket.fr</a>
+                <a href="tel:+33600000000">📱 06 00 00 00 00</a>
+                <a onclick="showPage('messagerie')" style="cursor:pointer">💬 Messagerie en ligne</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 AL Chazeau Fayol Basket – Tous droits réservés</p>
+            <p>Fait avec <span class="heart">❤️</span> pour les passionnés de basket 🏀</p>
+        </div>
+    </footer>
 
-    <!-- Modal Match -->
+    <!-- LIGHTBOX GALERIE -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="close-btn" onclick="closeLightbox()">✕</button>
+        <img id="lightboxImg" src="" alt="">
+    </div>
+
+    <!-- MODALS -->
     <div class="modal-overlay" id="modal-match">
         <div class="modal">
             <h3>📅 Match</h3>
@@ -1008,7 +1280,7 @@
             <div class="form-group"><label>Heure</label><input type="time" id="matchHeure" value="20:00"></div>
             <div class="form-group"><label>Adversaire</label><input type="text" id="matchAdversaire" placeholder="Ex: BC Saint-Étienne"></div>
             <div class="form-group"><label>Lieu</label><select id="matchLieu"><option value="Domicile">🏠 Domicile</option><option value="Extérieur">🚗 Extérieur</option></select></div>
-            <div class="form-group"><label>Salle</label><input type="text" id="matchSalle" placeholder="Salle GM4 Firminy" value="Salle GM4 Firminy"></div>
+            <div class="form-group"><label>Salle</label><input type="text" id="matchSalle" value="Salle GM4 Firminy"></div>
             <div class="form-actions">
                 <button class="btn btn-danger" onclick="closeModal('match')">Annuler</button>
                 <button class="btn btn-gold" onclick="saveMatch()">💾 Enregistrer</button>
@@ -1016,15 +1288,14 @@
         </div>
     </div>
 
-    <!-- Modal Résultat -->
     <div class="modal-overlay" id="modal-resultat">
         <div class="modal">
             <h3>📊 Résultat</h3>
             <input type="hidden" id="resultatId">
             <div class="form-group"><label>Date</label><input type="date" id="resultatDate"></div>
-            <div class="form-group"><label>Adversaire</label><input type="text" id="resultatAdversaire" placeholder="Ex: BC Saint-Étienne"></div>
-            <div class="form-group"><label>Score ALCF</label><input type="number" id="resultatScoreALCF" placeholder="72"></div>
-            <div class="form-group"><label>Score Adversaire</label><input type="number" id="resultatScoreAdv" placeholder="65"></div>
+            <div class="form-group"><label>Adversaire</label><input type="text" id="resultatAdversaire"></div>
+            <div class="form-group"><label>Score ALCF</label><input type="number" id="resultatScoreALCF"></div>
+            <div class="form-group"><label>Score Adversaire</label><input type="number" id="resultatScoreAdv"></div>
             <div class="form-actions">
                 <button class="btn btn-danger" onclick="closeModal('resultat')">Annuler</button>
                 <button class="btn btn-gold" onclick="saveResultat()">💾 Enregistrer</button>
@@ -1032,23 +1303,22 @@
         </div>
     </div>
 
-    <!-- Modal Joueur -->
     <div class="modal-overlay" id="modal-joueur">
         <div class="modal">
             <h3>👤 Joueur</h3>
             <input type="hidden" id="joueurId">
-            <div class="form-group"><label>Prénom</label><input type="text" id="joueurPrenom" placeholder="Prénom"></div>
-            <div class="form-group"><label>Nom</label><input type="text" id="joueurNom" placeholder="Nom"></div>
-            <div class="form-group"><label>Numéro de maillot</label><input type="number" id="joueurNumero" placeholder="7"></div>
-            <div class="form-group"><label>Poste</label><select id="joueurPoste"><option value="Meneur">Meneur Poste 1</option><option value="Arrière">Arrière (SG)</option><option value="Ailier">Ailier (SF)</option><option value="Ailier fort">Ailier fort (PF)</option><option value="Pivot">Pivot (C)</option></select></div>
+            <div class="form-group"><label>Prénom</label><input type="text" id="joueurPrenom"></div>
+            <div class="form-group"><label>Nom</label><input type="text" id="joueurNom"></div>
+            <div class="form-group"><label>Numéro de maillot</label><input type="number" id="joueurNumero"></div>
+            <div class="form-group"><label>Poste</label><select id="joueurPoste"><option value="Meneur">Meneur</option><option value="Arrière">Arrière</option><option value="Ailier">Ailier</option><option value="Ailier fort">Ailier fort</option><option value="Pivot">Pivot</option></select></div>
             <div class="form-group"><label>📅 Date de naissance</label><input type="date" id="joueurDateNaissance"></div>
-            <div class="form-group"><label>Taille (cm)</label><input type="number" id="joueurTaille" placeholder="185"></div>
-            <div class="form-group"><label>🪪 Numéro de licence</label><input type="text" id="joueurLicence" placeholder="Ex: 1234567"></div>
-            <div class="form-group"><label>📱 Numéro de téléphone</label><input type="tel" id="joueurTel" placeholder="Ex: 06 12 34 56 78"></div>
-            <div class="form-group"><label>📧 Adresse email</label><input type="email" id="joueurEmail" placeholder="Ex: romario@gmail.com"></div>
+            <div class="form-group"><label>Taille (cm)</label><input type="number" id="joueurTaille"></div>
+            <div class="form-group"><label>🪪 Licence</label><input type="text" id="joueurLicence"></div>
+            <div class="form-group"><label>📱 Téléphone</label><input type="tel" id="joueurTel"></div>
+            <div class="form-group"><label>📧 Email</label><input type="email" id="joueurEmail"></div>
             <div class="form-group">
-                <label>📸 Photo du joueur (URL)</label>
-                <input type="url" id="joueurPhoto" placeholder="https://i.imgur.com/xxxxx.png" oninput="previewPhoto(this.value)">
+                <label>📸 Photo (URL)</label>
+                <input type="url" id="joueurPhoto" oninput="previewPhoto(this.value)">
                 <p class="photo-help">Colle le lien direct de la photo</p>
                 <img id="photoPreview" class="photo-preview" style="display:none">
             </div>
@@ -1059,17 +1329,65 @@
         </div>
     </div>
 
-    <!-- Modal Classement -->
+    <!-- MODAL STAFF -->
+    <div class="modal-overlay" id="modal-staff">
+        <div class="modal">
+            <h3>👔 Membre du staff</h3>
+            <input type="hidden" id="staffId">
+            <div class="form-group"><label>Prénom</label><input type="text" id="staffPrenom"></div>
+            <div class="form-group"><label>Nom</label><input type="text" id="staffNom"></div>
+            <div class="form-group"><label>Rôle</label><select id="staffRole">
+                <option value="Entraîneur">🏀 Entraîneur</option>
+                <option value="Entraîneur adjoint">👨‍🏫 Entraîneur adjoint</option>
+                <option value="Président">👔 Président</option>
+                <option value="Dirigeant">🎯 Dirigeant</option>
+                <option value="Coach">📋 Coach</option>
+                <option value="Préparateur physique">💪 Préparateur physique</option>
+                <option value="Kiné">🩺 Kiné</option>
+                <option value="Responsable">⭐ Responsable</option>
+            </select></div>
+            <div class="form-group"><label>📱 Téléphone</label><input type="tel" id="staffTel"></div>
+            <div class="form-group"><label>📧 Email</label><input type="email" id="staffEmail"></div>
+            <div class="form-group">
+                <label>📸 Photo (URL)</label>
+                <input type="url" id="staffPhoto" oninput="previewStaffPhoto(this.value)">
+                <img id="staffPhotoPreview" class="photo-preview" style="display:none">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-danger" onclick="closeModal('staff')">Annuler</button>
+                <button class="btn btn-gold" onclick="saveStaff()">💾 Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PHOTO GALERIE -->
+    <div class="modal-overlay" id="modal-photo">
+        <div class="modal">
+            <h3>📸 Ajouter une photo</h3>
+            <input type="hidden" id="photoId">
+            <div class="form-group">
+                <label>URL de la photo</label>
+                <input type="url" id="photoUrl" placeholder="https://i.imgur.com/xxxxx.png">
+                <p class="photo-help">Conseil : utilise <a href="https://imgur.com" target="_blank" style="color:var(--violet-mid)">imgur.com</a> pour héberger tes photos gratuitement</p>
+            </div>
+            <div class="form-group"><label>Légende (optionnel)</label><input type="text" id="photoLegende" placeholder="Ex: Match vs BC Saint-Étienne"></div>
+            <div class="form-actions">
+                <button class="btn btn-danger" onclick="closeModal('photo')">Annuler</button>
+                <button class="btn btn-gold" onclick="savePhoto()">💾 Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="modal-classement">
         <div class="modal">
             <h3>🥇 Classement</h3>
             <input type="hidden" id="classementId">
-            <div class="form-group"><label>Position</label><input type="number" id="classementPos" placeholder="1"></div>
-            <div class="form-group"><label>Équipe</label><input type="text" id="classementEquipe" placeholder="ALCF Basket"></div>
-            <div class="form-group"><label>Matchs joués</label><input type="number" id="classementMJ" placeholder="0"></div>
-            <div class="form-group"><label>Victoires</label><input type="number" id="classementV" placeholder="0"></div>
-            <div class="form-group"><label>Défaites</label><input type="number" id="classementD" placeholder="0"></div>
-            <div class="form-group"><label>Points</label><input type="number" id="classementPts" placeholder="0"></div>
+            <div class="form-group"><label>Position</label><input type="number" id="classementPos"></div>
+            <div class="form-group"><label>Équipe</label><input type="text" id="classementEquipe"></div>
+            <div class="form-group"><label>Matchs joués</label><input type="number" id="classementMJ"></div>
+            <div class="form-group"><label>Victoires</label><input type="number" id="classementV"></div>
+            <div class="form-group"><label>Défaites</label><input type="number" id="classementD"></div>
+            <div class="form-group"><label>Points</label><input type="number" id="classementPts"></div>
             <div class="form-actions">
                 <button class="btn btn-danger" onclick="closeModal('classement')">Annuler</button>
                 <button class="btn btn-gold" onclick="saveClassement()">💾 Enregistrer</button>
@@ -1077,13 +1395,12 @@
         </div>
     </div>
 
-    <!-- Modal Info -->
     <div class="modal-overlay" id="modal-info">
         <div class="modal">
             <h3>📌 Info</h3>
             <input type="hidden" id="infoId">
-            <div class="form-group"><label>Titre</label><input type="text" id="infoTitre" placeholder="Horaires d'entraînement"></div>
-            <div class="form-group"><label>Contenu</label><textarea id="infoContenu" placeholder="Détails..." rows="5"></textarea></div>
+            <div class="form-group"><label>Titre</label><input type="text" id="infoTitre"></div>
+            <div class="form-group"><label>Contenu</label><textarea id="infoContenu" rows="5"></textarea></div>
             <div class="form-actions">
                 <button class="btn btn-danger" onclick="closeModal('info')">Annuler</button>
                 <button class="btn btn-gold" onclick="saveInfo()">💾 Enregistrer</button>
@@ -1091,11 +1408,10 @@
         </div>
     </div>
 
-    <!-- Modal Message -->
     <div class="modal-overlay" id="modal-message">
         <div class="modal">
             <h3>💬 Nouveau message</h3>
-            <div class="form-group"><label>Message</label><textarea id="messageTexte" placeholder="Écris ton message..." rows="4"></textarea></div>
+            <div class="form-group"><label>Message</label><textarea id="messageTexte" rows="4"></textarea></div>
             <div class="form-actions">
                 <button class="btn btn-danger" onclick="closeModal('message')">Annuler</button>
                 <button class="btn btn-gold" onclick="saveMessage()">📨 Envoyer</button>
@@ -1103,21 +1419,17 @@
         </div>
     </div>
 
-    <!-- Modal Stats Individuelles -->
     <div class="modal-overlay" id="modal-statsIndiv">
         <div class="modal">
             <h3>🏀 Stats individuelles</h3>
             <input type="hidden" id="statsIndivId">
-            <div class="form-group">
-                <label>Joueur</label>
-                <select id="statsIndivJoueur"><option value="">-- Choisir un joueur --</option></select>
-            </div>
-            <div class="form-group"><label>🎯 Paniers à 3 points</label><input type="number" id="statsIndiv3pts" placeholder="0" value="0"></div>
-            <div class="form-group"><label>✌️ Paniers à 2 points</label><input type="number" id="statsIndiv2pts" placeholder="0" value="0"></div>
-            <div class="form-group"><label>☝️ Lancers francs (1 point)</label><input type="number" id="statsIndiv1pt" placeholder="0" value="0"></div>
-            <div class="form-group"><label>🟥 Fautes commises</label><input type="number" id="statsIndivFautes" placeholder="0" value="0"></div>
-            <div class="form-group"><label>🏀 Nombre de matchs</label><input type="number" id="statsIndivMatchs" placeholder="0" value="0"></div>
-            <div class="form-group"><label>⏱️ Temps de jeu (minutes)</label><input type="number" id="statsIndivTemps" placeholder="0" value="0"></div>
+            <div class="form-group"><label>Joueur</label><select id="statsIndivJoueur"><option value="">-- Choisir --</option></select></div>
+            <div class="form-group"><label>🎯 Paniers à 3 points</label><input type="number" id="statsIndiv3pts" value="0"></div>
+            <div class="form-group"><label>✌️ Paniers à 2 points</label><input type="number" id="statsIndiv2pts" value="0"></div>
+            <div class="form-group"><label>☝️ Lancers francs</label><input type="number" id="statsIndiv1pt" value="0"></div>
+            <div class="form-group"><label>🟥 Fautes</label><input type="number" id="statsIndivFautes" value="0"></div>
+            <div class="form-group"><label>🏀 Matchs</label><input type="number" id="statsIndivMatchs" value="0"></div>
+            <div class="form-group"><label>⏱️ Temps de jeu (min)</label><input type="number" id="statsIndivTemps" value="0"></div>
             <div class="form-actions">
                 <button class="btn btn-danger" onclick="closeModal('statsIndiv')">Annuler</button>
                 <button class="btn btn-gold" onclick="saveStatsIndiv()">💾 Enregistrer</button>
@@ -1125,13 +1437,9 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
-        // ============================================
-        // 🔑 FIREBASE CONFIG
-        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyCYZuhh6iKsUMM-MBA3fANDGgCQOhANfVU",
             authDomain: "alcf-basket.firebaseapp.com",
@@ -1140,19 +1448,15 @@
             messagingSenderId: "1082312491425",
             appId: "1:1082312491425:web:646f4c5158d2707b0d8be0"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-
         const ADMIN_EMAILS = ["polocezar@gmail.com"];
-
         let currentUser = null;
         let isAdmin = false;
+        let countdownInterval = null;
+        let nextMatchDate = null;
 
-        // ============================================
-        // AUTH
-        // ============================================
         auth.onAuthStateChanged(user => {
             currentUser = user;
             if (user) {
@@ -1179,10 +1483,8 @@
             const e = document.getElementById('loginEmail').value;
             const p = document.getElementById('loginPassword').value;
             if (!e || !p) return showToast('Remplis tous les champs', 'error');
-            try {
-                await auth.signInWithEmailAndPassword(e, p);
-                showToast('Connecté ! 🏀', 'success');
-            } catch (err) { showToast('Email ou mot de passe incorrect', 'error'); }
+            try { await auth.signInWithEmailAndPassword(e, p); showToast('Connecté ! 🏀', 'success'); }
+            catch (err) { showToast('Email ou mot de passe incorrect', 'error'); }
         }
 
         async function doRegister() {
@@ -1190,21 +1492,12 @@
             const p = document.getElementById('loginPassword').value;
             if (!e || !p) return showToast('Remplis tous les champs', 'error');
             if (p.length < 6) return showToast('Mot de passe : 6 caractères min', 'error');
-            try {
-                await auth.createUserWithEmailAndPassword(e, p);
-                showToast('Compte créé ! Bienvenue 🏀', 'success');
-            } catch (err) { showToast('Erreur : ' + err.message, 'error'); }
+            try { await auth.createUserWithEmailAndPassword(e, p); showToast('Compte créé ! 🏀', 'success'); }
+            catch (err) { showToast('Erreur : ' + err.message, 'error'); }
         }
 
-        function doLogout() {
-            auth.signOut();
-            showToast('Déconnecté', 'info');
-            showPage('accueil');
-        }
+        function doLogout() { auth.signOut(); showToast('Déconnecté', 'info'); showPage('accueil'); }
 
-        // ============================================
-        // NAVIGATION
-        // ============================================
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.navbar-links a').forEach(a => a.classList.remove('active'));
@@ -1224,25 +1517,59 @@
                 case 'resultats': loadResultats(); break;
                 case 'classement': loadClassement(); break;
                 case 'effectif': loadEffectif(); break;
+                case 'staff': loadStaff(); break;
+                case 'galerie': loadGalerie(); break;
                 case 'stats': loadStats(); loadStatsIndiv(); break;
                 case 'infos': loadInfos(); break;
                 case 'messagerie': loadMessages(); break;
             }
         }
 
+        // ========== PROCHAIN MATCH + COMPTE À REBOURS ==========
         function loadNextMatch() {
             const today = new Date().toISOString().split('T')[0];
             db.collection('matchs').where('date', '>=', today).orderBy('date').limit(1).get().then(snap => {
                 if (!snap.empty) {
                     const m = snap.docs[0].data();
-                    document.getElementById('nextMatchText').textContent =
-                        'ALCF Basket vs ' + m.adversaire + ' · ' + formatDate(m.date) + ' ' + m.heure + ' – ' + m.salle;
+                    document.getElementById('nextMatchText').textContent = 'ALCF Basket vs ' + m.adversaire + ' · ' + formatDate(m.date) + ' ' + m.heure + ' – ' + m.salle;
+                    // Initialiser le compte à rebours
+                    nextMatchDate = new Date(m.date + 'T' + (m.heure || '20:00') + ':00');
+                    document.getElementById('countdownBanner').style.display = 'block';
+                    startCountdown();
                 } else {
                     document.getElementById('nextMatchText').textContent = 'Pas de prochain match programmé';
+                    document.getElementById('countdownBanner').style.display = 'none';
+                    if (countdownInterval) clearInterval(countdownInterval);
                 }
             }).catch(() => {
                 document.getElementById('nextMatchText').textContent = 'Pas de prochain match programmé';
+                document.getElementById('countdownBanner').style.display = 'none';
             });
+        }
+
+        function startCountdown() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        function updateCountdown() {
+            if (!nextMatchDate) return;
+            const now = new Date();
+            const diff = nextMatchDate - now;
+            if (diff <= 0) {
+                document.getElementById('countdownBanner').innerHTML = '<div class="countdown-label">🔥 LE MATCH A COMMENCÉ ! ALLEZ ALCF ! 🏀</div>';
+                clearInterval(countdownInterval);
+                return;
+            }
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById('cdDays').textContent = days;
+            document.getElementById('cdHours').textContent = hours;
+            document.getElementById('cdMinutes').textContent = minutes;
+            document.getElementById('cdSeconds').textContent = seconds;
         }
 
         function loadCalendrier() {
@@ -1287,10 +1614,7 @@
                 grid.innerHTML = snap.docs.map(doc => {
                     const j = doc.data();
                     const ini = ((j.prenom||'')[0]||'') + ((j.nom||'')[0]||'');
-                    const photoHTML = j.photo
-                        ? '<img src="'+j.photo+'" class="player-photo" alt="'+j.prenom+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="player-avatar" style="display:none">'+ini.toUpperCase()+'</div>'
-                        : '<div class="player-avatar">'+ini.toUpperCase()+'</div>';
-
+                    const photoHTML = j.photo ? '<img src="'+j.photo+'" class="player-photo" alt="'+j.prenom+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="player-avatar" style="display:none">'+ini.toUpperCase()+'</div>' : '<div class="player-avatar">'+ini.toUpperCase()+'</div>';
                     let age = '';
                     if (j.dateNaissance) {
                         const birth = new Date(j.dateNaissance);
@@ -1299,19 +1623,54 @@
                         if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) a--;
                         age = a + ' ans';
                     }
-
                     let details = '';
                     if (j.taille) details += j.taille + ' cm';
                     if (age) details += (details ? ' · ' : '') + age;
                     if (j.licence) details += (details ? '<br>' : '') + '🪪 ' + j.licence;
-
                     let contact = '';
                     if (j.telephone) contact += '<div class="player-contact">📱 <a href="tel:'+j.telephone+'">' + j.telephone + '</a></div>';
                     if (j.email) contact += '<div class="player-contact">📧 <a href="mailto:'+j.email+'">' + j.email + '</a></div>';
-
                     return '<div class="player-card"><div class="player-number">'+(j.numero||'?')+'</div>'+photoHTML+'<h4>'+j.prenom+' '+j.nom+'</h4><div class="position">'+(j.poste||'-')+'</div><div class="details">'+details+'</div>'+contact+'<div class="player-actions admin-only"><button class="btn btn-small btn-primary" onclick="editJoueur(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'joueurs\',\''+doc.id+'\')">🗑️</button></div></div>';
                 }).join('');
             });
+        }
+
+        // ========== LOAD STAFF ==========
+        function loadStaff() {
+            db.collection('staff').orderBy('createdAt', 'asc').onSnapshot(snap => {
+                const grid = document.getElementById('staffGrid');
+                if (snap.empty) { grid.innerHTML = '<div class="empty-state"><span class="emoji">👔</span>Aucun membre du staff</div>'; return; }
+                grid.innerHTML = snap.docs.map(doc => {
+                    const s = doc.data();
+                    const ini = ((s.prenom||'')[0]||'') + ((s.nom||'')[0]||'');
+                    const photoHTML = s.photo ? '<img src="'+s.photo+'" class="staff-photo" alt="'+s.prenom+'">' : '<div class="player-avatar" style="background:linear-gradient(135deg, var(--gold), var(--gold-dark)); color:var(--violet-dark)">'+ini.toUpperCase()+'</div>';
+                    let contact = '';
+                    if (s.telephone) contact += '<div style="margin-top:5px; font-size:0.85em">📱 <a href="tel:'+s.telephone+'" style="color:var(--gold)">' + s.telephone + '</a></div>';
+                    if (s.email) contact += '<div style="margin-top:5px; font-size:0.85em">📧 <a href="mailto:'+s.email+'" style="color:var(--gold)">' + s.email + '</a></div>';
+                    return '<div class="staff-card">'+photoHTML+'<h4>'+s.prenom+' '+s.nom+'</h4><div class="role">'+s.role+'</div>'+contact+'<div class="player-actions admin-only" style="margin-top:12px"><button class="btn btn-small btn-gold" onclick="editStaff(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'staff\',\''+doc.id+'\')">🗑️</button></div></div>';
+                }).join('');
+            });
+        }
+
+        // ========== LOAD GALERIE ==========
+        function loadGalerie() {
+            db.collection('galerie').orderBy('createdAt', 'desc').onSnapshot(snap => {
+                const grid = document.getElementById('galerieGrid');
+                if (snap.empty) { grid.innerHTML = '<div class="empty-state"><span class="emoji">📸</span>Aucune photo pour le moment.<br>Les admins peuvent en ajouter !</div>'; return; }
+                grid.innerHTML = snap.docs.map(doc => {
+                    const p = doc.data();
+                    return '<div class="galerie-item" onclick="openLightbox(\''+p.url+'\')"><img src="'+p.url+'" alt="'+(p.legende||'Photo')+'"><button class="delete-btn" onclick="event.stopPropagation();deleteDoc(\'galerie\',\''+doc.id+'\')">🗑️</button>'+(p.legende?'<div class="caption">'+p.legende+'</div>':'')+'</div>';
+                }).join('');
+            });
+        }
+
+        function openLightbox(url) {
+            document.getElementById('lightboxImg').src = url;
+            document.getElementById('lightbox').classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
         }
 
         function loadStats() {
@@ -1328,19 +1687,15 @@
         function loadStatsIndiv() {
             db.collection('statsIndiv').orderBy('totalPts', 'desc').onSnapshot(snap => {
                 const body = document.getElementById('statsIndivBody');
-                if (snap.empty) {
-                    body.innerHTML = '<tr><td colspan="9"><div class="empty-state"><span class="emoji">📈</span>Aucune stat individuelle.<br>Clique sur "+ Ajouter stats joueur"</div></td></tr>';
-                    return;
-                }
+                if (snap.empty) { body.innerHTML = '<tr><td colspan="9"><div class="empty-state"><span class="emoji">📈</span>Aucune stat individuelle</div></td></tr>'; return; }
                 body.innerHTML = snap.docs.map(doc => {
                     const s = doc.data();
                     return '<tr><td><strong>'+s.joueurNom+'</strong></td><td>'+s.pts3+'</td><td>'+s.pts2+'</td><td>'+s.pts1+'</td><td><strong>'+s.totalPts+'</strong></td><td>'+s.fautes+'</td><td>'+s.matchs+'</td><td>'+(s.tempsJeu||0)+' min</td><td class="admin-only"><button class="btn btn-small btn-primary" onclick="editStatsIndiv(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'statsIndiv\',\''+doc.id+'\')">🗑️</button></td></tr>';
                 }).join('');
             });
-
             db.collection('joueurs').orderBy('nom').get().then(snap => {
                 const sel = document.getElementById('statsIndivJoueur');
-                sel.innerHTML = '<option value="">-- Choisir un joueur --</option>';
+                sel.innerHTML = '<option value="">-- Choisir --</option>';
                 snap.docs.forEach(doc => {
                     const j = doc.data();
                     sel.innerHTML += '<option value="'+j.prenom+' '+j.nom+'">'+j.prenom+' '+j.nom+' (#'+(j.numero||'?')+')</option>';
@@ -1372,7 +1727,7 @@
             });
         }
 
-        // ============================================ SAVE ============================================
+        // ========== SAVE ==========
         async function saveMatch() {
             if (!isAdmin) return showToast('Accès admin requis', 'error');
             const id = document.getElementById('matchId').value;
@@ -1420,6 +1775,42 @@
             } catch(e) { showToast('Erreur: '+e.message, 'error'); }
         }
 
+        // ========== SAVE STAFF ==========
+        async function saveStaff() {
+            if (!isAdmin) return showToast('Accès admin requis', 'error');
+            const id = document.getElementById('staffId').value;
+            const data = {
+                prenom: document.getElementById('staffPrenom').value,
+                nom: document.getElementById('staffNom').value,
+                role: document.getElementById('staffRole').value,
+                telephone: document.getElementById('staffTel').value || null,
+                email: document.getElementById('staffEmail').value || null,
+                photo: document.getElementById('staffPhoto').value || null
+            };
+            if (!data.prenom || !data.nom) return showToast('Prénom et nom requis', 'error');
+            try {
+                if (id) await db.collection('staff').doc(id).update(data);
+                else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('staff').add(data); }
+                closeModal('staff'); showToast('Membre du staff enregistré ✅', 'success');
+            } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+        }
+
+        // ========== SAVE PHOTO GALERIE ==========
+        async function savePhoto() {
+            if (!isAdmin) return showToast('Accès admin requis', 'error');
+            const id = document.getElementById('photoId').value;
+            const data = {
+                url: document.getElementById('photoUrl').value,
+                legende: document.getElementById('photoLegende').value || null
+            };
+            if (!data.url) return showToast("URL de la photo requise", 'error');
+            try {
+                if (id) await db.collection('galerie').doc(id).update(data);
+                else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('galerie').add(data); }
+                closeModal('photo'); showToast('Photo ajoutée ✅', 'success');
+            } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+        }
+
         async function saveClassement() {
             if (!isAdmin) return showToast('Accès admin requis', 'error');
             const id = document.getElementById('classementId').value;
@@ -1462,17 +1853,8 @@
             const pts2 = parseInt(document.getElementById('statsIndiv2pts').value)||0;
             const pts1 = parseInt(document.getElementById('statsIndiv1pt').value)||0;
             const totalPts = (pts3 * 3) + (pts2 * 2) + pts1;
-
-            const data = {
-                joueurNom: document.getElementById('statsIndivJoueur').value,
-                pts3, pts2, pts1, totalPts,
-                fautes: parseInt(document.getElementById('statsIndivFautes').value)||0,
-                matchs: parseInt(document.getElementById('statsIndivMatchs').value)||0,
-                tempsJeu: parseInt(document.getElementById('statsIndivTemps').value)||0
-            };
-
+            const data = { joueurNom: document.getElementById('statsIndivJoueur').value, pts3, pts2, pts1, totalPts, fautes: parseInt(document.getElementById('statsIndivFautes').value)||0, matchs: parseInt(document.getElementById('statsIndivMatchs').value)||0, tempsJeu: parseInt(document.getElementById('statsIndivTemps').value)||0 };
             if (!data.joueurNom) return showToast('Choisis un joueur', 'error');
-
             try {
                 if (id) await db.collection('statsIndiv').doc(id).update(data);
                 else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('statsIndiv').add(data); }
@@ -1480,7 +1862,7 @@
             } catch(e) { showToast('Erreur: '+e.message, 'error'); }
         }
 
-        // ============================================ EDIT ============================================
+        // ========== EDIT ==========
         async function editMatch(id) {
             const d = (await db.collection('matchs').doc(id).get()).data();
             document.getElementById('matchId').value = id;
@@ -1519,6 +1901,19 @@
             openModal('joueur');
         }
 
+        async function editStaff(id) {
+            const d = (await db.collection('staff').doc(id).get()).data();
+            document.getElementById('staffId').value = id;
+            document.getElementById('staffPrenom').value = d.prenom;
+            document.getElementById('staffNom').value = d.nom;
+            document.getElementById('staffRole').value = d.role;
+            document.getElementById('staffTel').value = d.telephone||'';
+            document.getElementById('staffEmail').value = d.email||'';
+            document.getElementById('staffPhoto').value = d.photo||'';
+            previewStaffPhoto(d.photo||'');
+            openModal('staff');
+        }
+
         async function editClassement(id) {
             const d = (await db.collection('classement').doc(id).get()).data();
             document.getElementById('classementId').value = id;
@@ -1552,14 +1947,12 @@
             openModal('statsIndiv');
         }
 
-        // ============================================ DELETE ============================================
         async function deleteDoc(col, id) {
             if (!confirm('Supprimer ?')) return;
             try { await db.collection(col).doc(id).delete(); showToast('Supprimé ✅', 'success'); }
             catch(e) { showToast('Erreur: '+e.message, 'error'); }
         }
 
-        // ============================================ MODALS ============================================
         function openModal(type) {
             const idField = document.getElementById(type+'Id');
             if (idField && !idField.value) {
@@ -1574,7 +1967,7 @@
                 db.collection('joueurs').orderBy('nom').get().then(snap => {
                     const sel = document.getElementById('statsIndivJoueur');
                     const currentVal = sel.value;
-                    sel.innerHTML = '<option value="">-- Choisir un joueur --</option>';
+                    sel.innerHTML = '<option value="">-- Choisir --</option>';
                     snap.docs.forEach(doc => {
                         const j = doc.data();
                         sel.innerHTML += '<option value="'+j.prenom+' '+j.nom+'">'+j.prenom+' '+j.nom+' (#'+(j.numero||'?')+')</option>';
@@ -1585,6 +1978,9 @@
             document.getElementById('modal-'+type).classList.add('active');
             if (type === 'joueur' && !document.getElementById('joueurId').value) {
                 document.getElementById('photoPreview').style.display = 'none';
+            }
+            if (type === 'staff' && !document.getElementById('staffId').value) {
+                document.getElementById('staffPhotoPreview').style.display = 'none';
             }
         }
 
@@ -1598,19 +1994,24 @@
             o.addEventListener('click', e => { if(e.target===o) o.classList.remove('active'); });
         });
 
-        // ============================================ PHOTO PREVIEW ============================================
         function previewPhoto(url) {
             const preview = document.getElementById('photoPreview');
             if (url && url.startsWith('http')) {
                 preview.src = url;
                 preview.style.display = 'block';
                 preview.onerror = () => { preview.style.display = 'none'; };
-            } else {
-                preview.style.display = 'none';
-            }
+            } else { preview.style.display = 'none'; }
         }
 
-        // ============================================ TOAST ============================================
+        function previewStaffPhoto(url) {
+            const preview = document.getElementById('staffPhotoPreview');
+            if (url && url.startsWith('http')) {
+                preview.src = url;
+                preview.style.display = 'block';
+                preview.onerror = () => { preview.style.display = 'none'; };
+            } else { preview.style.display = 'none'; }
+        }
+
         function showToast(msg, type='info') {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -1618,14 +2019,12 @@
             setTimeout(() => t.classList.remove('show'), 3500);
         }
 
-        // ============================================ UTILS ============================================
         function formatDate(s) {
             if (!s) return '-';
             const d = new Date(s+'T00:00:00');
             return d.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'});
         }
 
-        // Init
         loadData('accueil');
     </script>
 
