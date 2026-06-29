@@ -13,7 +13,6 @@
         :root {
             --violet: #2d1048;
             --gold: #f5a623;
-            --gold-light: #ffd700;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,7 +31,6 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .nav-logo img {
@@ -42,8 +40,8 @@
         .nav-logo span {
             font-size: 1.8rem;
             font-weight: bold;
-            color: var(--gold-light);
-            margin-left: 10px;
+            color: #ffd700;
+            margin-left: 12px;
         }
 
         .nav-menu a {
@@ -53,34 +51,31 @@
             font-weight: 500;
         }
 
-        .nav-menu a:hover {
-            color: var(--gold);
-        }
-
-        /* HERO - VERSION PLUS IMPACTANTE */
+        /* ==================== HERO ==================== */
         .hero {
             background: linear-gradient(135deg, var(--violet), #4a1a6b);
             color: white;
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 40px 5% 60px;
+            padding: 40px 5%;
         }
 
         .hero-content {
             display: grid;
-            grid-template-columns: 380px 1fr 380px;
+            grid-template-columns: 420px 1fr 420px;
             gap: 40px;
-            max-width: 1650px;
+            max-width: 1700px;
             margin: 0 auto;
             align-items: center;
         }
 
         .logo {
-            width: 380px;
-            height: 380px;
+            width: 420px !important;
+            height: 420px !important;
             object-fit: contain;
-            filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.7));
+            filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.8));
+            border: 4px solid red;   /* ← TEMPORAIRE pour voir si le CSS est chargé */
         }
 
         .main-content {
@@ -99,23 +94,15 @@
         }
 
         .hero h1 {
-            font-size: 4.2rem;
+            font-size: 4.3rem;
             line-height: 1.05;
             margin-bottom: 15px;
         }
 
         .subtitle {
-            color: var(--gold-light);
+            color: #ffd700;
             font-size: 1.8rem;
             margin-bottom: 40px;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 35px 0;
         }
 
         .btn {
@@ -124,6 +111,7 @@
             font-weight: 600;
             text-decoration: none;
             transition: all 0.3s;
+            margin: 8px;
         }
 
         .btn-outline {
@@ -135,10 +123,6 @@
         .btn-gold {
             background: var(--gold);
             color: #2d1048;
-        }
-
-        .btn:hover {
-            transform: translateY(-5px);
         }
 
         .next-match {
@@ -153,31 +137,22 @@
 
         .team-photo img {
             width: 100%;
-            max-width: 380px;
+            max-width: 420px;
             border: 8px solid var(--gold);
             border-radius: 20px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
 
-        .team-caption {
-            margin-top: 15px;
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
-        /* Responsive */
         @media (max-width: 1200px) {
             .hero-content {
                 grid-template-columns: 1fr;
                 text-align: center;
-                gap: 50px;
             }
             .logo { 
-                width: 280px; 
-                height: 280px; 
-                margin: 0 auto; 
+                width: 300px !important; 
+                height: 300px !important; 
+                margin: 0 auto;
             }
-            .hero h1 { font-size: 3.2rem; }
         }
     </style>
 </head>
@@ -211,12 +186,12 @@
                 <h1>BIENVENUE SUR<br>L'ESPACE PNM ALFC BASKET</h1>
                 <p class="subtitle">Site officiel de l'équipe</p>
 
-                <div class="hero-buttons">
+                <div>
                     <a href="#" class="btn btn-outline">👕 Maillot violet</a>
                     <a href="#" class="btn btn-outline">🏀 Club officiel</a>
                 </div>
 
-                <div class="hero-buttons">
+                <div>
                     <a href="#effectif" class="btn btn-gold">Voir l'effectif</a>
                     <a href="#calendrier" class="btn btn-gold">Calendrier</a>
                 </div>
@@ -228,13 +203,13 @@
 
             <div>
                 <img src="equipe-2025-2026.png" alt="Équipe PNM" class="team-photo">
-                <p class="team-caption">Équipe PNM – AL Chazeau Fayol Basket</p>
+                <p style="margin-top: 15px; opacity: 0.9;">Équipe PNM – AL Chazeau Fayol Basket</p>
             </div>
         </div>
     </section>
 
     <script>
-        console.log("%c✅ Version avec logo beaucoup plus gros chargée", "color:#f5a623; font-size:16px");
+        console.log("%c✅ NOUVELLE VERSION - Logo forcé à 420px", "color:red; font-size:18px; font-weight:bold");
     </script>
 </body>
 </html>
