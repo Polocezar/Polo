@@ -14,28 +14,22 @@
         :root {
             --violet-dark: #2d1048;
             --violet-mid: #4a1a6b;
-            --violet-light: #6b2fa0;
             --gold: #f5a623;
             --gold-light: #ffd700;
-            --gold-dark: #c8860a;
-            --white: #ffffff;
-            --gray-light: #f5f5f5;
-            --text-dark: #1a1a1a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--gray-light);
-            color: var(--text-dark);
-            line-height: 1.6;
+            background: #f5f5f5;
+            color: #1a1a1a;
         }
 
-        /* ====================== NAVBAR ====================== */
+        /* NAVBAR */
         .navbar {
             background: linear-gradient(135deg, var(--violet-dark), var(--violet-mid));
-            padding: 15px 30px;
+            padding: 12px 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -51,12 +45,13 @@
             gap: 12px;
             color: white;
             text-decoration: none;
+            font-size: 1.5rem;
             font-weight: bold;
-            font-size: 1.4rem;
         }
 
         .nav-logo img {
-            height: 55px;
+            height: 65px;
+            width: auto;
         }
 
         .nav-menu {
@@ -68,7 +63,6 @@
             color: white;
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s;
         }
 
         .nav-menu a:hover {
@@ -77,40 +71,45 @@
 
         .hamburger {
             display: none;
-            font-size: 1.8rem;
             color: white;
+            font-size: 28px;
             cursor: pointer;
         }
 
-        /* ====================== HERO ====================== */
+        /* HERO */
         .hero {
             background: linear-gradient(135deg, #2d1048 0%, #4a1a6b 100%);
             color: white;
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 100px 5% 80px;
+            padding: 40px 5%;
         }
 
         .hero-content {
             display: grid;
-            grid-template-columns: 280px 1fr 380px;
-            gap: 50px;
-            max-width: 1450px;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 40px;
+            max-width: 1400px;
             margin: 0 auto;
             align-items: center;
+            width: 100%;
+        }
+
+        .logo-container {
+            text-align: center;
         }
 
         .logo {
-            width: 270px;
-            height: 270px;
+            width: 260px;
+            height: 260px;
             object-fit: contain;
-            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.5));
-            transition: all 0.4s ease;
+            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+            transition: transform 0.4s ease;
         }
 
         .logo:hover {
-            transform: scale(1.08) rotate(6deg);
+            transform: scale(1.08) rotate(8deg);
         }
 
         .main-content {
@@ -119,27 +118,25 @@
 
         .badge {
             display: inline-block;
-            background: rgba(245, 166, 35, 0.15);
+            background: rgba(245, 166, 35, 0.2);
             color: var(--gold);
-            padding: 8px 22px;
-            border-radius: 30px;
+            padding: 10px 25px;
+            border-radius: 50px;
             border: 2px solid var(--gold);
-            font-weight: 700;
+            font-weight: bold;
             margin-bottom: 20px;
-            font-size: 1.1rem;
         }
 
         .hero h1 {
-            font-size: 3.1rem;
-            line-height: 1.05;
-            margin-bottom: 10px;
+            font-size: 3.2rem;
+            line-height: 1.1;
+            margin-bottom: 8px;
         }
 
-        .hero .subtitle {
+        .subtitle {
             color: var(--gold-light);
-            font-size: 1.45rem;
+            font-size: 1.5rem;
             margin-bottom: 30px;
-            font-weight: 600;
         }
 
         .hero-buttons {
@@ -147,15 +144,15 @@
             gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
-            margin: 30px 0;
+            margin: 25px 0;
         }
 
         .btn {
-            padding: 12px 28px;
-            border-radius: 30px;
-            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 50px;
             font-weight: 600;
-            transition: all 0.3s ease;
+            text-decoration: none;
+            transition: all 0.3s;
         }
 
         .btn-gold {
@@ -163,10 +160,7 @@
             color: #2d1048;
         }
 
-        .btn-gold:hover {
-            background: var(--gold-light);
-            transform: translateY(-3px);
-        }
+        .btn-gold:hover { transform: translateY(-4px); background: #ffbb33; }
 
         .btn-outline {
             background: transparent;
@@ -175,86 +169,48 @@
         }
 
         .btn-outline:hover {
-            background: rgba(245, 166, 35, 0.1);
+            background: rgba(245, 166, 35, 0.15);
         }
 
         .team-photo img {
             width: 100%;
             max-width: 420px;
-            border-radius: 16px;
             border: 6px solid var(--gold);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
 
         .next-match {
             background: linear-gradient(90deg, var(--gold), #ffbb33);
             color: #2d1048;
-            padding: 20px;
+            padding: 18px;
             border-radius: 12px;
             font-weight: bold;
             margin-top: 30px;
-            box-shadow: 0 8px 20px rgba(245, 166, 35, 0.3);
-        }
-
-        /* ====================== SECTIONS ====================== */
-        section {
-            padding: 80px 5%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h2 {
-            text-align: center;
-            color: var(--violet-dark);
-            margin-bottom: 40px;
-            font-size: 2.5rem;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--violet-dark);
-            color: white;
-            text-align: center;
-            padding: 40px 20px;
         }
 
         /* Responsive */
         @media (max-width: 992px) {
             .hero-content {
                 grid-template-columns: 1fr;
-                gap: 40px;
                 text-align: center;
             }
-            .logo { width: 210px; height: 210px; }
-            .nav-menu {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: var(--violet-mid);
-                padding: 20px;
-            }
-            .nav-menu.active {
-                display: flex;
-            }
-            .hamburger {
-                display: block;
-            }
+            .logo { width: 200px; height: 200px; }
+            .nav-menu { display: none; }
+            .hamburger { display: block; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ====================== NAVBAR ====================== -->
+    <!-- NAVBAR -->
     <nav class="navbar">
         <a href="#" class="nav-logo">
             <img src="logo-alcf.png" alt="Logo AL Chazeau Fayol Basket">
             <span>ALCF Basket</span>
         </a>
         
-        <div class="nav-menu" id="navMenu">
+        <div class="nav-menu">
             <a href="#hero">Accueil</a>
             <a href="#calendrier">Calendrier</a>
             <a href="#resultats">Résultats</a>
@@ -267,16 +223,18 @@
             <a href="#messagerie">Messagerie</a>
         </div>
         
-        <div class="hamburger" id="hamburger">☰</div>
+        <div class="hamburger">☰</div>
     </nav>
 
-    <!-- ====================== HERO ====================== -->
+    <!-- HERO -->
     <section class="hero" id="hero">
         <div class="hero-content">
+            <!-- Logo Gauche -->
             <div class="logo-container">
                 <img src="logo-alcf.png" alt="Logo AL Chazeau Fayol Basket" class="logo">
             </div>
 
+            <!-- Texte Central -->
             <div class="main-content">
                 <div class="badge">ÉQUIPE PNM 🏆 LIGUE AUVERGNE RHÔNE-ALPES</div>
                 <h1>BIENVENUE SUR<br>L'ESPACE PNM ALFC BASKET</h1>
@@ -297,66 +255,31 @@
                 </div>
             </div>
 
+            <!-- Photo Droite -->
             <div class="team-photo">
                 <img src="equipe-2025-2026.png" alt="Équipe PNM AL Chazeau Fayol Basket">
-                <p style="margin-top: 12px; opacity: 0.9;">Équipe PNM – AL Chazeau Fayol Basket</p>
+                <p style="margin-top: 15px; opacity: 0.9;">Équipe PNM – AL Chazeau Fayol Basket</p>
             </div>
         </div>
     </section>
 
-    <!-- ====================== AUTRES SECTIONS (à compléter) ====================== -->
-    <section id="effectif"><h2>Effectif 2025-2026</h2><p>Contenu à venir...</p></section>
-    <section id="calendrier"><h2>Calendrier</h2><p>Contenu à venir...</p></section>
-    <section id="resultats"><h2>Résultats</h2><p>Contenu à venir...</p></section>
-    <section id="classement"><h2>Classement</h2><p>Contenu à venir...</p></section>
-    <section id="staff"><h2>Staff Technique & Dirigeants</h2><p>Contenu à venir...</p></section>
-    <section id="galerie"><h2>Galerie Photos</h2><p>Contenu à venir...</p></section>
-    <section id="stats"><h2>Statistiques</h2><p>Contenu à venir...</p></section>
-    <section id="infos"><h2>Informations Club</h2><p>Contenu à venir...</p></section>
-    <section id="messagerie"><h2>Messagerie</h2><p>Contenu à venir (réservé aux membres connectés)...</p></section>
+    <!-- Autres sections (tu pourras les remplir plus tard) -->
+    <section id="effectif" style="padding: 80px 5%; text-align:center;">
+        <h2>Effectif 2025-2026</h2>
+        <p>Contenu à venir...</p>
+    </section>
 
-    <!-- ====================== FOOTER ====================== -->
-    <footer>
+    <footer style="background:#2d1048; color:white; text-align:center; padding:40px 20px;">
         <p>&copy; 2025 AL Chazeau Fayol Basket - Tous droits réservés</p>
-        <p>Salle GM4 - Firminy | <a href="https://maps.google.com" style="color:var(--gold)">Voir sur Google Maps</a></p>
     </footer>
 
     <script>
-        // ====================== Firebase Configuration ======================
-        const firebaseConfig = {
-            apiKey: "TA_CLE_API_ICI",
-            authDomain: "ton-projet.firebaseapp.com",
-            projectId: "ton-projet",
-            storageBucket: "ton-projet.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef123456"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        // ====================== Mobile Menu ======================
-        const hamburger = document.getElementById('hamburger');
-        const navMenu = document.getElementById('navMenu');
-
-        hamburger.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
+        // Simple menu mobile (à améliorer plus tard)
+        document.querySelector('.hamburger').addEventListener('click', () => {
+            alert("Menu mobile à développer");
         });
 
-        // ====================== Compte à rebours (exemple) ======================
-        function updateNextMatch() {
-            const nextMatchEl = document.getElementById('next-match');
-            // Tu pourras connecter ça à Firestore plus tard
-            nextMatchEl.textContent = "Pas de prochain match programmé";
-        }
-
-        // Initialisation
-        window.onload = () => {
-            updateNextMatch();
-        };
-
-        console.log("%c✅ Site AL Chazeau Fayol Basket chargé avec succès", "color:#f5a623; font-size:14px");
+        console.log("%c✅ Site AL Chazeau Fayol Basket chargé", "color:#f5a623; font-size:16px");
     </script>
 </body>
 </html>
