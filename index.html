@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AL Chazeau Fayol Basket - PNM</title>
 
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -26,10 +25,9 @@
             color: #1a1a1a;
         }
 
-        /* NAVBAR */
         .navbar {
             background: linear-gradient(135deg, var(--violet-dark), var(--violet-mid));
-            padding: 12px 30px;
+            padding: 12px 25px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -50,18 +48,14 @@
         }
 
         .nav-logo img {
-            height: 65px;
+            height: 68px;
             width: auto;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 25px;
         }
 
         .nav-menu a {
             color: white;
             text-decoration: none;
+            margin-left: 20px;
             font-weight: 500;
         }
 
@@ -69,43 +63,30 @@
             color: var(--gold);
         }
 
-        .hamburger {
-            display: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-        }
-
-        /* HERO */
         .hero {
             background: linear-gradient(135deg, #2d1048 0%, #4a1a6b 100%);
             color: white;
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 40px 5%;
+            padding: 60px 5%;
         }
 
         .hero-content {
             display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            gap: 40px;
-            max-width: 1400px;
+            grid-template-columns: 280px 1fr 400px;
+            gap: 50px;
+            max-width: 1450px;
             margin: 0 auto;
             align-items: center;
-            width: 100%;
-        }
-
-        .logo-container {
-            text-align: center;
         }
 
         .logo {
-            width: 260px;
-            height: 260px;
+            width: 270px;
+            height: 270px;
             object-fit: contain;
-            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
-            transition: transform 0.4s ease;
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
+            transition: all 0.4s ease;
         }
 
         .logo:hover {
@@ -117,41 +98,34 @@
         }
 
         .badge {
-            display: inline-block;
             background: rgba(245, 166, 35, 0.2);
             color: var(--gold);
             padding: 10px 25px;
             border-radius: 50px;
             border: 2px solid var(--gold);
             font-weight: bold;
+            display: inline-block;
             margin-bottom: 20px;
         }
 
         .hero h1 {
-            font-size: 3.2rem;
+            font-size: 3.1rem;
             line-height: 1.1;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .subtitle {
             color: var(--gold-light);
-            font-size: 1.5rem;
+            font-size: 1.45rem;
             margin-bottom: 30px;
         }
 
-        .hero-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 25px 0;
-        }
-
         .btn {
-            padding: 14px 30px;
+            padding: 13px 28px;
             border-radius: 50px;
             font-weight: 600;
             text-decoration: none;
+            margin: 8px;
             transition: all 0.3s;
         }
 
@@ -160,16 +134,15 @@
             color: #2d1048;
         }
 
-        .btn-gold:hover { transform: translateY(-4px); background: #ffbb33; }
+        .btn-gold:hover {
+            transform: translateY(-4px);
+            background: #ffbb33;
+        }
 
         .btn-outline {
             background: transparent;
             color: white;
             border: 2px solid var(--gold);
-        }
-
-        .btn-outline:hover {
-            background: rgba(245, 166, 35, 0.15);
         }
 
         .team-photo img {
@@ -183,21 +156,18 @@
         .next-match {
             background: linear-gradient(90deg, var(--gold), #ffbb33);
             color: #2d1048;
-            padding: 18px;
+            padding: 20px;
             border-radius: 12px;
             font-weight: bold;
             margin-top: 30px;
         }
 
-        /* Responsive */
         @media (max-width: 992px) {
             .hero-content {
                 grid-template-columns: 1fr;
                 text-align: center;
             }
             .logo { width: 200px; height: 200px; }
-            .nav-menu { display: none; }
-            .hamburger { display: block; }
         }
     </style>
 </head>
@@ -222,30 +192,26 @@
             <a href="#infos">Infos</a>
             <a href="#messagerie">Messagerie</a>
         </div>
-        
-        <div class="hamburger">☰</div>
     </nav>
 
     <!-- HERO -->
     <section class="hero" id="hero">
         <div class="hero-content">
-            <!-- Logo Gauche -->
-            <div class="logo-container">
+            <div>
                 <img src="logo-alcf.png" alt="Logo AL Chazeau Fayol Basket" class="logo">
             </div>
 
-            <!-- Texte Central -->
             <div class="main-content">
                 <div class="badge">ÉQUIPE PNM 🏆 LIGUE AUVERGNE RHÔNE-ALPES</div>
                 <h1>BIENVENUE SUR<br>L'ESPACE PNM ALFC BASKET</h1>
                 <p class="subtitle">Site officiel de l'équipe</p>
 
-                <div class="hero-buttons">
+                <div>
                     <a href="#" class="btn btn-outline">👕 Maillot violet</a>
                     <a href="#" class="btn btn-outline">🏀 Club officiel</a>
                 </div>
 
-                <div class="hero-buttons">
+                <div>
                     <a href="#effectif" class="btn btn-gold">Voir l'effectif</a>
                     <a href="#calendrier" class="btn btn-gold">Calendrier</a>
                 </div>
@@ -255,31 +221,15 @@
                 </div>
             </div>
 
-            <!-- Photo Droite -->
             <div class="team-photo">
-                <img src="equipe-2025-2026.png" alt="Équipe PNM AL Chazeau Fayol Basket">
+                <img src="equipe-2025-2026.png" alt="Équipe PNM">
                 <p style="margin-top: 15px; opacity: 0.9;">Équipe PNM – AL Chazeau Fayol Basket</p>
             </div>
         </div>
     </section>
 
-    <!-- Autres sections (tu pourras les remplir plus tard) -->
-    <section id="effectif" style="padding: 80px 5%; text-align:center;">
-        <h2>Effectif 2025-2026</h2>
-        <p>Contenu à venir...</p>
-    </section>
-
-    <footer style="background:#2d1048; color:white; text-align:center; padding:40px 20px;">
-        <p>&copy; 2025 AL Chazeau Fayol Basket - Tous droits réservés</p>
-    </footer>
-
     <script>
-        // Simple menu mobile (à améliorer plus tard)
-        document.querySelector('.hamburger').addEventListener('click', () => {
-            alert("Menu mobile à développer");
-        });
-
-        console.log("%c✅ Site AL Chazeau Fayol Basket chargé", "color:#f5a623; font-size:16px");
+        console.log("%c✅ Site AL Chazeau Fayol Basket chargé avec le nouveau logo", "color:#f5a623; font-size:15px");
     </script>
 </body>
 </html>
