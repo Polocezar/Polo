@@ -13,15 +13,11 @@
         :root {
             --violet: #2d1048;
             --gold: #f5a623;
-            --gold-light: #ffd700;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
 
         .navbar {
             background: linear-gradient(135deg, var(--violet), #4a1a6b);
@@ -32,25 +28,15 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .nav-logo img {
-            height: 78px;
-        }
+        .nav-logo img { height: 75px; }
 
         .nav-logo span {
-            font-size: 1.85rem;
+            font-size: 1.9rem;
             font-weight: bold;
-            color: var(--gold-light);
-            margin-left: 12px;
-        }
-
-        .nav-menu a {
-            color: white;
-            text-decoration: none;
-            margin-left: 30px;
-            font-weight: 500;
+            color: #ffd700;
+            margin-left: 10px;
         }
 
         /* HERO */
@@ -60,34 +46,36 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 40px 5% 60px;
+            padding: 30px 5%;
         }
 
         .hero-content {
             display: grid;
-            grid-template-columns: 420px 1fr 420px;
-            gap: 40px;
-            max-width: 1700px;
+            grid-template-columns: 480px 1fr 400px;
+            gap: 30px;
+            max-width: 1750px;
             margin: 0 auto;
             align-items: center;
         }
 
         .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border: 3px dashed yellow;
+            border-radius: 20px;
+            padding: 20px;
         }
 
         .logo {
-            width: 100%;
-            max-width: 420px;
-            height: auto;
-            filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.75));
+            width: 100% !important;
+            max-width: 460px !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+            filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.8));
+            transform: scale(1.15);
         }
 
-        .main-content {
-            text-align: center;
-        }
+        .main-content { text-align: center; }
 
         .badge {
             display: inline-block;
@@ -101,23 +89,15 @@
         }
 
         .hero h1 {
-            font-size: 4.4rem;
+            font-size: 4.5rem;
             line-height: 1.05;
             margin-bottom: 15px;
         }
 
         .subtitle {
-            color: var(--gold-light);
-            font-size: 1.85rem;
-            margin-bottom: 45px;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 35px 0;
+            color: #ffd700;
+            font-size: 1.9rem;
+            margin-bottom: 40px;
         }
 
         .btn {
@@ -125,6 +105,7 @@
             border-radius: 50px;
             font-weight: 600;
             text-decoration: none;
+            margin: 8px;
             transition: all 0.3s;
         }
 
@@ -139,10 +120,6 @@
             color: #2d1048;
         }
 
-        .btn:hover {
-            transform: translateY(-5px);
-        }
-
         .next-match {
             background: linear-gradient(90deg, var(--gold), #ffbb33);
             color: #2d1048;
@@ -155,20 +132,15 @@
 
         .team-photo img {
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             border: 8px solid var(--gold);
             border-radius: 20px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
 
         @media (max-width: 1200px) {
-            .hero-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 50px;
-            }
-            .logo { max-width: 320px; }
-            .hero h1 { font-size: 3.4rem; }
+            .hero-content { grid-template-columns: 1fr; }
+            .logo { transform: scale(1.0); }
         }
     </style>
 </head>
@@ -218,14 +190,14 @@
             </div>
 
             <div>
-                <img src="equipe-2025-2026.png" alt="Équipe PNM" class="team-photo">
-                <p style="margin-top: 15px; opacity: 0.9; text-align:center;">Équipe PNM – AL Chazeau Fayol Basket</p>
+                <img src="equipe-2025-2026.png" alt="Équipe" class="team-photo">
+                <p style="text-align:center; margin-top:15px; opacity:0.9;">Équipe PNM – AL Chazeau Fayol Basket</p>
             </div>
         </div>
     </section>
 
     <script>
-        console.log("%c✅ Version avec logo mieux centré et plus gros chargée", "color:#ffd700; font-size:16px");
+        console.log("%c🔴 VERSION TEST - Regarde le cadre jaune autour du logo", "color:yellow; font-size:18px; font-weight:bold");
     </script>
 </body>
 </html>
