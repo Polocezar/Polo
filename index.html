@@ -1,0 +1,1756 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AL Chazeau Fayol Basket - PNM</title>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+    <style>
+        :root {
+            --violet-dark: #2d1048;
+            --violet-mid: #4a1a6b;
+            --violet-light: #6b2fa0;
+            --gold: #f5a623;
+            --gold-light: #ffd700;
+            --gold-dark: #c8860a;
+            --white: #ffffff;
+            --gray-light: #f5f5f5;
+            --gray: #e0e0e0;
+            --gray-dark: #666;
+            --text-dark: #1a1a1a;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --info: #3498db;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gray-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+       /* ============================================= */
+/* ===== NAVBAR COMPLÈTE AVEC LOGO ===== */
+/* ============================================= */
+
+.navbar {
+    background: linear-gradient(135deg, var(--violet-dark), var(--violet-mid));
+    padding: 10px 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 70px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.navbar-logo img {
+    height: 55px;
+    width: auto;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+    transition: transform 0.3s ease;
+}
+
+.navbar-logo img:hover {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+.navbar-brand {
+    color: var(--gold);
+    font-size: 1.1em;
+    font-weight: 900;
+    text-decoration: none;
+    letter-spacing: 1px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.navbar-links {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+.navbar-links a {
+    color: var(--white);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.navbar-links a:hover, .navbar-links a.active {
+    background: rgba(255,255,255,0.15);
+    color: var(--gold);
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: var(--gold);
+    border-radius: 2px;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+    .navbar {
+        padding: 10px 15px;
+        height: auto;
+        flex-wrap: wrap;
+    }
+    
+    .navbar-logo img {
+        height: 45px;
+    }
+    
+    .navbar-brand {
+        font-size: 1em;
+    }
+    
+    .hamburger {
+        display: flex;
+    }
+    
+    .navbar-links {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        gap: 5px;
+        padding: 15px 0;
+    }
+    
+    .navbar-links.open {
+        display: flex;
+    }
+    
+    .navbar-links a {
+        width: 100%;
+        text-align: center;
+    }
+}
+        /* ============================================= */
+/* ===== LOGO DANS LA NAVBAR ===== */
+/* ============================================= */
+
+.navbar-logo img {
+    height: 50px;
+    width: auto;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+    transition: transform 0.3s ease;
+}
+
+.navbar-logo img:hover {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+/* Ajustement mobile */
+@media (max-width: 768px) {
+    .navbar-logo img {
+        height: 40px;
+    }
+    
+    .navbar {
+        padding: 0 15px;
+    }
+    
+    .navbar-brand {
+        font-size: 1em;
+    }
+}
+
+        .btn-nav {
+            padding: 8px 18px !important;
+            border-radius: 20px !important;
+            font-weight: 600 !important;
+        }
+
+        .btn-connexion { border: 2px solid var(--white) !important; }
+        .btn-logout { background: var(--danger) !important; color: white !important; font-size: 0.8em !important; }
+
+        .user-info {
+            color: var(--gold);
+            font-size: 0.8em;
+            padding: 5px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+
+        /* HERO - TITRE CENTRÉ */
+        .hero {
+            background: linear-gradient(135deg, var(--violet-dark) 0%, var(--violet-mid) 50%, var(--violet-light) 100%);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(245,166,35,0.2);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .hero h1 { color: var(--white); font-size: 3em; line-height: 1.1; margin-bottom: 5px; }
+        .hero h1 .highlight { color: var(--gold); }
+
+        .hero p {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1em;
+            margin: 20px 0;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .hero-tags { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; justify-content: center; }
+
+        .hero-tags span {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--white);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+
+        .hero-bottom {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-top: 30px;
+            z-index: 1;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .next-match-banner {
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+            color: var(--violet-dark);
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        .next-match-banner .label { color: var(--danger); font-weight: 800; font-size: 0.9em; }
+
+        .hero-image { z-index: 1; }
+
+        .hero-image img {
+            width: 350px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            object-fit: cover;
+            max-height: 280px;
+        }
+
+        .hero-image .caption {
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        /* SECTIONS */
+        .section {
+            padding: 50px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title { text-align: center; font-size: 2em; color: var(--violet-dark); margin-bottom: 10px; }
+        .section-subtitle { text-align: center; color: var(--gray-dark); margin-bottom: 40px; }
+
+        /* MENU CARDS */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .menu-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .menu-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.12); }
+        .menu-card h3 { color: var(--violet-mid); font-size: 1.4em; margin-bottom: 8px; }
+        .menu-card > p { color: var(--gray-dark); font-size: 0.9em; margin-bottom: 20px; }
+
+        .menu-item {
+            background: var(--gray-light);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover { background: #ede0f5; border-left-color: var(--violet-light); }
+        .menu-item h4 { color: var(--text-dark); margin-bottom: 3px; }
+        .menu-item p { color: var(--gray-dark); font-size: 0.85em; }
+
+        /* PAGES */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 40px 40px 0;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .page-header h2 { color: var(--violet-dark); font-size: 2em; }
+
+        .page-content {
+            padding: 0 40px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* TABLES */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .data-table th {
+            background: var(--violet-dark);
+            color: var(--gold);
+            padding: 15px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--gray);
+            font-size: 0.9em;
+        }
+
+        .data-table tr:hover td { background: #f8f0ff; }
+        .data-table tr:last-child td { border-bottom: none; }
+
+        .classement-row.highlight {
+            background: linear-gradient(90deg, #f8f0ff, #ede0f5) !important;
+            font-weight: 700;
+        }
+
+        /* PLAYER CARDS - AVEC PHOTO */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 20px;
+        }
+
+        .player-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .player-card:hover { transform: translateY(-5px); }
+
+        .player-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--gold);
+            color: var(--violet-dark);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.1em;
+        }
+
+     .player-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top;
+    margin: 0 auto 15px;
+    display: block;
+    border: 4px solid var(--gold);
+    box-shadow: 0 0 0 6px #f0e6ff, 0 5px 20px rgba(0,0,0,0.15);
+    background-color: #f0e6ff;
+}
+
+
+      .player-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet-light), var(--violet-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 3em;
+    font-weight: 900;
+    margin: 0 auto 15px;
+    border: 4px solid var(--violet-light);
+}
+
+        .player-card h4 { color: var(--violet-dark); margin-bottom: 5px; font-size: 1.15em; }
+        .player-card .position { color: var(--gold-dark); font-weight: 600; font-size: 0.9em; }
+        .player-card .details { color: var(--gray-dark); font-size: 0.85em; margin-top: 8px; }
+        
+
+        .player-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        /* MESSAGES */
+        .messages-container { max-width: 800px; margin: 0 auto; }
+
+        .message-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            border-left: 4px solid var(--violet-light);
+        }
+
+        .message-header { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
+        .message-author { font-weight: 700; color: var(--violet-dark); }
+        .message-date { color: var(--gray-dark); font-size: 0.8em; }
+        .message-text { color: var(--text-dark); line-height: 1.6; }
+        .message-actions { margin-top: 10px; display: flex; gap: 5px; }
+
+        /* INFO CARDS */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+        }
+
+        .info-card h4 { color: var(--violet-mid); margin-bottom: 10px; font-size: 1.1em; }
+        .info-card p { color: var(--gray-dark); line-height: 1.6; font-size: 0.95em; }
+        .info-actions { margin-top: 10px; display: flex; gap: 5px; }
+
+        /* STATS */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+        }
+
+        .stat-card .value { font-size: 2.5em; font-weight: 900; color: var(--violet-dark); }
+        .stat-card .label { color: var(--gray-dark); font-size: 0.9em; margin-top: 5px; }
+
+        .stats-section-title {
+            color: var(--violet-dark);
+            margin: 30px 0 15px;
+            font-size: 1.4em;
+            border-bottom: 3px solid var(--gold);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background: var(--violet-mid); color: var(--white); }
+        .btn-primary:hover { background: var(--violet-dark); }
+        .btn-gold { background: var(--gold); color: var(--violet-dark); }
+        .btn-gold:hover { background: var(--gold-dark); }
+        .btn-danger { background: var(--danger); color: var(--white); }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-success { background: var(--success); color: var(--white); }
+        .btn-small { padding: 5px 12px; font-size: 0.8em; }
+
+        /* MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 550px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal h3 { color: var(--violet-dark); margin-bottom: 25px; font-size: 1.5em; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--violet-dark); font-size: 0.9em; }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--violet-light);
+        }
+
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px; }
+
+        .photo-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--violet-light);
+            margin-top: 10px;
+        }
+
+        .photo-help {
+            font-size: 0.8em;
+            color: var(--gray-dark);
+            margin-top: 5px;
+        }
+
+        /* LOGIN */
+        .login-container {
+            max-width: 400px;
+            margin: 60px auto;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .login-container h2 { color: var(--violet-dark); margin-bottom: 30px; }
+        .login-container .emoji { font-size: 3em; margin-bottom: 15px; }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 5000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.info { background: var(--info); }
+
+        /* ADMIN */
+        .admin-only { display: none !important; }
+        body.is-admin .admin-only { display: inline-flex !important; }
+
+        /* EMPTY */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-dark); }
+        .empty-state .emoji { font-size: 3em; margin-bottom: 15px; display: block; }
+
+        /* HAMBURGER */
+        .hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; }
+        .hamburger span { width: 25px; height: 3px; background: white; border-radius: 3px; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .hamburger { display: flex; }
+            .navbar-links {
+                display: none;
+                position: absolute;
+                top: 65px;
+                left: 0; right: 0;
+                background: var(--violet-dark);
+                flex-direction: column;
+                padding: 15px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            }
+            .navbar-links.open { display: flex; }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 10px 15px; height: auto; flex-wrap: wrap; gap: 10px; }
+            .hero { padding: 30px 20px; }
+            .hero h1 { font-size: 2em; }
+            .hero-image img { width: 280px; max-height: 220px; }
+            .hero-bottom { flex-direction: column; }
+            .section, .page-header, .page-content { padding-left: 15px; padding-right: 15px; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .modal { padding: 20px; margin: 10px; }
+            .data-table { font-size: 0.8em; }
+            .data-table th, .data-table td { padding: 8px 6px; }
+        }
+       /* ============================================= */
+/* ===== VENUE CARD - SALLE GM4 FIRMINY V2 ===== */
+/* ============================================= */
+
+.venue-card {
+    max-width: 380px;
+    margin: 20px auto;           /* Centré + un peu d'espace */
+}
+
+.venue-card a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background-color: #f8f5ff;
+    padding: 16px 20px;
+    border-radius: 16px;
+    text-decoration: none;
+    color: inherit;
+    border: 2px solid #e0d4f5;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.1);
+}
+
+.venue-card a:hover {
+    background-color: white;
+    border-color: var(--violet-mid);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(147, 51, 234, 0.18);
+}
+
+.venue-icon {
+    font-size: 1.8em;
+}
+
+.venue-text strong {
+    display: block;
+    color: var(--violet-mid);
+    font-size: 1.1em;
+    margin-bottom: 3px;
+}
+
+.venue-address {
+    font-size: 0.87em;
+    color: var(--gray-dark);
+}
+/* ============================================= */
+/* ===== HERO AVEC LOGO + PHOTO ÉQUIPE ===== */
+/* ============================================= */
+
+.hero-layout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    margin: 30px 0;
+    padding: 20px;
+}
+
+.hero-logo {
+    flex: 0 0 200px;
+    display: flex;
+    justify-content: center;
+}
+
+.hero-logo img {
+    width: 180px;
+    height: auto;
+    filter: drop-shadow(0 5px 15px rgba(147, 51, 234, 0.4));
+    transition: transform 0.3s ease;
+}
+
+.hero-logo img:hover {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+.hero-text {
+    flex: 1;
+    text-align: center;
+}
+
+.hero-text h1 {
+    font-size: 1.8em;
+    color: var(--violet-dark);
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.hero-text .highlight {
+    color: var(--gold-dark);
+    font-weight: 900;
+}
+
+.hero-subtitle {
+    color: var(--gray-dark);
+    font-size: 1.1em;
+    margin-top: 10px;
+}
+
+.hero-team-photo {
+    flex: 0 0 250px;
+    display: flex;
+    justify-content: center;
+}
+
+.hero-team-photo img {
+    width: 220px;
+    height: auto;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    border: 4px solid var(--gold);
+    transition: transform 0.3s ease;
+}
+
+.hero-team-photo img:hover {
+    transform: scale(1.05);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .hero-layout {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .hero-logo, .hero-team-photo {
+        flex: none;
+        width: 100%;
+    }
+    
+    .hero-logo img {
+        width: 140px;
+    }
+    
+    .hero-team-photo img {
+        width: 180px;
+    }
+    
+    .hero-text h1 {
+        font-size: 1.4em;
+    }
+}
+📋 Récapitulatif des actions :
+Action	Où	Quoi
+1	index.html	Remplacer la section hero par le nouveau HTML
+2	<style>	Ajouter le CSS ci-dessus
+3	GitHub	Vérifier que logo.png et photo équipe 2025_2026.png sont bien uploadés
+4	GitHub Pages	Attendre 2-3 min que le site se mette à jour
+5	Navigateur	Rafraîchir https://polocezar.github.io/Polo/
+
+    </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+<nav class="navbar">
+    <!-- LOGO DU CLUB -->
+    <div class="navbar-logo">
+        <img src="logo.png" alt="Logo BB Ghazeau Favol">
+    </div>
+    
+    <span class="navbar-brand" onclick="showPage('accueil')">🏀 AL CHAZEAU FAYOL BASKET</span>
+    
+    <div class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">
+        <span></span><span></span><span></span>
+    </div>
+    
+    <div class="navbar-links" id="navLinks">
+        <a onclick="showPage('accueil')" class="active" id="nav-accueil">Accueil</a>
+        <a onclick="showPage('calendrier')" id="nav-calendrier">Calendrier</a>
+        <a onclick="showPage('resultats')" id="nav-resultats">Résultats</a>
+        <a onclick="showPage('classement')" id="nav-classement">Classement</a>
+        <a onclick="showPage('effectif')" id="nav-effectif">Effectif</a>
+        <a onclick="showPage('stats')" id="nav-stats">Stats</a>
+        <a onclick="showPage('infos')" id="nav-infos">Infos</a>
+        <a onclick="showPage('messagerie')" id="nav-messagerie">Messagerie</a>
+        <span class="user-info" id="userInfo" style="display:none"></span>
+        <a class="btn-nav btn-connexion" onclick="showPage('login')" id="btnLogin">Connexion</a>
+        <a class="btn-nav btn-logout" onclick="dologout()" id="btnLogout" style="display:none">Déconnexion</a>
+    </div>
+</nav>
+<!-- FIN NAVBAR -->
+
+
+   <!-- SECTION HERO - BIENVENUE -->
+<div id="page-accueil" class="page active">
+    <div class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">ÉQUIPE PNM 🏆 LIGUE AUVERGNE RHÔNE-ALPES</span>
+            
+            <!-- NOUVELLE STRUCTURE AVEC LOGO + PHOTO -->
+            <div class="hero-layout">
+                <!-- Logo à gauche -->
+                <div class="hero-logo">
+                    <img src="logo.png" alt="Logo AL Chazeau Favol">
+                </div>
+                
+                <!-- Texte au centre -->
+                <div class="hero-text">
+                    <h1>BIENVENUE SUR<br>L'ESPACE <span class="highlight">PNM ALCF BASKET</span></h1>
+                    <p class="hero-subtitle">Site officiel de l'équipe</p>
+                </div>
+                
+                <!-- Photo équipe à droite -->
+                <div class="hero-team-photo">
+                    <img src="photo équipe 2025_2026.png" alt="Photo équipe 2025-2026">
+                </div>
+            </div>
+            
+            <!-- Boutons d'action -->
+            <div class="hero-buttons">
+                <a onclick="showPage('effectif')" class="btn btn-primary">Voir l'effectif</a>
+                <a onclick="showPage('calendrier')" class="btn btn-secondary">Calendrier</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+                    <span>👕 Maillot violet</span>
+                    <span>🏀 Club officiel</span>
+                </div>
+            </div>
+            <div class="hero-bottom">
+                <div class="next-match-banner">
+                    <div class="label">🔴 Prochain match :</div>
+                    <div id="nextMatchText">Chargement...</div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://i.imgur.com/6wbziFS.png" alt="Équipe PNM">
+                    <div class="caption">Équipe PNM – AL Chazeau Fayol Basket</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Menu principal</h2>
+            <p class="section-subtitle">Choisis une rubrique pour accéder rapidement aux informations de l'équipe.</p>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <h3>🏆 Compétition</h3>
+                    <p>Suis la saison sportive de l'équipe PNM.</p>
+                    <div class="menu-item" onclick="showPage('calendrier')"><h4>📅 Calendrier</h4><p>Matchs, horaires, salles, déplacements.</p></div>
+                    <div class="menu-item" onclick="showPage('resultats')"><h4>📊 Résultats</h4><p>Scores des rencontres et résumé.</p></div>
+                    <div class="menu-item" onclick="showPage('classement')"><h4>🥇 Classement</h4><p>Position dans le championnat.</p></div>
+                </div>
+                <div class="menu-card">
+                    <h3>📢 Infos & communication</h3>
+                    <p>Centralise les messages importants de l'équipe PNM.</p>
+                    <div class="menu-item" onclick="showPage('infos')"><h4>📌 Infos du club</h4><p>Horaires, salle, annonces, documents.</p></div>
+                    <div class="menu-item" onclick="showPage('messagerie')"><h4>💬 Messagerie</h4><p>Messages staff, dirigeants, groupe PNM.</p></div>
+                </div>
+                <div class="menu-card">
+                    <h3>👥 Effectif & statistiques</h3>
+                    <p>Consulte les joueurs et les performances.</p>
+                    <div class="menu-item" onclick="showPage('effectif')"><h4>🧑‍🤝‍🧑 Effectif PNM</h4><p>Fiches joueurs, contacts, maillots.</p></div>
+                    <div class="menu-item" onclick="showPage('stats')"><h4>📈 Statistiques</h4><p>Points, rebonds, victoires, défaites.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE CALENDRIER -->
+    <div id="page-calendrier" class="page">
+        <div class="page-header">
+            <h2>📅 Calendrier des matchs</h2>
+            <button class="btn btn-gold admin-only" onclick="openModal('match')">+ Ajouter un match</button>
+        </div>
+        <div class="page-content">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Heure</th><th>Adversaire</th><th>Lieu</th><th>Salle</th><th class="admin-only">Actions</th></tr></thead>
+                <tbody id="calendrierBody"><tr><td colspan="6"><div class="empty-state"><span class="emoji">📅</span>Chargement...</div></td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGE RÉSULTATS -->
+    <div id="page-resultats" class="page">
+        <div class="page-header">
+            <h2>📊 Résultats des matchs</h2>
+            <button class="btn btn-gold admin-only" onclick="openModal('resultat')">+ Ajouter un résultat</button>
+        </div>
+        <div class="page-content">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Match</th><th>Score</th><th>Résultat</th><th class="admin-only">Actions</th></tr></thead>
+                <tbody id="resultatsBody"><tr><td colspan="5"><div class="empty-state"><span class="emoji">📊</span>Chargement...</div></td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGE CLASSEMENT -->
+    <div id="page-classement" class="page">
+        <div class="page-header">
+            <h2>🥇 Classement PNM</h2>
+            <button class="btn btn-gold admin-only" onclick="openModal('classement')">+ Ajouter équipe</button>
+        </div>
+        <div class="page-content">
+            <table class="data-table">
+                <thead><tr><th>Pos</th><th>Équipe</th><th>MJ</th><th>V</th><th>D</th><th>Pts</th><th class="admin-only">Actions</th></tr></thead>
+                <tbody id="classementBody"><tr><td colspan="7"><div class="empty-state"><span class="emoji">🥇</span>Chargement...</div></td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGE EFFECTIF - AVEC PHOTOS -->
+    <div id="page-effectif" class="page">
+        <div class="page-header">
+            <h2>👥 Effectif PNM</h2>
+            <button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Ajouter un joueur</button>
+        </div>
+        <div class="page-content">
+            <div class="players-grid" id="effectifGrid"><div class="empty-state"><span class="emoji">👥</span>Chargement...</div></div>
+        </div>
+    </div>
+
+    <!-- PAGE STATS - AVEC STATS INDIVIDUELLES -->
+    <div id="page-stats" class="page">
+        <div class="page-header">
+            <h2>📈 Statistiques</h2>
+            <button class="btn btn-gold admin-only" onclick="openModal('statsIndiv')">+ Ajouter stats joueur</button>
+        </div>
+        <div class="page-content">
+            <h3 class="stats-section-title">📊 Stats d'équipe</h3>
+            <div class="stats-overview">
+                <div class="stat-card"><div class="value" id="statVictoires">-</div><div class="label">Victoires</div></div>
+                <div class="stat-card"><div class="value" id="statDefaites">-</div><div class="label">Défaites</div></div>
+                <div class="stat-card"><div class="value" id="statMatchs">-</div><div class="label">Matchs joués</div></div>
+                <div class="stat-card"><div class="value" id="statPtsMoy">-</div><div class="label">Points/match</div></div>
+            </div>
+
+            <h3 class="stats-section-title">🏀 Stats individuelles</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Joueur</th>
+                        <th>🎯 3pts</th>
+                        <th>✌️ 2pts</th>
+                        <th>☝️ 1pt (LF)</th>
+                        <th>📊 Total pts</th>
+                        <th>🟥 Fautes</th>
+                        <th>🏀 Matchs</th>
+                        <th>⏱️ Temps de jeu</th>
+                        <th class="admin-only">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="statsIndivBody">
+                    <tr><td colspan="8"><div class="empty-state"><span class="emoji">📈</span>Aucune stat individuelle</div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGE INFOS -->
+    <div id="page-infos" class="page">
+        <div class="page-header">
+            <h2>📌 Infos du club</h2>
+            <button class="btn btn-gold admin-only" onclick="openModal('info')">+ Ajouter une info</button>
+        </div>
+        <div class="page-content">
+            <div class="info-cards" id="infosGrid"><div class="empty-state"><span class="emoji">📌</span>Chargement...</div></div>
+        </div>
+    </div>
+
+    <!-- PAGE MESSAGERIE -->
+    <div id="page-messagerie" class="page">
+        <div class="page-header">
+            <h2>💬 Messagerie</h2>
+            <button class="btn btn-gold" onclick="openModal('message')" id="btnNewMsg" style="display:none">+ Nouveau message</button>
+        </div>
+        <div class="page-content">
+            <div class="messages-container" id="messagesContainer"><div class="empty-state"><span class="emoji">💬</span>Chargement...</div></div>
+        </div>
+    </div>
+
+    <!-- PAGE LOGIN -->
+    <div id="page-login" class="page">
+        <div class="login-container">
+            <div class="emoji">🏀</div>
+            <h2>Connexion</h2>
+            <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="ton.email@exemple.com"></div>
+            <div class="form-group"><label>Mot de passe</label><input type="password" id="loginPassword" placeholder="Mot de passe"></div>
+            <div class="form-actions" style="justify-content:center; flex-direction:column; gap:10px;">
+                <button class="btn btn-primary" onclick="doLogin()" style="width:100%">Se connecter</button>
+                <button class="btn btn-gold" onclick="doRegister()" style="width:100%">Créer un compte</button>
+            </div>
+            <p style="margin-top:15px; font-size:0.85em; color:var(--gray-dark);">
+                Crée un compte pour accéder à la messagerie.<br>
+                Demande les droits admin au responsable.
+            </p>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MODALS
+         ============================================ -->
+
+    <!-- Modal Match -->
+    <div class="modal-overlay" id="modal-match">
+        <div class="modal">
+            <h3>📅 Match</h3>
+            <input type="hidden" id="matchId">
+            <div class="form-group"><label>Date</label><input type="date" id="matchDate"></div>
+            <div class="form-group"><label>Heure</label><input type="time" id="matchHeure" value="20:00"></div>
+            <div class="form-group"><label>Adversaire</label><input type="text" id="matchAdversaire" placeholder="Ex: BC Saint-Étienne"></div>
+            <div class="form-group"><label>Lieu</label><select id="matchLieu"><option value="Domicile">🏠 Domicile</option><option value="Extérieur">🚗 Extérieur</option></select></div>
+            <div class="form-group"><label>Salle</label><input type="text" id="matchSalle" placeholder="Salle GM4 Firminy" value="Salle GM4 Firminy"></div>
+            <div class="form-actions">
+                <button class="btn btn-danger" onclick="closeModal('match')">Annuler</button>
+                <button class="btn btn-gold" onclick="saveMatch()">💾 Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Résultat -->
+    <div class="modal-overlay" id="modal-resultat">
+        <div class="modal">
+            <h3>📊 Résultat</h3>
+            <input type="hidden" id="resultatId">
+            <div class="form-group"><label>Date</label><input type="date" id="resultatDate"></div>
+            <div class="form-group"><label>Adversaire</label><input type="text" id="resultatAdversaire" placeholder="Ex: BC Saint-Étienne"></div>
+            <div class="form-group"><label>Score ALCF</label><input type="number" id="resultatScoreALCF" placeholder="72"></div>
+            <div class="form-group"><label>Score Adversaire</label><input type="number" id="resultatScoreAdv" placeholder="65"></div>
+            <div class="form-actions">
+                <button class="btn btn-danger" onclick="closeModal('resultat')">Annuler</button>
+                <button class="btn btn-gold" onclick="saveResultat()">💾 Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Joueur - AVEC PHOTO -->
+    <div class="modal-overlay" id="modal-joueur">
+    <div class="modal">
+        <h3>👤 Joueur</h3>
+        <input type="hidden" id="joueurId">
+        <div class="form-group"><label>Prénom</label><input type="text" id="joueurPrenom" placeholder="Prénom"></div>
+        <div class="form-group"><label>Nom</label><input type="text" id="joueurNom" placeholder="Nom"></div>
+        <div class="form-group"><label>Numéro de maillot</label><input type="number" id="joueurNumero" placeholder="7"></div>
+        <div class="form-group"><label>Poste</label><select id="joueurPoste"><option value="Meneur">Meneur Poste 1</option><option value="Arrière">Arrière (SG)</option><option value="Ailier">Ailier (SF)</option><option value="Ailier fort">Ailier fort (PF)</option><option value="Pivot">Pivot (C)</option></select></div>
+        <div class="form-group"><label>📅 Date de naissance</label><input type="date" id="joueurDateNaissance"></div>
+        <div class="form-group"><label>Taille (cm)</label><input type="number" id="joueurTaille" placeholder="185"></div>
+        <div class="form-group"><label>🪪 Numéro de licence</label><input type="text" id="joueurLicence" placeholder="Ex: 1234567"></div>
+        <div class="form-group"><label>📱 Numéro de téléphone</label><input type="tel" id="joueurTel" placeholder="Ex: 06 12 34 56 78"></div>
+        <div class="form-group"><label>📧 Adresse email</label><input type="email" id="joueurEmail" placeholder="Ex: romario@gmail.com"></div>
+        <div class="form-group">
+            <label>📸 Photo du joueur (URL)</label>
+            <input type="url" id="joueurPhoto" placeholder="https://i.imgur.com/xxxxx.png" oninput="previewPhoto(this.value)">
+            <p class="photo-help">Colle le lien direct de la photo (BBCode depuis Imgur)</p>
+            <img id="photoPreview" class="photo-preview" style="display:none">
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-danger" onclick="closeModal('joueur')">Annuler</button>
+            <button class="btn btn-gold" onclick="saveJoueur()">💾 Enregistrer</button>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal Classement -->
+    <div class="modal-overlay" id="modal-classement">
+        <div class="modal">
+            <h3>🥇 Classement</h3>
+            <input type="hidden" id="classementId">
+            <div class="form-group"><label>Position</label><input type="number" id="classementPos" placeholder="1"></div>
+            <div class="form-group"><label>Équipe</label><input type="text" id="classementEquipe" placeholder="ALCF Basket"></div>
+            <div class="form-group"><label>Matchs joués</label><input type="number" id="classementMJ" placeholder="0"></div>
+            <div class="form-group"><label>Victoires</label><input type="number" id="classementV" placeholder="0"></div>
+            <div class="form-group"><label>Défaites</label><input type="number" id="classementD" placeholder="0"></div>
+            <div class="form-group"><label>Points</label><input type="number" id="classementPts" placeholder="0"></div>
+            <div class="form-actions">
+                <button class="btn btn-danger" onclick="closeModal('classement')">Annuler</button>
+                <button class="btn btn-gold" onclick="saveClassement()">💾 Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Info -->
+    <div class="modal-overlay" id="modal-info">
+        <div class="modal">
+            <h3>📌 Info</h3>
+            <input type="hidden" id="infoId">
+            <div class="form-group"><label>Titre</label><input type="text" id="infoTitre" placeholder="Horaires d'entraînement"></div>
+            <div class="form-group"><label>Contenu</label><textarea id="infoContenu" placeholder="Détails..." rows="5"></textarea></div>
+            <div class="form-actions">
+                <button class="btn btn-danger" onclick="closeModal('info')">Annuler</button>
+                <button class="btn btn-gold" onclick="saveInfo()">💾 Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Message -->
+    <div class="modal-overlay" id="modal-message">
+        <div class="modal">
+            <h3>💬 Nouveau message</h3>
+            <div class="form-group"><label>Message</label><textarea id="messageTexte" placeholder="Écris ton message..." rows="4"></textarea></div>
+            <div class="form-actions">
+                <button class="btn btn-danger" onclick="closeModal('message')">Annuler</button>
+                <button class="btn btn-gold" onclick="saveMessage()">📨 Envoyer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Stats Individuelles -->
+    <div class="modal-overlay" id="modal-statsIndiv">
+        <div class="modal">
+            <h3>🏀 Stats individuelles</h3>
+            <input type="hidden" id="statsIndivId">
+            <div class="form-group">
+                <label>Joueur</label>
+                <select id="statsIndivJoueur"><option value="">-- Choisir un joueur --</option></select>
+            </div>
+            <div class="form-group"><label>🎯 Paniers à 3 points</label><input type="number" id="statsIndiv3pts" placeholder="0" value="0"></div>
+            <div class="form-group"><label>✌️ Paniers à 2 points</label><input type="number" id="statsIndiv2pts" placeholder="0" value="0"></div>
+            <div class="form-group"><label>☝️ Lancers francs (1 point)</label><input type="number" id="statsIndiv1pt" placeholder="0" value="0"></div>
+            <div class="form-group"><label>🟥 Fautes commises</label><input type="number" id="statsIndivFautes" placeholder="0" value="0"></div>
+            <div class="form-group"><label>🏀 Nombre de matchs</label><input type="number" id="statsIndivMatchs" placeholder="0" value="0"></div>
+            <div class="form-group"><label>🏀 Nombre de matchs</label><input type="number" id="statsIndivMatchs" placeholder="0" value="0"></div>
+            <div class="form-actions">
+                <button class="btn btn-danger" onclick="closeModal('statsIndiv')">Annuler</button>
+                <button class="btn btn-gold" onclick="saveStatsIndiv()">💾 Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================
+        // 🔑 FIREBASE CONFIG
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYZuhh6iKsUMM-MBA3fANDGgCQOhANfVU",
+            authDomain: "alcf-basket.firebaseapp.com",
+            projectId: "alcf-basket",
+            storageBucket: "alcf-basket.firebasestorage.app",
+            messagingSenderId: "1082312491425",
+            appId: "1:1082312491425:web:646f4c5158d2707b0d8be0"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        const ADMIN_EMAILS = ["polocezar@gmail.com"];
+
+        let currentUser = null;
+        let isAdmin = false;
+
+        // ============================================
+        // AUTH
+        // ============================================
+        auth.onAuthStateChanged(user => {
+            currentUser = user;
+            if (user) {
+                isAdmin = ADMIN_EMAILS.includes(user.email.toLowerCase());
+                document.getElementById('btnLogin').style.display = 'none';
+                document.getElementById('btnLogout').style.display = 'inline-flex';
+                document.getElementById('btnNewMsg').style.display = 'inline-flex';
+                document.getElementById('userInfo').style.display = 'inline';
+                document.getElementById('userInfo').textContent = '👤 ' + user.email.split('@')[0];
+                if (isAdmin) document.body.classList.add('is-admin');
+                else document.body.classList.remove('is-admin');
+                if (document.getElementById('page-login').classList.contains('active')) showPage('accueil');
+            } else {
+                isAdmin = false;
+                document.body.classList.remove('is-admin');
+                document.getElementById('btnLogin').style.display = 'inline-flex';
+                document.getElementById('btnLogout').style.display = 'none';
+                document.getElementById('btnNewMsg').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'none';
+            }
+        });
+
+        async function doLogin() {
+            const e = document.getElementById('loginEmail').value;
+            const p = document.getElementById('loginPassword').value;
+            if (!e || !p) return showToast('Remplis tous les champs', 'error');
+            try {
+                await auth.signInWithEmailAndPassword(e, p);
+                showToast('Connecté ! 🏀', 'success');
+            } catch (err) { showToast('Email ou mot de passe incorrect', 'error'); }
+        }
+
+        async function doRegister() {
+            const e = document.getElementById('loginEmail').value;
+            const p = document.getElementById('loginPassword').value;
+            if (!e || !p) return showToast('Remplis tous les champs', 'error');
+            if (p.length < 6) return showToast('Mot de passe : 6 caractères min', 'error');
+            try {
+                await auth.createUserWithEmailAndPassword(e, p);
+                showToast('Compte créé ! Bienvenue 🏀', 'success');
+            } catch (err) { showToast('Erreur : ' + err.message, 'error'); }
+        }
+
+        function doLogout() {
+            auth.signOut();
+            showToast('Déconnecté', 'info');
+            showPage('accueil');
+        }
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.navbar-links a').forEach(a => a.classList.remove('active'));
+            const page = document.getElementById('page-' + id);
+            if (page) page.classList.add('active');
+            const nav = document.getElementById('nav-' + id);
+            if (nav) nav.classList.add('active');
+            document.getElementById('navLinks').classList.remove('open');
+            loadData(id);
+            window.scrollTo(0, 0);
+        }
+
+        // ============================================
+        // LOAD DATA
+        // ============================================
+        function loadData(id) {
+            switch(id) {
+                case 'accueil': loadNextMatch(); break;
+                case 'calendrier': loadCalendrier(); break;
+                case 'resultats': loadResultats(); break;
+                case 'classement': loadClassement(); break;
+                case 'effectif': loadEffectif(); break;
+                case 'stats': loadStats(); loadStatsIndiv(); break;
+                case 'infos': loadInfos(); break;
+                case 'messagerie': loadMessages(); break;
+            }
+        }
+
+        function loadNextMatch() {
+            const today = new Date().toISOString().split('T')[0];
+            db.collection('matchs').where('date', '>=', today).orderBy('date').limit(1).get().then(snap => {
+                if (!snap.empty) {
+                    const m = snap.docs[0].data();
+                    document.getElementById('nextMatchText').textContent =
+                        'ALCF Basket vs ' + m.adversaire + ' · ' + formatDate(m.date) + ' ' + m.heure + ' – ' + m.salle;
+                } else {
+                    document.getElementById('nextMatchText').textContent = 'Pas de prochain match programmé';
+                }
+            }).catch(() => {
+                document.getElementById('nextMatchText').textContent = 'Pas de prochain match programmé';
+            });
+        }
+
+        function loadCalendrier() {
+            db.collection('matchs').orderBy('date', 'asc').onSnapshot(snap => {
+                const body = document.getElementById('calendrierBody');
+                if (snap.empty) { body.innerHTML = '<tr><td colspan="6"><div class="empty-state"><span class="emoji">📅</span>Aucun match</div></td></tr>'; return; }
+                body.innerHTML = snap.docs.map(doc => {
+                    const m = doc.data();
+                    return '<tr><td>'+formatDate(m.date)+'</td><td>'+(m.heure||'-')+'</td><td><strong>'+m.adversaire+'</strong></td><td>'+(m.lieu==='Domicile'?'🏠 Dom.':'🚗 Ext.')+'</td><td>'+(m.salle||'-')+'</td><td class="admin-only"><button class="btn btn-small btn-primary" onclick="editMatch(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'matchs\',\''+doc.id+'\')">🗑️</button></td></tr>';
+                }).join('');
+            });
+        }
+
+        function loadResultats() {
+            db.collection('resultats').orderBy('date', 'desc').onSnapshot(snap => {
+                const body = document.getElementById('resultatsBody');
+                if (snap.empty) { body.innerHTML = '<tr><td colspan="5"><div class="empty-state"><span class="emoji">📊</span>Aucun résultat</div></td></tr>'; return; }
+                body.innerHTML = snap.docs.map(doc => {
+                    const r = doc.data();
+                    const res = r.scoreALCF > r.scoreAdv ? '🟢 Victoire' : (r.scoreALCF < r.scoreAdv ? '🔴 Défaite' : '🟡 Nul');
+                    return '<tr><td>'+formatDate(r.date)+'</td><td>ALCF vs <strong>'+r.adversaire+'</strong></td><td><strong>'+r.scoreALCF+' - '+r.scoreAdv+'</strong></td><td>'+res+'</td><td class="admin-only"><button class="btn btn-small btn-primary" onclick="editResultat(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'resultats\',\''+doc.id+'\')">🗑️</button></td></tr>';
+                }).join('');
+            });
+        }
+
+        function loadClassement() {
+            db.collection('classement').orderBy('position', 'asc').onSnapshot(snap => {
+                const body = document.getElementById('classementBody');
+                if (snap.empty) { body.innerHTML = '<tr><td colspan="7"><div class="empty-state"><span class="emoji">🥇</span>Classement vide</div></td></tr>'; return; }
+                body.innerHTML = snap.docs.map(doc => {
+                    const c = doc.data();
+                    const hl = (c.equipe||'').toLowerCase().includes('alcf') || (c.equipe||'').toLowerCase().includes('chazeau');
+                    return '<tr class="classement-row'+(hl?' highlight':'')+'"><td><strong>'+c.position+'</strong></td><td>'+(hl?'🏀 ':'')+c.equipe+'</td><td>'+(c.mj||0)+'</td><td>'+(c.victoires||0)+'</td><td>'+(c.defaites||0)+'</td><td><strong>'+(c.points||0)+'</strong></td><td class="admin-only"><button class="btn btn-small btn-primary" onclick="editClassement(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'classement\',\''+doc.id+'\')">🗑️</button></td></tr>';
+                }).join('');
+            });
+        }
+
+        // EFFECTIF - AVEC PHOTOS
+        function loadEffectif() {
+    db.collection('joueurs').orderBy('numero', 'asc').onSnapshot(snap => {
+        const grid = document.getElementById('effectifGrid');
+        if (snap.empty) { grid.innerHTML = '<div class="empty-state"><span class="emoji">👥</span>Aucun joueur</div>'; return; }
+        grid.innerHTML = snap.docs.map(doc => {
+            const j = doc.data();
+            const ini = ((j.prenom||'')[0]||'') + ((j.nom||'')[0]||'');
+            const photoHTML = j.photo
+                ? '<img src="'+j.photo+'" class="player-photo" alt="'+j.prenom+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="player-avatar" style="display:none">'+ini.toUpperCase()+'</div>'
+                : '<div class="player-avatar">'+ini.toUpperCase()+'</div>';
+            
+            let age = '';
+            if (j.dateNaissance) {
+                const birth = new Date(j.dateNaissance);
+                const today = new Date();
+                let a = today.getFullYear() - birth.getFullYear();
+                if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) a--;
+                age = a + ' ans';
+            }
+
+            let details = '';
+            if (j.taille) details += j.taille + ' cm';
+            if (age) details += (details ? ' · ' : '') + age;
+            if (j.licence) details += (details ? '<br>' : '') + '🪪 ' + j.licence;
+
+            let contact = '';
+            if (j.telephone) contact += '<div class="player-contact">📱 <a href="tel:'+j.telephone+'">' + j.telephone + '</a></div>';
+            if (j.email) contact += '<div class="player-contact">📧 <a href="mailto:'+j.email+'">' + j.email + '</a></div>';
+
+            return '<div class="player-card"><div class="player-number">'+(j.numero||'?')+'</div>'+photoHTML+'<h4>'+j.prenom+' '+j.nom+'</h4><div class="position">'+(j.poste||'-')+'</div><div class="details">'+details+'</div>'+contact+'<div class="player-actions admin-only"><button class="btn btn-small btn-primary" onclick="editJoueur(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'joueurs\',\''+doc.id+'\')">🗑️</button></div></div>';
+        }).join('');
+    });
+}
+
+        // STATS ÉQUIPE
+        function loadStats() {
+            db.collection('resultats').get().then(snap => {
+                let v=0, d=0, pts=0;
+                snap.docs.forEach(doc => { const r=doc.data(); if(r.scoreALCF>r.scoreAdv)v++; else d++; pts+=(r.scoreALCF||0); });
+                document.getElementById('statVictoires').textContent = v;
+                document.getElementById('statDefaites').textContent = d;
+                document.getElementById('statMatchs').textContent = snap.size;
+                document.getElementById('statPtsMoy').textContent = snap.size>0?(pts/snap.size).toFixed(1):'-';
+            });
+        }
+
+        // STATS INDIVIDUELLES
+        function loadStatsIndiv() {
+            db.collection('statsIndiv').orderBy('totalPts', 'desc').onSnapshot(snap => {
+                const body = document.getElementById('statsIndivBody');
+                if (snap.empty) {
+                    body.innerHTML = '<tr><td colspan="8"><div class="empty-state"><span class="emoji">📈</span>Aucune stat individuelle.<br>Clique sur "+ Ajouter stats joueur"</div></td></tr>';
+                    return;
+                }
+                body.innerHTML = snap.docs.map(doc => {
+                    const s = doc.data();
+                    return '<tr><td><strong>'+s.joueurNom+'</strong></td><td>'+s.pts3+'</td><td>'+s.pts2+'</td><td>'+s.pts1+'</td><td><strong>'+s.totalPts+'</strong></td><td>'+s.fautes+'</td><td>'+s.matchs+'</td><td>'+(s.tempsJeu||0)+' min</td><td class="admin-only"><button class="btn btn-small btn-primary" onclick="editStatsIndiv(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'statsIndiv\',\''+doc.id+'\')">🗑️</button></td></tr>';
+                }).join('');
+            });
+
+            // Charger la liste des joueurs dans le select
+            db.collection('joueurs').orderBy('nom').get().then(snap => {
+                const sel = document.getElementById('statsIndivJoueur');
+                sel.innerHTML = '<option value="">-- Choisir un joueur --</option>';
+                snap.docs.forEach(doc => {
+                    const j = doc.data();
+                    sel.innerHTML += '<option value="'+j.prenom+' '+j.nom+'">'+j.prenom+' '+j.nom+' (#'+(j.numero||'?')+')</option>';
+                });
+            });
+        }
+
+        function loadInfos() {
+            db.collection('infos').orderBy('createdAt', 'desc').onSnapshot(snap => {
+                const grid = document.getElementById('infosGrid');
+                if (snap.empty) { grid.innerHTML = '<div class="empty-state"><span class="emoji">📌</span>Aucune info</div>'; return; }
+                grid.innerHTML = snap.docs.map(doc => {
+                    const i = doc.data();
+                    return '<div class="info-card"><h4>'+i.titre+'</h4><p>'+(i.contenu||'').replace(/\n/g,'<br>')+'</p><div class="info-actions admin-only"><button class="btn btn-small btn-primary" onclick="editInfo(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" onclick="deleteDoc(\'infos\',\''+doc.id+'\')">🗑️</button></div></div>';
+                }).join('');
+            });
+        }
+
+        function loadMessages() {
+            db.collection('messages').orderBy('createdAt', 'desc').onSnapshot(snap => {
+                const c = document.getElementById('messagesContainer');
+                if (snap.empty) { c.innerHTML = '<div class="empty-state"><span class="emoji">💬</span>Aucun message</div>'; return; }
+                c.innerHTML = snap.docs.map(doc => {
+                    const m = doc.data();
+                    const date = m.createdAt ? new Date(m.createdAt.seconds*1000).toLocaleString('fr-FR') : '';
+                    const canDel = isAdmin || (currentUser && currentUser.email===m.authorEmail);
+                    return '<div class="message-card"><div class="message-header"><span class="message-author">🏀 '+(m.author||'Anonyme')+'</span><span class="message-date">'+date+'</span></div><div class="message-text">'+(m.texte||'').replace(/\n/g,'<br>')+'</div>'+(canDel?'<div class="message-actions"><button class="btn btn-small btn-danger" onclick="deleteDoc(\'messages\',\''+doc.id+'\')">🗑️</button></div>':'')+'</div>';
+                }).join('');
+            });
+        }
+
+        // ============================================
+        // SAVE
+        // ============================================
+        async function saveMatch() {
+            if (!isAdmin) return showToast('Accès admin requis', 'error');
+            const id = document.getElementById('matchId').value;
+            const data = { date: document.getElementById('matchDate').value, heure: document.getElementById('matchHeure').value, adversaire: document.getElementById('matchAdversaire').value, lieu: document.getElementById('matchLieu').value, salle: document.getElementById('matchSalle').value };
+            if (!data.date || !data.adversaire) return showToast('Date et adversaire requis', 'error');
+            try {
+                if (id) await db.collection('matchs').doc(id).update(data);
+                else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('matchs').add(data); }
+                closeModal('match'); showToast('Match enregistré ✅', 'success');
+            } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+        }
+
+        async function saveResultat() {
+            if (!isAdmin) return showToast('Accès admin requis', 'error');
+            const id = document.getElementById('resultatId').value;
+            const data = { date: document.getElementById('resultatDate').value, adversaire: document.getElementById('resultatAdversaire').value, scoreALCF: parseInt(document.getElementById('resultatScoreALCF').value)||0, scoreAdv: parseInt(document.getElementById('resultatScoreAdv').value)||0 };
+            if (!data.date || !data.adversaire) return showToast('Date et adversaire requis', 'error');
+            try {
+                if (id) await db.collection('resultats').doc(id).update(data);
+                else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('resultats').add(data); }
+                closeModal('resultat'); showToast('Résultat enregistré ✅', 'success');
+            } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+        }
+
+        async function saveJoueur() {
+    if (!isAdmin) return showToast('Accès admin requis', 'error');
+    const id = document.getElementById('joueurId').value;
+    const data = {
+        prenom: document.getElementById('joueurPrenom').value,
+        nom: document.getElementById('joueurNom').value,
+        numero: parseInt(document.getElementById('joueurNumero').value)||0,
+        poste: document.getElementById('joueurPoste').value,
+        dateNaissance: document.getElementById('joueurDateNaissance').value || null,
+        taille: parseInt(document.getElementById('joueurTaille').value)||null,
+        licence: document.getElementById('joueurLicence').value || null,
+        telephone: document.getElementById('joueurTel').value || null,
+        email: document.getElementById('joueurEmail').value || null,
+        photo: document.getElementById('joueurPhoto').value || null
+    };
+    if (!data.prenom || !data.nom) return showToast('Prénom et nom requis', 'error');
+    try {
+        if (id) await db.collection('joueurs').doc(id).update(data);
+        else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('joueurs').add(data); }
+        closeModal('joueur'); showToast('Joueur enregistré ✅', 'success');
+    } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+}
+
+        async function saveClassement() {
+            if (!isAdmin) return showToast('Accès admin requis', 'error');
+            const id = document.getElementById('classementId').value;
+            const data = { position: parseInt(document.getElementById('classementPos').value)||0, equipe: document.getElementById('classementEquipe').value, mj: parseInt(document.getElementById('classementMJ').value)||0, victoires: parseInt(document.getElementById('classementV').value)||0, defaites: parseInt(document.getElementById('classementD').value)||0, points: parseInt(document.getElementById('classementPts').value)||0 };
+            if (!data.equipe) return showToast("Nom d'équipe requis", 'error');
+            try {
+                if (id) await db.collection('classement').doc(id).update(data);
+                else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('classement').add(data); }
+                closeModal('classement'); showToast('Classement mis à jour ✅', 'success');
+            } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+        }
+
+        async function saveInfo() {
+            if (!isAdmin) return showToast('Accès admin requis', 'error');
+            const id = document.getElementById('infoId').value;
+            const data = { titre: document.getElementById('infoTitre').value, contenu: document.getElementById('infoContenu').value };
+            if (!data.titre) return showToast('Titre requis', 'error');
+            try {
+                if (id) await db.collection('infos').doc(id).update(data);
+                else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('infos').add(data); }
+                closeModal('info'); showToast('Info publiée ✅', 'success');
+            } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+        }
+
+        async function saveMessage() {
+            if (!currentUser) return showToast("Connecte-toi d'abord", 'error');
+            const texte = document.getElementById('messageTexte').value;
+            if (!texte.trim()) return showToast('Écris un message', 'error');
+            try {
+                await db.collection('messages').add({ texte, author: currentUser.email.split('@')[0], authorEmail: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                closeModal('message'); document.getElementById('messageTexte').value = '';
+                showToast('Message envoyé ✅', 'success');
+            } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+        }
+
+        // SAVE STATS INDIVIDUELLES
+        async function saveStatsIndiv() {
+    if (!isAdmin) return showToast('Accès admin requis', 'error');
+    const id = document.getElementById('statsIndivId').value;
+    const pts3 = parseInt(document.getElementById('statsIndiv3pts').value)||0;
+    const pts2 = parseInt(document.getElementById('statsIndiv2pts').value)||0;
+    const pts1 = parseInt(document.getElementById('statsIndiv1pt').value)||0;
+    const totalPts = (pts3 * 3) + (pts2 * 2) + pts1;
+
+    const data = {
+        joueurNom: document.getElementById('statsIndivJoueur').value,
+        pts3, pts2, pts1, totalPts,
+        fautes: parseInt(document.getElementById('statsIndivFautes').value)||0,
+        matchs: parseInt(document.getElementById('statsIndivMatchs').value)||0,
+        tempsJeu: parseInt(document.getElementById('statsIndivTemps').value)||0
+    };
+
+    if (!data.joueurNom) return showToast('Choisis un joueur', 'error');
+
+    try {
+        if (id) await db.collection('statsIndiv').doc(id).update(data);
+        else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('statsIndiv').add(data); }
+        closeModal('statsIndiv'); showToast('Stats enregistrées ✅', 'success');
+    } catch(e) { showToast('Erreur: '+e.message, 'error'); }
+}
+
+        // ============================================
+        // EDIT
+        // ============================================
+        async function editMatch(id) {
+            const d = (await db.collection('matchs').doc(id).get()).data();
+            document.getElementById('matchId').value = id;
+            document.getElementById('matchDate').value = d.date;
+            document.getElementById('matchHeure').value = d.heure;
+            document.getElementById('matchAdversaire').value = d.adversaire;
+            document.getElementById('matchLieu').value = d.lieu;
+            document.getElementById('matchSalle').value = d.salle;
+            openModal('match');
+        }
+
+        async function editResultat(id) {
+            const d = (await db.collection('resultats').doc(id).get()).data();
+            document.getElementById('resultatId').value = id;
+            document.getElementById('resultatDate').value = d.date;
+            document.getElementById('resultatAdversaire').value = d.adversaire;
+            document.getElementById('resultatScoreALCF').value = d.scoreALCF;
+            document.getElementById('resultatScoreAdv').value = d.scoreAdv;
+            openModal('resultat');
+        }
+
+        async function editJoueur(id) {
+    const d = (await db.collection('joueurs').doc(id).get()).data();
+    document.getElementById('joueurId').value = id;
+    document.getElementById('joueurPrenom').value = d.prenom;
+    document.getElementById('joueurNom').value = d.nom;
+    document.getElementById('joueurNumero').value = d.numero;
+    document.getElementById('joueurPoste').value = d.poste;
+    document.getElementById('joueurDateNaissance').value = d.dateNaissance||'';
+    document.getElementById('joueurTaille').value = d.taille||'';
+    document.getElementById('joueurLicence').value = d.licence||'';
+    document.getElementById('joueurTel').value = d.telephone||'';
+    document.getElementById('joueurEmail').value = d.email||'';
+    document.getElementById('joueurPhoto').value = d.photo||'';
+    previewPhoto(d.photo||'');
+    openModal('joueur');
+}
+
+        async function editClassement(id) {
+            const d = (await db.collection('classement').doc(id).get()).data();
+            document.getElementById('classementId').value = id;
+            document.getElementById('classementPos').value = d.position;
+            document.getElementById('classementEquipe').value = d.equipe;
+            document.getElementById('classementMJ').value = d.mj;
+            document.getElementById('classementV').value = d.victoires;
+            document.getElementById('classementD').value = d.defaites;
+            document.getElementById('classementPts').value = d.points;
+            openModal('classement');
+        }
+
+        async function editInfo(id) {
+            const d = (await db.collection('infos').doc(id).get()).data();
+            document.getElementById('infoId').value = id;
+            document.getElementById('infoTitre').value = d.titre;
+            document.getElementById('infoContenu').value = d.contenu;
+            openModal('info');
+        }
+
+        async function editStatsIndiv(id) {
+            await loadStatsIndiv(); // Refresh joueurs list
+            const d = (await db.collection('statsIndiv').doc(id).get()).data();
+            document.getElementById('statsIndivId').value = id;
+            document.getElementById('statsIndivJoueur').value = d.joueurNom;
+            document.getElementById('statsIndiv3pts').value = d.pts3;
+            document.getElementById('statsIndiv2pts').value = d.pts2;
+            document.getElementById('statsIndiv1pt').value = d.pts1;
+            document.getElementById('statsIndivFautes').value = d.fautes;
+            document.getElementById('statsIndivMatchs').value = d.matchs;
+            document.getElementById('statsIndivTemps').value = d.tempsJeu||0;
+            openModal('statsIndiv');
+        }
+
+        // ============================================
+        // DELETE
+        // ============================================
+        async function deleteDoc(col, id) {
+            if (!confirm('Supprimer ?')) return;
+            try { await db.collection(col).doc(id).delete(); showToast('Supprimé ✅', 'success'); }
+            catch(e) { showToast('Erreur: '+e.message, 'error'); }
+        }
+
+        // ============================================
+        // MODALS
+        // ============================================
+        function openModal(type) {
+            const idField = document.getElementById(type+'Id');
+            if (idField && !idField.value) {
+                const modal = document.getElementById('modal-'+type);
+                modal.querySelectorAll('input:not([type=hidden])').forEach(i => {
+                    if (!['matchHeure','matchSalle'].includes(i.id)) i.value = i.type==='number'?'0':'';
+                });
+                modal.querySelectorAll('textarea').forEach(t => t.value='');
+                modal.querySelectorAll('select').forEach(s => s.selectedIndex=0);
+            }
+            if (type === 'statsIndiv') {
+                // Charger les joueurs
+                db.collection('joueurs').orderBy('nom').get().then(snap => {
+                    const sel = document.getElementById('statsIndivJoueur');
+                    const currentVal = sel.value;
+                    sel.innerHTML = '<option value="">-- Choisir un joueur --</option>';
+                    snap.docs.forEach(doc => {
+                        const j = doc.data();
+                        sel.innerHTML += '<option value="'+j.prenom+' '+j.nom+'">'+j.prenom+' '+j.nom+' (#'+(j.numero||'?')+')</option>';
+                    });
+                    if (currentVal) sel.value = currentVal;
+                });
+            }
+            document.getElementById('modal-'+type).classList.add('active');
+            // Reset photo preview
+            if (type === 'joueur' && !document.getElementById('joueurId').value) {
+                document.getElementById('photoPreview').style.display = 'none';
+            }
+        }
+
+        function closeModal(type) {
+            document.getElementById('modal-'+type).classList.remove('active');
+            const idField = document.getElementById(type+'Id');
+            if (idField) idField.value = '';
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(o => {
+            o.addEventListener('click', e => { if(e.target===o) o.classList.remove('active'); });
+        });
+
+        // ============================================
+        // PHOTO PREVIEW
+        // ============================================
+        function previewPhoto(url) {
+            const preview = document.getElementById('photoPreview');
+            if (url && url.startsWith('http')) {
+                preview.src = url;
+                preview.style.display = 'block';
+                preview.onerror = () => { preview.style.display = 'none'; };
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        // ============================================
+        // TOAST
+        // ============================================
+        function showToast(msg, type='info') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast ' + type + ' show';
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        // ============================================
+        // UTILS
+        // ============================================
+        function formatDate(s) {
+            if (!s) return '-';
+            const d = new Date(s+'T00:00:00');
+            return d.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'});
+        }
+
+        // Init
+        loadData('accueil');
+    </script>
+
+</body>
+</html>
