@@ -22,9 +22,9 @@
         .nav-logo img { height: 72px; }
         .nav-logo span { font-size: 2.2rem; font-weight: 800; color: #ffd700; margin-left: 14px; }
         .nav-menu { display: flex; align-items: center; gap: 5px; }
-        .nav-menu a { color: white; text-decoration: none; padding: 8px 16px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        .nav-menu a { color: white; text-decoration: none; padding: 8px 12px; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
         .nav-menu a:hover, .nav-menu a.active { color: var(--gold-light); background: rgba(255,255,255,0.1); }
-        .user-info { color: var(--gold-light); margin: 0 15px; font-weight: bold; }
+        .user-info { color: var(--gold-light); margin: 0 10px; font-weight: bold; font-size: 0.8rem; }
 
         /* HERO ACCUEIL */
         .hero { background: linear-gradient(135deg, var(--violet), #4a1a6b); color: white; padding: 60px 4%; min-height: 85vh; display: flex; align-items: center; }
@@ -33,12 +33,9 @@
         .hero-text { text-align: center; }
         .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 15px; font-weight: 900; }
         .hero .subtitle { color: var(--gold-light); font-size: 1.8rem; margin-bottom: 25px; font-weight: 600; }
-        .next-match-box { background: linear-gradient(90deg, var(--gold), #ffbb33); color: var(--violet); padding: 15px 30px; border-radius: 50px; font-weight: 800; display: inline-block; box-shadow: 0 10px 20px rgba(0,0,0,0.2); margin-bottom: 30px; }
-        .hero-team-img { width: 100%; max-width: 500px; border: 6px solid var(--gold); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        
-        /* BOUTONS HERO & VENUE */
         .hero-btns { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
-        .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 15px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; margin-top: 10px; }
+        .hero-team-img { width: 100%; max-width: 500px; border: 6px solid var(--gold); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 15px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
         .venue-card:hover { background: var(--gold); color: var(--violet); transform: translateY(-3px); }
 
         /* PAGE SYSTEM */
@@ -48,12 +45,23 @@
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .page-header h2 { color: var(--violet); font-size: 2.2rem; border-bottom: 4px solid var(--gold); padding-bottom: 5px; }
 
+        /* GALERIE PHOTO */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .gallery-item { position: relative; border-radius: 15px; overflow: hidden; height: 250px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: 0.3s; }
+        .gallery-item:hover { transform: scale(1.02); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-caption { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(45, 16, 72, 0.8); color: white; padding: 10px; font-size: 0.9rem; text-align: center; }
+
+        /* LIGHTBOX */
+        .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; cursor: zoom-out; }
+        .lightbox.active { display: flex; }
+        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.5); cursor: default; }
+
         /* TABLES & GRID */
         .table-responsive { overflow-x: auto; border-radius: 15px; background: white; box-shadow: 0 5px 25px rgba(0,0,0,0.06); }
         .data-table { width: 100%; border-collapse: collapse; }
         .data-table th { background: var(--violet); color: var(--gold-light); padding: 15px; text-align: left; }
         .data-table td { padding: 15px; border-bottom: 1px solid var(--gray); }
-        .highlight td { background: #fdf6ec !important; font-weight: bold; }
         .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; cursor: pointer; transition: 0.3s; }
         .player-card:hover { transform: translateY(-8px); border: 1px solid var(--gold); }
@@ -93,11 +101,12 @@
             <a onclick="showPage('classement')" id="nav-classement">Classement</a>
             <a onclick="showPage('effectif')" id="nav-effectif">Effectif</a>
             <a onclick="showPage('stats')" id="nav-stats">Stats</a>
+            <a onclick="showPage('galerie')" id="nav-galerie">Galerie</a>
             <a onclick="showPage('infos')" id="nav-infos">Infos</a>
             <a onclick="showPage('messagerie')" id="nav-messagerie">Messagerie</a>
             <span class="user-info" id="userInfo" style="display:none"></span>
-            <a class="btn btn-gold" style="font-size:0.8rem; padding:8px 15px;" onclick="showPage('login')" id="btnLogin">Connexion</a>
-            <a class="btn" style="font-size:0.8rem; padding:8px 15px; background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Déconnexion</a>
+            <a class="btn btn-gold" style="font-size:0.7rem; padding:8px 12px;" onclick="showPage('login')" id="btnLogin">Connexion</a>
+            <a class="btn" style="font-size:0.7rem; padding:8px 12px; background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Déconnexion</a>
         </div>
     </nav>
 
@@ -109,16 +118,10 @@
                 <div class="hero-text">
                     <h1>BIENVENUE CHEZ<br>LES VIOLETS</h1>
                     <p class="subtitle">Espace officiel ALCF Basket - PNM</p>
-                    
-                    <!-- LES BOUTONS HERO -->
                     <div class="hero-btns">
                         <button onclick="showPage('effectif')" class="btn btn-gold">L'Effectif</button>
                         <button onclick="showPage('calendrier')" class="btn btn-gold">Calendrier</button>
                     </div>
-
-                    <div class="next-match-box">🔴 Prochain match : <span id="nextMatchText">Chargement...</span></div>
-                    
-                    <!-- LA CARTE SALLE GM4 -->
                     <div style="margin-top:20px;">
                         <a href="https://www.google.com/maps/search/?api=1&query=1+rue+des+noyers+42700+Firminy" target="_blank" class="venue-card">
                             <span style="font-size:1.5rem;">📍</span>
@@ -132,6 +135,17 @@
                 <img src="equipe-2025-2026.png" class="hero-team-img">
             </div>
         </section>
+    </div>
+
+    <!-- GALERIE -->
+    <div id="page-galerie" class="page">
+        <div class="container">
+            <div class="page-header">
+                <h2>📸 Galerie Photos</h2>
+                <button class="btn btn-gold admin-only" onclick="openModal('galerie')">+ Ajouter Photo</button>
+            </div>
+            <div class="gallery-grid" id="galleryGrid"></div>
+        </div>
     </div>
 
     <!-- CALENDRIER -->
@@ -200,7 +214,18 @@
         </div>
     </div>
 
-    <!-- MODALES -->
+    <!-- MODALE GALERIE -->
+    <div class="modal-overlay" id="modal-galerie">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('galerie')">×</button>
+            <h3>Ajouter une Photo</h3>
+            <div class="form-group" style="margin-top:15px;"><label>URL de l'image</label><input type="text" id="galPhotoUrl" placeholder="https://i.imgur.com/..."></div>
+            <div class="form-group"><label>Légende</label><input type="text" id="galLegende" placeholder="Match contre..."></div>
+            <button class="btn btn-gold" style="width:100%;margin-top:20px;" onclick="savePhoto()">Ajouter à la galerie</button>
+        </div>
+    </div>
+
+    <!-- MODALE JOUEUR -->
     <div class="modal-overlay" id="modal-joueur">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('joueur')">×</button>
@@ -210,16 +235,7 @@
                 <div class="form-group"><label>Prénom</label><input type="text" id="joueurPrenom"></div>
                 <div class="form-group"><label>Nom</label><input type="text" id="joueurNom"></div>
                 <div class="form-group"><label>N° Maillot</label><input type="number" id="joueurNumero"></div>
-                <div class="form-group">
-                    <label>Poste</label>
-                    <select id="joueurPoste">
-                        <option value="Meneur">1 - Meneur</option>
-                        <option value="Arrière">2 - Arrière</option>
-                        <option value="Ailier">3 - Ailier</option>
-                        <option value="Ailier Fort">4 - Ailier Fort</option>
-                        <option value="Pivot">5 - Pivot</option>
-                    </select>
-                </div>
+                <div class="form-group"><label>Poste</label><select id="joueurPoste"><option value="Meneur">1 - Meneur</option><option value="Arrière">2 - Arrière</option><option value="Ailier">3 - Ailier</option><option value="Ailier Fort">4 - Ailier Fort</option><option value="Pivot">5 - Pivot</option></select></div>
                 <div class="form-group"><label>Taille (cm)</label><input type="number" id="joueurTaille"></div>
                 <div class="form-group"><label>Naissance</label><input type="date" id="joueurDateNaissance"></div>
                 <div class="form-group" style="grid-column: span 2;"><label>Photo URL</label><input type="text" id="joueurPhoto"></div>
@@ -231,26 +247,11 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-player-details">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal('player-details')">×</button>
-            <div style="display:flex; align-items:center; gap:20px; border-bottom:2px solid var(--gray); padding-bottom:20px; margin-bottom:20px;">
-                <img id="detPhoto" class="player-img" style="margin:0; width:110px; height:110px;">
-                <div style="text-align:left;">
-                    <h3 id="detName" style="color:var(--violet); font-size:1.8rem;">-</h3>
-                    <p id="detPoste" style="color:var(--gold); font-weight:bold;"></p>
-                    <p id="detNum" style="font-weight:bold; color:var(--violet-light)"></p>
-                </div>
-            </div>
-            <div style="display:flex; justify-content:space-around; margin-bottom:20px; border-bottom:2px solid var(--gray);">
-                <button class="player-tabs-btn active" id="btnInf" onclick="switchTab('infos')" style="background:none; border:none; border-bottom:3px solid transparent; padding:10px; font-weight:bold; cursor:pointer;">🪪 Infos</button>
-                <button class="player-tabs-btn" id="btnSta" onclick="switchTab('stats')" style="background:none; border:none; border-bottom:3px solid transparent; padding:10px; font-weight:bold; cursor:pointer;">📈 Stats</button>
-            </div>
-            <div id="tabInfos"></div><div id="tabStats" style="display:none"></div>
-        </div>
-    </div>
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox" onclick="this.classList.remove('active')"><img id="lightboxImg" src=""></div>
 
     <!-- AUTRES MODALES ADMIN -->
+    <div class="modal-overlay" id="modal-player-details"><div class="modal"><button class="modal-close" onclick="closeModal('player-details')">×</button><div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;"><img id="detPhoto" class="player-img" style="margin:0;width:100px;height:100px;"><div style="text-align:left;"><h3 id="detName" style="color:var(--violet);font-size:1.6rem;">-</h3><p id="detPoste" style="color:var(--gold);font-weight:bold;"></p><p id="detNum" style="font-weight:bold;color:var(--violet-light)"></p></div></div><div style="display:flex;justify-content:space-around;margin-bottom:20px;border-bottom:2px solid var(--gray);"><button class="player-tabs-btn active" id="btnInf" onclick="switchTab('infos')">🪪 Infos</button><button class="player-tabs-btn" id="btnSta" onclick="switchTab('stats')">📈 Stats</button></div><div id="tabInfos"></div><div id="tabStats" style="display:none"></div></div></div>
     <div class="modal-overlay" id="modal-match"><div class="modal"><button class="modal-close" onclick="closeModal('match')">×</button><h3>Match</h3><input type="hidden" id="matchId"><div class="form-grid"><div class="form-group"><label>Date</label><input type="date" id="matchDate"></div><div class="form-group"><label>Heure</label><input type="time" id="matchHeure"></div><div class="form-group" style="grid-column:span 2"><label>Adversaire</label><input type="text" id="matchAdv"></div><div class="form-group"><label>Lieu</label><select id="matchLieu"><option>Domicile</option><option>Extérieur</option></select></div><div class="form-group"><label>Salle</label><input type="text" id="matchSalle"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveMatch()">Sauver</button></div></div>
     <div class="modal-overlay" id="modal-resultat"><div class="modal"><button class="modal-close" onclick="closeModal('resultat')">×</button><h3>Résultat</h3><input type="hidden" id="resultatId"><div class="form-grid"><div class="form-group" style="grid-column:span 2"><label>Adversaire</label><input type="text" id="resAdv"></div><div class="form-group"><label>ALCF</label><input type="number" id="resAlcf"></div><div class="form-group"><label>Adv</label><input type="number" id="resOpp"></div><div class="form-group" style="grid-column:span 2"><label>Date</label><input type="date" id="resDate"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveResultat()">Sauver</button></div></div>
     <div class="modal-overlay" id="modal-classement"><div class="modal"><button class="modal-close" onclick="closeModal('classement')">×</button><h3>Equipe</h3><input type="hidden" id="classementId"><div class="form-grid"><div class="form-group"><label>Pos</label><input type="number" id="clPos"></div><div class="form-group"><label>Nom</label><input type="text" id="clNom"></div><div class="form-group"><label>MJ</label><input type="number" id="clMJ"></div><div class="form-group"><label>V</label><input type="number" id="clV"></div><div class="form-group"><label>D</label><input type="number" id="clD"></div><div class="form-group"><label>Pts</label><input type="number" id="clPts"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveClassement()">Sauver</button></div></div>
@@ -296,20 +297,36 @@
         }
 
         function loadData(id) {
-            if(id==='accueil') loadNext();
+            if(id==='galerie') loadGallery();
+            if(id==='effectif') loadEff();
             if(id==='calendrier') loadCal();
             if(id==='resultats') loadRes();
             if(id==='classement') loadClas();
-            if(id==='effectif') loadEff();
             if(id==='stats') loadStats();
             if(id==='infos') loadInf();
             if(id==='messagerie') loadMsg();
         }
 
-        function loadNext() {
-            db.collection('matchs').where('date','>=',new Date().toISOString().split('T')[0]).orderBy('date').limit(1).get().then(snap => {
-                document.getElementById('nextMatchText').textContent = snap.empty ? 'Aucun match' : 'vs ' + snap.docs[0].data().adversaire;
+        // GALERIE LOGIC
+        function loadGallery() {
+            db.collection('photos').orderBy('createdAt', 'desc').onSnapshot(snap => {
+                document.getElementById('galleryGrid').innerHTML = snap.docs.map(doc => {
+                    const p = doc.data();
+                    return `<div class="gallery-item" onclick="openLightbox('${p.url}')">
+                        <img src="${p.url}">
+                        ${p.legende ? `<div class="gallery-caption">${p.legende}</div>` : ''}
+                        <button class="btn-icon admin-only" style="position:absolute;top:10px;right:10px;background:var(--danger);" onclick="event.stopPropagation(); deleteDoc('photos','${doc.id}')">🗑️</button>
+                    </div>`;
+                }).join('');
             });
+        }
+        function openLightbox(url) { document.getElementById('lightboxImg').src = url; document.getElementById('lightbox').classList.add('active'); }
+        async function savePhoto() {
+            const url = document.getElementById('galPhotoUrl').value;
+            const legende = document.getElementById('galLegende').value;
+            if(!url) return alert('URL requise');
+            await db.collection('photos').add({ url, legende, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            closeModal('galerie'); document.getElementById('galPhotoUrl').value=''; document.getElementById('galLegende').value='';
         }
 
         function loadEff() {
@@ -335,14 +352,7 @@
             document.getElementById('detName').textContent = d.prenom + ' ' + d.nom;
             document.getElementById('detPoste').textContent = d.poste;
             document.getElementById('detNum').textContent = 'Maillot n° ' + d.numero;
-            document.getElementById('tabInfos').innerHTML = `
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;background:var(--gray-light);padding:20px;border-radius:15px;text-align:left;">
-                    <div><small>NAISSANCE</small><p><strong>${d.dateNaissance || '-'}</strong></p></div>
-                    <div><small>TAILLE</small><p><strong>${d.taille || '-'} cm</strong></p></div>
-                    <div><small>LICENCE</small><p><strong>${isAdmin ? (d.licence || '-') : '••••••'}</strong></p></div>
-                    <div><small>TEL</small><p><strong>${isAdmin ? (d.telephone || '-') : '••••••'}</strong></p></div>
-                    <div style="grid-column:span 2"><small>EMAIL</small><p><strong>${isAdmin ? (d.email || '-') : '••••••'}</strong></p></div>
-                </div>`;
+            document.getElementById('tabInfos').innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;background:var(--gray-light);padding:20px;border-radius:15px;text-align:left;"><div><small>NAISSANCE</small><p><strong>${d.dateNaissance || '-'}</strong></p></div><div><small>TAILLE</small><p><strong>${d.taille || '-'} cm</strong></p></div><div><small>LICENCE</small><p><strong>${isAdmin ? (d.licence || '-') : '••••••'}</strong></p></div><div><small>TEL</small><p><strong>${isAdmin ? (d.telephone || '-') : '••••••'}</strong></p></div><div style="grid-column:span 2"><small>EMAIL</small><p><strong>${isAdmin ? (d.email || '-') : '••••••'}</strong></p></div></div>`;
             const sS = await db.collection('statsIndiv').where('joueurNom','==',d.prenom+' '+d.nom).get();
             if(!sS.empty) { const s = sS.docs[0].data(); document.getElementById('tabStats').innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div style="background:var(--violet);color:white;padding:15px;border-radius:15px;text-align:center;"><span style="font-size:1.5rem;font-weight:900;color:var(--gold);display:block;">${s.totalPts}</span>Points</div><div style="background:var(--gray);padding:15px;border-radius:15px;text-align:center;"><span style="font-size:1.5rem;font-weight:900;display:block;">${s.matchs}</span>Matchs</div></div>`; }
             else { document.getElementById('tabStats').innerHTML = '<p>Pas de stats.</p>'; }
@@ -350,13 +360,7 @@
         }
 
         async function saveJoueur() {
-            const id = document.getElementById('joueurId').value, data = {
-                prenom: document.getElementById('joueurPrenom').value, nom: document.getElementById('joueurNom').value,
-                numero: parseInt(document.getElementById('joueurNumero').value)||0, poste: document.getElementById('joueurPoste').value,
-                taille: document.getElementById('joueurTaille').value, dateNaissance: document.getElementById('joueurDateNaissance').value,
-                photo: document.getElementById('joueurPhoto').value, licence: document.getElementById('joueurLicence').value||'',
-                telephone: document.getElementById('joueurTel').value||'', email: document.getElementById('joueurEmail').value||''
-            };
+            const id = document.getElementById('joueurId').value, data = { prenom: document.getElementById('joueurPrenom').value, nom: document.getElementById('joueurNom').value, numero: parseInt(document.getElementById('joueurNumero').value)||0, poste: document.getElementById('joueurPoste').value, taille: document.getElementById('joueurTaille').value, dateNaissance: document.getElementById('joueurDateNaissance').value, photo: document.getElementById('joueurPhoto').value, licence: document.getElementById('joueurLicence').value||'', telephone: document.getElementById('joueurTel').value||'', email: document.getElementById('joueurEmail').value||'' };
             if(id) await db.collection('joueurs').doc(id).update(data); else await db.collection('joueurs').add(data);
             closeModal('joueur');
         }
@@ -402,12 +406,9 @@
             document.getElementById('tabStats').style.display = t==='stats'?'block':'none';
             document.getElementById('btnInf').classList.toggle('active', t==='infos');
             document.getElementById('btnSta').classList.toggle('active', t==='stats');
-            document.getElementById('btnInf').style.borderBottomColor = t==='infos'?'var(--violet)':'transparent';
-            document.getElementById('btnSta').style.borderBottomColor = t==='stats'?'var(--violet)':'transparent';
         }
 
         showPage('accueil');
     </script>
 </body>
 </html>
-```
