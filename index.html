@@ -1,5 +1,353 @@
 <!DOCTYPE html>
 <html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AL Chazeau Fayol Basket - PNM</title>
+
+    <!-- Scripts Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+    <style>
+        :root {
+            --violet: #2d1048;
+            --violet-light: #4a1a6b;
+            --gold: #f5a623;
+            --gold-light: #ffd700;
+            --white: #ffffff;
+            --gray-light: #f5f5f5;
+            --gray: #e0e0e0;
+            --gray-dark: #666;
+            --danger: #e74c3c;
+            --success: #27ae60;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray-light); color: #111827; overflow-x: hidden; }
+
+        /* NAVBAR */
+        .navbar {
+            background: linear-gradient(135deg, var(--violet), #4a1a6b);
+            padding: 15px 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .nav-logo { display: flex; align-items: center; text-decoration: none; cursor: pointer; }
+        .nav-logo img { height: 72px; }
+        .nav-logo span { font-size: 2.2rem; font-weight: 800; color: #ffd700; margin-left: 14px; }
+        .nav-menu { display: flex; align-items: center; gap: 5px; }
+        .nav-menu a { color: white; text-decoration: none; padding: 8px 16px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        .nav-menu a:hover, .nav-menu a.active { color: var(--gold-light); background: rgba(255,255,255,0.1); }
+
+        /* GRID & CARDS */
+        .page { display: none; padding: 40px; max-width: 1400px; margin: 0 auto; }
+        .page.active { display: block; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-header h2 { color: var(--violet); font-size: 2.2rem; border-bottom: 4px solid var(--gold); }
+
+        .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .player-card {
+            background: var(--white); border-radius: 20px; padding: 30px 20px; text-align: center;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.06); transition: 0.3s; position: relative; cursor: pointer;
+        }
+        .player-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+        
+        /* PHOTO CADRAGE AMÉLIORÉ */
+        .player-photo {
+            width: 155px; height: 155px; border-radius: 50%; border: 4px solid var(--gold);
+            object-fit: cover; object-position: center 10%; /* Empêche de couper le haut des têtes */
+            margin: 0 auto 15px; display: block; background: #eee;
+        }
+        .player-number {
+            position: absolute; top: 15px; right: 15px; background: var(--gold);
+            color: var(--violet); width: 42px; height: 42px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: 900;
+        }
+
+        /* MODALES */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--white); border-radius: 24px; padding: 40px; max-width: 600px; width: 100%;
+            position: relative; animation: modalPop 0.3s ease-out;
+        }
+        @keyframes modalPop { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal-close-btn {
+            position: absolute; top: 20px; right: 20px; width: 36px; height: 36px;
+            border-radius: 50%; border: none; background: #f0f0f0; cursor: pointer;
+            font-size: 20px; font-weight: bold; color: var(--violet);
+        }
+
+        .player-tabs-btn {
+            background: none; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer;
+            color: var(--gray-dark); border-bottom: 3px solid transparent;
+        }
+        .player-tabs-btn.active { color: var(--violet); border-bottom-color: var(--violet); }
+
+        .m-stat-card {
+            background: linear-gradient(135deg, var(--violet), #4a1a6b);
+            padding: 15px; border-radius: 16px; text-align: center; color: white;
+        }
+
+        /* BOUTONS ADMIN */
+        .btn { padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; text-decoration: none; }
+        .btn-gold { background: var(--gold); color: var(--violet); }
+        .admin-actions { margin-top: 15px; display: flex; gap: 10px; justify-content: center; }
+        .btn-edit { background: #f5a623; color: white; padding: 5px 12px; border-radius: 8px; }
+        .btn-delete { background: #e74c3c; color: white; padding: 5px 12px; border-radius: 8px; }
+
+        .admin-only { display: none !important; }
+        body.is-admin .admin-only { display: inline-flex !important; }
+        
+        .toast { position: fixed; bottom: 30px; right: 30px; padding: 16px 28px; border-radius: 50px; color: white; z-index: 5000; display: none; }
+        
+        @media (max-width: 768px) { .hero-content { grid-template-columns: 1fr; text-align: center; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a class="nav-logo" onclick="showPage('accueil')">
+            <img src="logo-alcf.png" alt="Logo">
+            <span>ALCF Basket</span>
+        </a>
+        <div class="nav-menu">
+            <a onclick="showPage('accueil')">Accueil</a>
+            <a onclick="showPage('effectif')" id="nav-effectif">Effectif</a>
+            <span class="user-info" id="userInfo" style="display:none; color:white; margin-left:15px;"></span>
+            <a class="btn btn-gold" onclick="showPage('login')" id="btnLogin">Connexion</a>
+            <a class="btn" style="background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Déconnexion</a>
+        </div>
+    </nav>
+
+    <!-- ACCUEIL -->
+    <div id="page-accueil" class="page active">
+        <div style="text-align:center; padding: 50px 0;">
+            <h1 style="font-size: 3rem; color: var(--violet);">BIENVENUE CHEZ LES VIOLETS</h1>
+            <img src="equipe-2025-2026.png" style="width:100%; max-width:800px; border-radius:20px; margin-top:30px; border:5px solid var(--gold);">
+        </div>
+    </div>
+
+    <!-- EFFECTIF -->
+    <div id="page-effectif" class="page">
+        <div class="page-header">
+            <h2>👥 Effectif PNM</h2>
+            <button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Ajouter un joueur</button>
+        </div>
+        <div class="players-grid" id="effectifGrid"></div>
+    </div>
+
+    <!-- MODAL DETAILS JOUEUR -->
+    <div class="modal-overlay" id="modal-player-details">
+        <div class="modal">
+            <button class="modal-close-btn" onclick="closeModal('player-details')">×</button>
+            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                <img id="detailPlayerPhoto" class="player-photo" style="margin:0; width:110px; height:110px;">
+                <div style="text-align:left">
+                    <h3 id="detailPlayerName" style="color:var(--violet); font-size:1.8rem;">-</h3>
+                    <p id="detailPlayerPoste" style="color:var(--gold); font-weight:bold; text-transform:uppercase;"></p>
+                    <p id="detailPlayerNumero" style="font-weight:bold; color:var(--violet-light)"></p>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-around; margin-bottom:20px; border-bottom:2px solid var(--gray)">
+                <button class="player-tabs-btn active" id="tab-btn-infos" onclick="switchPlayerTab('infos')">🪪 Informations</button>
+                <button class="player-tabs-btn" id="tab-btn-stats" onclick="switchPlayerTab('stats')">📈 Statistiques</button>
+            </div>
+            <div id="player-tab-infos"></div>
+            <div id="player-tab-stats" style="display:none"></div>
+        </div>
+    </div>
+
+    <!-- MODAL AJOUT/EDIT JOUEUR -->
+    <div class="modal-overlay" id="modal-joueur">
+        <div class="modal" style="max-width:500px;">
+            <h3>Fiche Joueur</h3>
+            <input type="hidden" id="joueurId">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px; text-align:left;">
+                <div><label>Prénom</label><input type="text" id="joueurPrenom" style="width:100%"></div>
+                <div><label>Nom</label><input type="text" id="joueurNom" style="width:100%"></div>
+                <div><label>N° Maillot</label><input type="number" id="joueurNumero" style="width:100%"></div>
+                <div><label>Poste</label><input type="text" id="joueurPoste" style="width:100%"></div>
+                <div><label>Taille (cm)</label><input type="number" id="joueurTaille" style="width:100%"></div>
+                <div><label>Naissance</label><input type="date" id="joueurDateNaissance" style="width:100%"></div>
+            </div>
+            <div style="text-align:left; margin-top:10px;">
+                <label>Photo URL</label><input type="text" id="joueurPhoto" style="width:100%">
+                <label>Licence</label><input type="text" id="joueurLicence" style="width:100%">
+                <label>Téléphone</label><input type="text" id="joueurTel" style="width:100%">
+                <label>Email</label><input type="text" id="joueurEmail" style="width:100%">
+            </div>
+            <div style="margin-top:20px;">
+                <button class="btn btn-gold" onclick="saveJoueur()">Enregistrer</button>
+                <button class="btn" onclick="closeModal('joueur')">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="page-login" class="page">
+        <div style="max-width:400px; margin:0 auto; background:white; padding:40px; border-radius:20px; text-align:center;">
+            <h2>Connexion PNM</h2>
+            <input type="email" id="loginEmail" placeholder="Email" style="width:100%; padding:10px; margin:10px 0;">
+            <input type="password" id="loginPassword" placeholder="Mot de passe" style="width:100%; padding:10px; margin:10px 0;">
+            <button class="btn btn-gold" onclick="doLogin()" style="width:100%">Se connecter</button>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYZuhh6iKsUMM-MBA3fANDGgCQOhANfVU",
+            authDomain: "alcf-basket.firebaseapp.com",
+            projectId: "alcf-basket",
+            storageBucket: "alcf-basket.firebasestorage.app",
+            messagingSenderId: "1082312491425",
+            appId: "1:1082312491425:web:646f4c5158d2707b0d8be0"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const ADMIN_EMAILS = ["polocezar@gmail.com"];
+        let isAdmin = false;
+
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                isAdmin = ADMIN_EMAILS.includes(user.email.toLowerCase());
+                document.body.classList.toggle('is-admin', isAdmin);
+                document.getElementById('userInfo').style.display = 'inline';
+                document.getElementById('userInfo').textContent = '👤 ' + user.email.split('@')[0];
+                document.getElementById('btnLogin').style.display = 'none';
+                document.getElementById('btnLogout').style.display = 'inline-flex';
+                if(document.getElementById('page-login').classList.contains('active')) showPage('accueil');
+            }
+        });
+
+        async function doLogin() {
+            try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); }
+            catch { alert('Erreur de connexion'); }
+        }
+        function doLogout() { auth.signOut(); location.reload(); }
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-'+id).classList.add('active');
+            if(id==='effectif') loadEffectif();
+        }
+
+        function loadEffectif() {
+            db.collection('joueurs').orderBy('numero').onSnapshot(snap => {
+                document.getElementById('effectifGrid').innerHTML = snap.docs.map(doc => {
+                    const j = doc.data();
+                    return `<div class="player-card" onclick="openPlayerDetails('${doc.id}')">
+                        <div class="player-number">${j.numero || '0'}</div>
+                        <img src="${j.photo || 'logo-alcf.png'}" class="player-photo">
+                        <h4>${j.prenom} ${j.nom}</h4>
+                        <p style="color:var(--gray-dark)">${j.poste}</p>
+                        <p style="font-size:0.75rem; color:var(--violet); font-weight:bold; margin-top:10px;">🔍 DETAILS</p>
+                        <div class="admin-only admin-actions">
+                            <button class="btn-edit" onclick="event.stopPropagation(); editJoueur('${doc.id}')">✏️</button>
+                            <button class="btn-delete" onclick="event.stopPropagation(); deleteJoueur('${doc.id}')">🗑️</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        async function openPlayerDetails(id) {
+            const doc = await db.collection('joueurs').doc(id).get();
+            const j = doc.data();
+            const age = calculateAge(j.dateNaissance);
+
+            document.getElementById('detailPlayerPhoto').src = j.photo || 'logo-alcf.png';
+            document.getElementById('detailPlayerName').textContent = j.prenom + ' ' + j.nom;
+            document.getElementById('detailPlayerPoste').textContent = j.poste;
+            document.getElementById('detailPlayerNumero').textContent = 'Maillot n° ' + (j.numero || '0');
+
+            document.getElementById('player-tab-infos').innerHTML = `
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; background:var(--gray-light); padding:20px; border-radius:15px; text-align:left;">
+                    <div><small>NAISSANCE</small><p><strong>${j.dateNaissance ? formatDate(j.dateNaissance) : '-'} (${age} ans)</strong></p></div>
+                    <div><small>TAILLE</small><p><strong>${j.taille ? j.taille + ' cm' : '-'}</strong></p></div>
+                    <div><small>LICENCE</small><p><strong>${isAdmin ? (j.licence || '-') : '••••••'}</strong></p></div>
+                    <div><small>TÉLÉPHONE</small><p><strong>${isAdmin ? (j.telephone ? `<a href="tel:${j.telephone}">${j.telephone}</a>` : '-') : '••••••'}</strong></p></div>
+                    <div style="grid-column: span 2;"><small>EMAIL</small><p><strong>${isAdmin ? (j.email ? `<a href="mailto:${j.email}">${j.email}</a>` : '-') : '••••••'}</strong></p></div>
+                </div>`;
+            
+            const sSnap = await db.collection('statsIndiv').where('joueurNom', '==', j.prenom + ' ' + j.nom).get();
+            if(!sSnap.empty) {
+                const s = sSnap.docs[0].data();
+                document.getElementById('player-tab-stats').innerHTML = `
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div class="m-stat-card"><span class="val">${s.totalPts}</span><span class="lab">Points</span></div>
+                        <div class="m-stat-card"><span class="val">${s.matchs > 0 ? (s.totalPts/s.matchs).toFixed(1) : 0}</span><span class="lab">Moyenne</span></div>
+                    </div>`;
+            } else { document.getElementById('player-tab-stats').innerHTML = '<p>Aucune stat.</p>'; }
+
+            switchPlayerTab('infos');
+            openModal('player-details');
+        }
+
+        async function saveJoueur() {
+            const id = document.getElementById('joueurId').value;
+            const data = {
+                prenom: document.getElementById('joueurPrenom').value,
+                nom: document.getElementById('joueurNom').value,
+                numero: parseInt(document.getElementById('joueurNumero').value) || 0,
+                poste: document.getElementById('joueurPoste').value,
+                taille: parseInt(document.getElementById('joueurTaille').value) || 0,
+                dateNaissance: document.getElementById('joueurDateNaissance').value,
+                photo: document.getElementById('joueurPhoto').value,
+                licence: document.getElementById('joueurLicence').value,
+                telephone: document.getElementById('joueurTel').value,
+                email: document.getElementById('joueurEmail').value
+            };
+            if(id) await db.collection('joueurs').doc(id).update(data);
+            else await db.collection('joueurs').add(data);
+            closeModal('joueur');
+        }
+
+        async function editJoueur(id) {
+            const d = (await db.collection('joueurs').doc(id).get()).data();
+            document.getElementById('joueurId').value = id;
+            document.getElementById('joueurPrenom').value = d.prenom;
+            document.getElementById('joueurNom').value = d.nom;
+            document.getElementById('joueurNumero').value = d.numero;
+            document.getElementById('joueurPoste').value = d.poste;
+            document.getElementById('joueurTaille').value = d.taille;
+            document.getElementById('joueurDateNaissance').value = d.dateNaissance;
+            document.getElementById('joueurPhoto').value = d.photo;
+            document.getElementById('joueurLicence').value = d.licence;
+            document.getElementById('joueurTel').value = d.telephone;
+            document.getElementById('joueurEmail').value = d.email;
+            openModal('joueur');
+        }
+
+        async function deleteJoueur(id) { if(confirm('Supprimer ce joueur ?')) await db.collection('joueurs').doc(id).delete(); }
+
+        function openModal(id) { document.getElementById('modal-'+id).classList.add('active'); }
+        function closeModal(id) { document.getElementById('modal-'+id).classList.remove('active'); if(id==='joueur') document.getElementById('joueurId').value=''; }
+        function switchPlayerTab(t) {
+            document.getElementById('player-tab-infos').style.display = t === 'infos' ? 'block' : 'none';
+            document.getElementById('player-tab-stats').style.display = t === 'stats' ? 'block' : 'none';
+            document.getElementById('tab-btn-infos').classList.toggle('active', t === 'infos');
+            document.getElementById('tab-btn-stats').classList.toggle('active', t === 'stats');
+        }
+        function formatDate(s) { return new Date(s).toLocaleDateString('fr-FR'); }
+        function calculateAge(s) {
+            if(!s) return '-';
+            const b = new Date(s), t = new Date();
+            let a = t.getFullYear() - b.getFullYear();
+            if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--;
+            return a;
+        }
+        showPage('accueil');
+    </script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
