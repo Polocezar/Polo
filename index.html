@@ -1,18 +1,3 @@
-C'est noté ! On laisse tomber le compte à rebours pour garder une interface épurée et on se concentre sur une **Galerie Photo** stylée avant d'attaquer le calendrier.
-
-Pour la galerie, l'idée est d'avoir une grille d'images où, quand on clique sur une photo, elle s'ouvre en grand (Lightbox) avec des flèches pour faire défiler.
-
-Voici la mise à jour complète de ton fichier `index.html`. 
-
-### Ce que j'ai ajouté :
-1.  **Une nouvelle page "Galerie"** dans le menu et le système de navigation.
-2.  **Un système d'upload (Admin)** : Tu peux ajouter une URL de photo et une légende.
-3.  **Une visionneuse (Lightbox)** : Quand on clique sur une image, elle s'affiche en plein écran.
-4.  **Boutons Admin** : Tu peux supprimer les photos directement depuis la galerie.
-
-**Copie ce code complet pour remplacer ton fichier :**
-
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -37,20 +22,21 @@ Voici la mise à jour complète de ton fichier `index.html`.
         .nav-logo img { height: 72px; }
         .nav-logo span { font-size: 2.2rem; font-weight: 800; color: #ffd700; margin-left: 14px; }
         .nav-menu { display: flex; align-items: center; gap: 5px; }
-        .nav-menu a { color: white; text-decoration: none; padding: 8px 12px; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+        .nav-menu a { color: white; text-decoration: none; padding: 8px 15px; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 0.95rem; }
         .nav-menu a:hover, .nav-menu a.active { color: var(--gold-light); background: rgba(255,255,255,0.1); }
-        .user-info { color: var(--gold-light); margin: 0 10px; font-weight: bold; font-size: 0.8rem; }
+        .user-info { color: var(--gold-light); margin: 0 15px; font-weight: bold; }
 
         /* HERO ACCUEIL */
         .hero { background: linear-gradient(135deg, var(--violet), #4a1a6b); color: white; padding: 60px 4%; min-height: 85vh; display: flex; align-items: center; }
         .hero-content { display: grid; grid-template-columns: 350px 1fr 500px; gap: 40px; max-width: 1700px; margin: 0 auto; align-items: center; width: 100%; }
-        .hero-logo { width: 100%; max-width: 320px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
+        .hero-logo { width: 100%; max-width: 340px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
         .hero-text { text-align: center; }
-        .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 15px; font-weight: 900; }
-        .hero .subtitle { color: var(--gold-light); font-size: 1.8rem; margin-bottom: 25px; font-weight: 600; }
-        .hero-btns { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
+        .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
+        .hero .subtitle { color: var(--gold-light); font-size: 1.8rem; margin-bottom: 35px; font-weight: 600; }
+        .hero-btns { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
         .hero-team-img { width: 100%; max-width: 500px; border: 6px solid var(--gold); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 15px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
+        
+        .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 20px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
         .venue-card:hover { background: var(--gold); color: var(--violet); transform: translateY(-3px); }
 
         /* PAGE SYSTEM */
@@ -60,46 +46,49 @@ Voici la mise à jour complète de ton fichier `index.html`.
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .page-header h2 { color: var(--violet); font-size: 2.2rem; border-bottom: 4px solid var(--gold); padding-bottom: 5px; }
 
-        /* GALERIE PHOTO */
+        /* GALERIE */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .gallery-item { position: relative; border-radius: 15px; overflow: hidden; height: 250px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: 0.3s; }
-        .gallery-item:hover { transform: scale(1.02); }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-        .gallery-caption { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(45, 16, 72, 0.8); color: white; padding: 10px; font-size: 0.9rem; text-align: center; }
+        .gallery-item { position: relative; border-radius: 15px; overflow: hidden; height: 250px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+        .gallery-item:hover img { transform: scale(1.05); }
+        .gallery-caption { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(45, 16, 72, 0.85); color: white; padding: 10px; font-size: 0.9rem; text-align: center; }
 
-        /* LIGHTBOX */
-        .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; cursor: zoom-out; }
-        .lightbox.active { display: flex; }
-        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.5); cursor: default; }
-
-        /* TABLES & GRID */
-        .table-responsive { overflow-x: auto; border-radius: 15px; background: white; box-shadow: 0 5px 25px rgba(0,0,0,0.06); }
-        .data-table { width: 100%; border-collapse: collapse; }
-        .data-table th { background: var(--violet); color: var(--gold-light); padding: 15px; text-align: left; }
-        .data-table td { padding: 15px; border-bottom: 1px solid var(--gray); }
+        /* PLAYERS GRID */
         .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; cursor: pointer; transition: 0.3s; }
-        .player-card:hover { transform: translateY(-8px); border: 1px solid var(--gold); }
+        .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
+        .player-card:hover { transform: translateY(-8px); border-color: var(--gold); }
         .player-img { width: 155px; height: 155px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; object-position: center 10%; margin: 0 auto 15px; display: block; }
         .player-num-badge { position: absolute; top: 15px; right: 15px; background: var(--gold); color: var(--violet); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; }
 
         /* MODALES */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
         .modal-overlay.active { display: flex; }
         .modal { background: white; border-radius: 24px; padding: 40px; max-width: 600px; width: 100%; position: relative; animation: modalPop 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
         @keyframes modalPop { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .modal-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #eee; cursor: pointer; font-size: 20px; font-weight: bold; color: var(--violet); }
+        
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
         .form-group label { font-weight: bold; color: var(--violet); font-size: 0.85rem; display: block; margin-bottom: 5px; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid var(--gray); border-radius: 10px; font-size: 1rem; }
 
+        /* LIGHTBOX */
+        .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; cursor: zoom-out; }
+        .lightbox.active { display: flex; }
+        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+
         /* BOUTONS */
-        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; text-decoration: none; display: inline-block; }
+        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; text-decoration: none; display: inline-block; font-size: 0.9rem; }
         .btn-gold { background: var(--gold); color: var(--violet); }
         .btn-gold:hover { background: #ffbb33; transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 2px solid var(--gold); color: white; }
+        .btn-outline:hover { background: var(--gold); color: var(--violet); }
         .btn-icon { padding: 8px 15px; border-radius: 8px; color: white; border: none; cursor: pointer; }
+
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: inline-flex !important; }
+        .toast { position: fixed; bottom: 30px; right: 30px; padding: 15px 30px; border-radius: 50px; color: white; font-weight: bold; z-index: 5000; display: none; }
+
+        @media (max-width: 990px) { .hero-content { grid-template-columns: 1fr; } .nav-menu { display: none; } }
     </style>
 </head>
 <body>
@@ -120,8 +109,8 @@ Voici la mise à jour complète de ton fichier `index.html`.
             <a onclick="showPage('infos')" id="nav-infos">Infos</a>
             <a onclick="showPage('messagerie')" id="nav-messagerie">Messagerie</a>
             <span class="user-info" id="userInfo" style="display:none"></span>
-            <a class="btn btn-gold" style="font-size:0.7rem; padding:8px 12px;" onclick="showPage('login')" id="btnLogin">Connexion</a>
-            <a class="btn" style="font-size:0.7rem; padding:8px 12px; background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Déconnexion</a>
+            <a class="btn btn-gold" style="padding:8px 15px; font-size:0.8rem;" onclick="showPage('login')" id="btnLogin">Connexion</a>
+            <a class="btn" style="padding:8px 15px; font-size:0.8rem; background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Déconnexion</a>
         </div>
     </nav>
 
@@ -129,25 +118,27 @@ Voici la mise à jour complète de ton fichier `index.html`.
     <div id="page-accueil" class="page">
         <section class="hero">
             <div class="hero-content">
-                <img src="logo-alcf.png" class="hero-logo">
+                <img src="logo-alcf.png" class="hero-logo" alt="ALCF Logo">
                 <div class="hero-text">
                     <h1>BIENVENUE CHEZ<br>LES VIOLETS</h1>
                     <p class="subtitle">Espace officiel ALCF Basket - PNM</p>
+                    
                     <div class="hero-btns">
-                        <button onclick="showPage('effectif')" class="btn btn-gold">L'Effectif</button>
-                        <button onclick="showPage('calendrier')" class="btn btn-gold">Calendrier</button>
+                        <button onclick="showPage('effectif')" class="btn btn-outline">VOIR L'EFFECTIF</button>
+                        <button onclick="showPage('calendrier')" class="btn btn-gold">CALENDRIER</button>
                     </div>
+
                     <div style="margin-top:20px;">
                         <a href="https://www.google.com/maps/search/?api=1&query=1+rue+des+noyers+42700+Firminy" target="_blank" class="venue-card">
-                            <span style="font-size:1.5rem;">📍</span>
+                            <span style="font-size:1.8rem;">📍</span>
                             <div style="text-align:left;">
-                                <strong style="display:block; font-size:1.1rem;">Salle GM4 Firminy</strong>
+                                <strong style="display:block; font-size:1.15rem;">Salle GM4 Firminy</strong>
                                 <small style="opacity:0.9;">1 Rue des Noyers, 42700 Firminy</small>
                             </div>
                         </a>
                     </div>
                 </div>
-                <img src="equipe-2025-2026.png" class="hero-team-img">
+                <img src="equipe-2025-2026.png" class="hero-team-img" alt="Equipe ALCF">
             </div>
         </section>
     </div>
@@ -155,10 +146,7 @@ Voici la mise à jour complète de ton fichier `index.html`.
     <!-- GALERIE -->
     <div id="page-galerie" class="page">
         <div class="container">
-            <div class="page-header">
-                <h2>📸 Galerie Photos</h2>
-                <button class="btn btn-gold admin-only" onclick="openModal('galerie')">+ Ajouter Photo</button>
-            </div>
+            <div class="page-header"><h2>📸 Galerie Photos</h2><button class="btn btn-gold admin-only" onclick="openModal('galerie')">+ Ajouter Photo</button></div>
             <div class="gallery-grid" id="galleryGrid"></div>
         </div>
     </div>
@@ -171,22 +159,6 @@ Voici la mise à jour complète de ton fichier `index.html`.
         </div>
     </div>
 
-    <!-- RESULTATS -->
-    <div id="page-resultats" class="page">
-        <div class="container">
-            <div class="page-header"><h2>📊 Résultats</h2><button class="btn btn-gold admin-only" onclick="openModal('resultat')">+ Résultat</button></div>
-            <div class="table-responsive"><table class="data-table"><thead><tr><th>Date</th><th>Adversaire</th><th>Score</th><th>Résultat</th><th class="admin-only">Actions</th></tr></thead><tbody id="resultatsBody"></tbody></table></div>
-        </div>
-    </div>
-
-    <!-- CLASSEMENT -->
-    <div id="page-classement" class="page">
-        <div class="container">
-            <div class="page-header"><h2>🥇 Classement</h2><button class="btn btn-gold admin-only" onclick="openModal('classement')">+ Équipe</button></div>
-            <div class="table-responsive"><table class="data-table"><thead><tr><th>Pos</th><th>Équipe</th><th>MJ</th><th>V</th><th>D</th><th>Pts</th><th class="admin-only">Actions</th></tr></thead><tbody id="classementBody"></tbody></table></div>
-        </div>
-    </div>
-
     <!-- EFFECTIF -->
     <div id="page-effectif" class="page">
         <div class="container">
@@ -195,29 +167,16 @@ Voici la mise à jour complète de ton fichier `index.html`.
         </div>
     </div>
 
+    <!-- RESULTATS -->
+    <div id="page-resultats" class="page"><div class="container"><div class="page-header"><h2>📊 Résultats</h2><button class="btn btn-gold admin-only" onclick="openModal('resultat')">+ Résultat</button></div><div class="table-responsive"><table class="data-table"><thead><tr><th>Date</th><th>Adversaire</th><th>Score</th><th>Résultat</th><th class="admin-only">Actions</th></tr></thead><tbody id="resultatsBody"></tbody></table></div></div></div>
+    <!-- CLASSEMENT -->
+    <div id="page-classement" class="page"><div class="container"><div class="page-header"><h2>🥇 Classement</h2><button class="btn btn-gold admin-only" onclick="openModal('classement')">+ Équipe</button></div><div class="table-responsive"><table class="data-table"><thead><tr><th>Pos</th><th>Équipe</th><th>MJ</th><th>V</th><th>D</th><th>Pts</th><th class="admin-only">Actions</th></tr></thead><tbody id="classementBody"></tbody></table></div></div></div>
     <!-- STATS -->
-    <div id="page-stats" class="page">
-        <div class="container">
-            <div class="page-header"><h2>📈 Statistiques</h2><button class="btn btn-gold admin-only" onclick="openModal('statsIndiv')">+ Stats</button></div>
-            <div class="table-responsive"><table class="data-table"><thead><tr><th>Joueur</th><th>🎯 3pt</th><th>✌️ 2pt</th><th>☝️ LF</th><th>📊 Total</th><th>Matchs</th><th class="admin-only">Actions</th></tr></thead><tbody id="statsIndivBody"></tbody></table></div>
-        </div>
-    </div>
-
+    <div id="page-stats" class="page"><div class="container"><div class="page-header"><h2>📈 Statistiques</h2><button class="btn btn-gold admin-only" onclick="openModal('statsIndiv')">+ Stats</button></div><div class="table-responsive"><table class="data-table"><thead><tr><th>Joueur</th><th>🎯 3pt</th><th>✌️ 2pt</th><th>☝️ LF</th><th>📊 Total</th><th>Matchs</th><th class="admin-only">Actions</th></tr></thead><tbody id="statsIndivBody"></tbody></table></div></div></div>
     <!-- INFOS -->
-    <div id="page-infos" class="page">
-        <div class="container">
-            <div class="page-header"><h2>📌 Infos Club</h2><button class="btn btn-gold admin-only" onclick="openModal('info')">+ Info</button></div>
-            <div id="infosGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;"></div>
-        </div>
-    </div>
-
+    <div id="page-infos" class="page"><div class="container"><div class="page-header"><h2>📌 Infos Club</h2><button class="btn btn-gold admin-only" onclick="openModal('info')">+ Info</button></div><div id="infosGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;"></div></div></div>
     <!-- MESSAGERIE -->
-    <div id="page-messagerie" class="page">
-        <div class="container">
-            <div class="page-header"><h2>💬 Messagerie</h2><button class="btn btn-gold" onclick="openModal('message')">+ Message</button></div>
-            <div id="messagesContainer" style="max-width:800px; margin:0 auto;"></div>
-        </div>
-    </div>
+    <div id="page-messagerie" class="page"><div class="container"><div class="page-header"><h2>💬 Messagerie</h2><button class="btn btn-gold" onclick="openModal('message')">+ Message</button></div><div id="messagesContainer" style="max-width:800px; margin:0 auto;"></div></div></div>
 
     <!-- LOGIN -->
     <div id="page-login" class="page">
@@ -226,17 +185,6 @@ Voici la mise à jour complète de ton fichier `index.html`.
             <div class="form-group"><label>Email</label><input type="email" id="loginEmail"></div>
             <div class="form-group"><label>Mot de passe</label><input type="password" id="loginPassword"></div>
             <button class="btn btn-gold" onclick="doLogin()" style="width:100%; margin-top:15px;">Se connecter</button>
-        </div>
-    </div>
-
-    <!-- MODALE GALERIE -->
-    <div class="modal-overlay" id="modal-galerie">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal('galerie')">×</button>
-            <h3>Ajouter une Photo</h3>
-            <div class="form-group" style="margin-top:15px;"><label>URL de l'image</label><input type="text" id="galPhotoUrl" placeholder="https://i.imgur.com/..."></div>
-            <div class="form-group"><label>Légende</label><input type="text" id="galLegende" placeholder="Match contre..."></div>
-            <button class="btn btn-gold" style="width:100%;margin-top:20px;" onclick="savePhoto()">Ajouter à la galerie</button>
         </div>
     </div>
 
@@ -262,17 +210,22 @@ Voici la mise à jour complète de ton fichier `index.html`.
         </div>
     </div>
 
-    <!-- LIGHTBOX -->
-    <div class="lightbox" id="lightbox" onclick="this.classList.remove('active')"><img id="lightboxImg" src=""></div>
-
-    <!-- AUTRES MODALES ADMIN -->
+    <!-- MODALE DETAILS -->
     <div class="modal-overlay" id="modal-player-details"><div class="modal"><button class="modal-close" onclick="closeModal('player-details')">×</button><div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;"><img id="detPhoto" class="player-img" style="margin:0;width:100px;height:100px;"><div style="text-align:left;"><h3 id="detName" style="color:var(--violet);font-size:1.6rem;">-</h3><p id="detPoste" style="color:var(--gold);font-weight:bold;"></p><p id="detNum" style="font-weight:bold;color:var(--violet-light)"></p></div></div><div style="display:flex;justify-content:space-around;margin-bottom:20px;border-bottom:2px solid var(--gray);"><button class="player-tabs-btn active" id="btnInf" onclick="switchTab('infos')">🪪 Infos</button><button class="player-tabs-btn" id="btnSta" onclick="switchTab('stats')">📈 Stats</button></div><div id="tabInfos"></div><div id="tabStats" style="display:none"></div></div></div>
+    
+    <!-- MODALE GALERIE -->
+    <div class="modal-overlay" id="modal-galerie"><div class="modal"><button class="modal-close" onclick="closeModal('galerie')">×</button><h3>Ajouter une Photo</h3><div class="form-group" style="margin-top:20px;"><label>URL de l'image</label><input type="text" id="galPhotoUrl"></div><div class="form-group"><label>Légende</label><input type="text" id="galLegende"></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="savePhoto()">Ajouter</button></div></div>
+    
+    <!-- AUTRES MODALES ADMIN -->
     <div class="modal-overlay" id="modal-match"><div class="modal"><button class="modal-close" onclick="closeModal('match')">×</button><h3>Match</h3><input type="hidden" id="matchId"><div class="form-grid"><div class="form-group"><label>Date</label><input type="date" id="matchDate"></div><div class="form-group"><label>Heure</label><input type="time" id="matchHeure"></div><div class="form-group" style="grid-column:span 2"><label>Adversaire</label><input type="text" id="matchAdv"></div><div class="form-group"><label>Lieu</label><select id="matchLieu"><option>Domicile</option><option>Extérieur</option></select></div><div class="form-group"><label>Salle</label><input type="text" id="matchSalle"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveMatch()">Sauver</button></div></div>
     <div class="modal-overlay" id="modal-resultat"><div class="modal"><button class="modal-close" onclick="closeModal('resultat')">×</button><h3>Résultat</h3><input type="hidden" id="resultatId"><div class="form-grid"><div class="form-group" style="grid-column:span 2"><label>Adversaire</label><input type="text" id="resAdv"></div><div class="form-group"><label>ALCF</label><input type="number" id="resAlcf"></div><div class="form-group"><label>Adv</label><input type="number" id="resOpp"></div><div class="form-group" style="grid-column:span 2"><label>Date</label><input type="date" id="resDate"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveResultat()">Sauver</button></div></div>
     <div class="modal-overlay" id="modal-classement"><div class="modal"><button class="modal-close" onclick="closeModal('classement')">×</button><h3>Equipe</h3><input type="hidden" id="classementId"><div class="form-grid"><div class="form-group"><label>Pos</label><input type="number" id="clPos"></div><div class="form-group"><label>Nom</label><input type="text" id="clNom"></div><div class="form-group"><label>MJ</label><input type="number" id="clMJ"></div><div class="form-group"><label>V</label><input type="number" id="clV"></div><div class="form-group"><label>D</label><input type="number" id="clD"></div><div class="form-group"><label>Pts</label><input type="number" id="clPts"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveClassement()">Sauver</button></div></div>
-    <div class="modal-overlay" id="modal-info"><div class="modal"><button class="modal-close" onclick="closeModal('info')">×</button><h3>Info</h3><input type="hidden" id="infoId"><div class="form-group"><label>Titre</label><input type="text" id="infoTitre"></div><div class="form-group"><label>Texte</label><textarea id="infoContenu"></textarea></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveInfo()">Sauver</button></div></div>
+    <div class="modal-overlay" id="modal-info"><div class="modal"><button class="modal-close" onclick="closeModal('info')">×</button><h3>Info</h3><input type="hidden" id="infoId"><div class="form-group"><label>Titre</label><input type="text" id="infoTitre"></div><div class="form-group"><label>Texte</label><textarea id="infoContenu"></textarea></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveInfo()">Publier</button></div></div>
     <div class="modal-overlay" id="modal-message"><div class="modal"><button class="modal-close" onclick="closeModal('message')">×</button><h3>Message</h3><textarea id="msgTexte" style="width:100%;height:100px;"></textarea><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveMsg()">Envoyer</button></div></div>
     <div class="modal-overlay" id="modal-statsIndiv"><div class="modal"><button class="modal-close" onclick="closeModal('statsIndiv')">×</button><h3>Stats</h3><input type="hidden" id="statsId"><div class="form-grid"><div class="form-group" style="grid-column:span 2"><label>Joueur</label><select id="stJoueur"></select></div><div class="form-group"><label>3pt</label><input type="number" id="st3"></div><div class="form-group"><label>2pt</label><input type="number" id="st2"></div><div class="form-group"><label>LF</label><input type="number" id="st1"></div><div class="form-group"><label>MJ</label><input type="number" id="stMJ"></div><div class="form-group"><label>Fautes</label><input type="number" id="stF"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveStatsIndiv()">Sauver</button></div></div>
+
+    <div class="lightbox" id="lightbox" onclick="this.classList.remove('active')"><img id="lightboxImg" src=""></div>
+    <div class="toast" id="toast"></div>
 
     <script>
         const firebaseConfig = {
@@ -322,7 +275,6 @@ Voici la mise à jour complète de ton fichier `index.html`.
             if(id==='messagerie') loadMsg();
         }
 
-        // GALERIE LOGIC
         function loadGallery() {
             db.collection('photos').orderBy('createdAt', 'desc').onSnapshot(snap => {
                 document.getElementById('galleryGrid').innerHTML = snap.docs.map(doc => {
@@ -337,10 +289,8 @@ Voici la mise à jour complète de ton fichier `index.html`.
         }
         function openLightbox(url) { document.getElementById('lightboxImg').src = url; document.getElementById('lightbox').classList.add('active'); }
         async function savePhoto() {
-            const url = document.getElementById('galPhotoUrl').value;
-            const legende = document.getElementById('galLegende').value;
-            if(!url) return alert('URL requise');
-            await db.collection('photos').add({ url, legende, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            const url = document.getElementById('galPhotoUrl').value, leg = document.getElementById('galLegende').value;
+            if(!url) return; await db.collection('photos').add({url, legende:leg, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
             closeModal('galerie'); document.getElementById('galPhotoUrl').value=''; document.getElementById('galLegende').value='';
         }
 
