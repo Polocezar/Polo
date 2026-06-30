@@ -26,6 +26,21 @@
         .nav-menu a:hover, .nav-menu a.active { color: var(--gold-light); background: rgba(255,255,255,0.1); }
         .user-info { color: var(--gold-light); margin: 0 15px; font-weight: bold; }
 
+        /* HERO ACCUEIL */
+        .hero { background: linear-gradient(135deg, var(--violet), #4a1a6b); color: white; padding: 60px 4%; min-height: 85vh; display: flex; align-items: center; }
+        .hero-content { display: grid; grid-template-columns: 350px 1fr 500px; gap: 40px; max-width: 1700px; margin: 0 auto; align-items: center; width: 100%; }
+        .hero-logo { width: 100%; max-width: 320px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
+        .hero-text { text-align: center; }
+        .hero h1 { font-size: 3.2rem; line-height: 1.1; margin-bottom: 15px; font-weight: 900; }
+        .hero .subtitle { color: var(--gold-light); font-size: 1.6rem; margin-bottom: 25px; font-weight: 600; }
+        .next-match-box { background: linear-gradient(90deg, var(--gold), #ffbb33); color: var(--violet); padding: 15px 30px; border-radius: 50px; font-weight: 800; display: inline-block; box-shadow: 0 10px 20px rgba(0,0,0,0.2); margin-bottom: 25px; }
+        .hero-team-img { width: 100%; max-width: 500px; border: 6px solid var(--gold); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        
+        /* BOUTONS HERO & VENUE */
+        .hero-btns { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
+        .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 15px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
+        .venue-card:hover { background: var(--gold); color: var(--violet); transform: translateY(-3px); }
+
         /* PAGE SYSTEM */
         .page { display: none; }
         .page.active { display: block; }
@@ -33,26 +48,13 @@
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .page-header h2 { color: var(--violet); font-size: 2.2rem; border-bottom: 4px solid var(--gold); padding-bottom: 5px; }
 
-        /* HERO ACCUEIL */
-        .hero { background: linear-gradient(135deg, var(--violet), #4a1a6b); color: white; padding: 60px 4%; min-height: 85vh; display: flex; align-items: center; }
-        .hero-content { display: grid; grid-template-columns: 350px 1fr 500px; gap: 40px; max-width: 1700px; margin: 0 auto; align-items: center; width: 100%; }
-        .hero-logo { width: 100%; max-width: 320px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
-        .hero-text { text-align: center; }
-        .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
-        .hero .subtitle { color: var(--gold-light); font-size: 1.8rem; margin-bottom: 35px; font-weight: 600; }
-        .next-match-box { background: linear-gradient(90deg, var(--gold), #ffbb33); color: var(--violet); padding: 18px 35px; border-radius: 50px; font-weight: 800; display: inline-block; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .hero-team-img { width: 100%; max-width: 500px; border: 6px solid var(--gold); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-
-        /* TABLES */
+        /* TABLES & GRID */
         .table-responsive { overflow-x: auto; border-radius: 15px; background: white; box-shadow: 0 5px 25px rgba(0,0,0,0.06); }
         .data-table { width: 100%; border-collapse: collapse; }
         .data-table th { background: var(--violet); color: var(--gold-light); padding: 15px; text-align: left; }
         .data-table td { padding: 15px; border-bottom: 1px solid var(--gray); }
-        .highlight td { background: #fdf6ec !important; font-weight: bold; }
-
-        /* PLAYERS GRID */
         .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); transition: 0.3s; position: relative; cursor: pointer; }
+        .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; cursor: pointer; transition: 0.3s; }
         .player-card:hover { transform: translateY(-8px); border: 1px solid var(--gold); }
         .player-img { width: 155px; height: 155px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; object-position: center 10%; margin: 0 auto 15px; display: block; }
         .player-num-badge { position: absolute; top: 15px; right: 15px; background: var(--gold); color: var(--violet); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; }
@@ -63,19 +65,15 @@
         .modal { background: white; border-radius: 24px; padding: 40px; max-width: 600px; width: 100%; position: relative; animation: modalPop 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
         @keyframes modalPop { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .modal-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #eee; cursor: pointer; font-size: 20px; font-weight: bold; color: var(--violet); }
-        
-        /* FORMS */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
-        .form-group { margin-bottom: 10px; }
         .form-group label { font-weight: bold; color: var(--violet); font-size: 0.85rem; display: block; margin-bottom: 5px; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid var(--gray); border-radius: 10px; font-size: 1rem; }
 
         /* BOUTONS */
-        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; }
+        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; text-decoration: none; display: inline-block; }
         .btn-gold { background: var(--gold); color: var(--violet); }
         .btn-gold:hover { background: #ffbb33; transform: translateY(-2px); }
         .btn-icon { padding: 8px 15px; border-radius: 8px; color: white; border: none; cursor: pointer; }
-
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: inline-flex !important; }
         .toast { position: fixed; bottom: 30px; right: 30px; padding: 15px 30px; border-radius: 50px; color: white; font-weight: bold; z-index: 5000; display: none; }
@@ -111,7 +109,17 @@
                 <div class="hero-text">
                     <h1>BIENVENUE CHEZ<br>LES VIOLETS</h1>
                     <p class="subtitle">Espace officiel ALCF Basket - PNM</p>
+                    <div class="hero-btns">
+                        <button onclick="showPage('effectif')" class="btn btn-gold">L'Effectif</button>
+                        <button onclick="showPage('calendrier')" class="btn btn-gold">Calendrier</button>
+                    </div>
                     <div class="next-match-box">🔴 Prochain match : <span id="nextMatchText">Chargement...</span></div>
+                    <div style="margin-top:20px;">
+                        <a href="https://www.google.com/maps/search/?api=1&query=1+rue+des+noyers+42700+Firminy" target="_blank" class="venue-card">
+                            <span>📍</span>
+                            <div style="text-align:left;"><strong style="display:block;">Salle GM4 Firminy</strong><small>1 Rue des Noyers, 42700 Firminy</small></div>
+                        </a>
+                    </div>
                 </div>
                 <img src="equipe-2025-2026.png" class="hero-team-img">
             </div>
@@ -153,7 +161,7 @@
     <!-- STATS -->
     <div id="page-stats" class="page">
         <div class="container">
-            <div class="page-header"><h2>📈 Statistiques</h2><button class="btn btn-gold admin-only" onclick="openModal('statsIndiv')">+ Stats Joueur</button></div>
+            <div class="page-header"><h2>📈 Statistiques</h2><button class="btn btn-gold admin-only" onclick="openModal('statsIndiv')">+ Stats</button></div>
             <div class="table-responsive"><table class="data-table"><thead><tr><th>Joueur</th><th>🎯 3pt</th><th>✌️ 2pt</th><th>☝️ LF</th><th>📊 Total</th><th>Matchs</th><th class="admin-only">Actions</th></tr></thead><tbody id="statsIndivBody"></tbody></table></div>
         </div>
     </div>
@@ -184,7 +192,7 @@
         </div>
     </div>
 
-    <!-- MODALE JOUEUR (AVEC SELECT POSTE) -->
+    <!-- MODALE JOUEUR -->
     <div class="modal-overlay" id="modal-joueur">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('joueur')">×</button>
@@ -228,23 +236,20 @@
                 </div>
             </div>
             <div style="display:flex; justify-content:space-around; margin-bottom:20px; border-bottom:2px solid var(--gray);">
-                <button class="player-tabs-btn active" id="btnInf" onclick="switchTab('infos')">🪪 Infos</button>
+                <button class="player-tabs-btn" id="btnInf" onclick="switchTab('infos')">🪪 Infos</button>
                 <button class="player-tabs-btn" id="btnSta" onclick="switchTab('stats')">📈 Stats</button>
             </div>
-            <div id="tabInfos"></div>
-            <div id="tabStats" style="display:none"></div>
+            <div id="tabInfos"></div><div id="tabStats" style="display:none"></div>
         </div>
     </div>
 
-    <!-- AUTRES MODALES -->
+    <!-- AUTRES MODALES ADMIN -->
     <div class="modal-overlay" id="modal-match"><div class="modal"><button class="modal-close" onclick="closeModal('match')">×</button><h3>Match</h3><input type="hidden" id="matchId"><div class="form-grid"><div class="form-group"><label>Date</label><input type="date" id="matchDate"></div><div class="form-group"><label>Heure</label><input type="time" id="matchHeure"></div><div class="form-group" style="grid-column:span 2"><label>Adversaire</label><input type="text" id="matchAdv"></div><div class="form-group"><label>Lieu</label><select id="matchLieu"><option>Domicile</option><option>Extérieur</option></select></div><div class="form-group"><label>Salle</label><input type="text" id="matchSalle"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveMatch()">Sauver</button></div></div>
     <div class="modal-overlay" id="modal-resultat"><div class="modal"><button class="modal-close" onclick="closeModal('resultat')">×</button><h3>Résultat</h3><input type="hidden" id="resultatId"><div class="form-grid"><div class="form-group" style="grid-column:span 2"><label>Adversaire</label><input type="text" id="resAdv"></div><div class="form-group"><label>ALCF</label><input type="number" id="resAlcf"></div><div class="form-group"><label>Adv</label><input type="number" id="resOpp"></div><div class="form-group" style="grid-column:span 2"><label>Date</label><input type="date" id="resDate"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveResultat()">Sauver</button></div></div>
     <div class="modal-overlay" id="modal-classement"><div class="modal"><button class="modal-close" onclick="closeModal('classement')">×</button><h3>Equipe</h3><input type="hidden" id="classementId"><div class="form-grid"><div class="form-group"><label>Pos</label><input type="number" id="clPos"></div><div class="form-group"><label>Nom</label><input type="text" id="clNom"></div><div class="form-group"><label>MJ</label><input type="number" id="clMJ"></div><div class="form-group"><label>V</label><input type="number" id="clV"></div><div class="form-group"><label>D</label><input type="number" id="clD"></div><div class="form-group"><label>Pts</label><input type="number" id="clPts"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveClassement()">Sauver</button></div></div>
-    <div class="modal-overlay" id="modal-info"><div class="modal"><button class="modal-close" onclick="closeModal('info')">×</button><h3>Info</h3><input type="hidden" id="infoId"><div class="form-group"><label>Titre</label><input type="text" id="infoTitre"></div><div class="form-group"><label>Texte</label><textarea id="infoContenu"></textarea></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveInfo()">Publier</button></div></div>
+    <div class="modal-overlay" id="modal-info"><div class="modal"><button class="modal-close" onclick="closeModal('info')">×</button><h3>Info Club</h3><input type="hidden" id="infoId"><div class="form-group"><label>Titre</label><input type="text" id="infoTitre"></div><div class="form-group"><label>Texte</label><textarea id="infoContenu"></textarea></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveInfo()">Sauver</button></div></div>
     <div class="modal-overlay" id="modal-message"><div class="modal"><button class="modal-close" onclick="closeModal('message')">×</button><h3>Message</h3><textarea id="msgTexte" style="width:100%;height:100px;"></textarea><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveMsg()">Envoyer</button></div></div>
     <div class="modal-overlay" id="modal-statsIndiv"><div class="modal"><button class="modal-close" onclick="closeModal('statsIndiv')">×</button><h3>Stats</h3><input type="hidden" id="statsId"><div class="form-grid"><div class="form-group" style="grid-column:span 2"><label>Joueur</label><select id="stJoueur"></select></div><div class="form-group"><label>3pt</label><input type="number" id="st3"></div><div class="form-group"><label>2pt</label><input type="number" id="st2"></div><div class="form-group"><label>LF</label><input type="number" id="st1"></div><div class="form-group"><label>MJ</label><input type="number" id="stMJ"></div><div class="form-group"><label>Fautes</label><input type="number" id="stF"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveStatsIndiv()">Sauver</button></div></div>
-
-    <div class="toast" id="toast"></div>
 
     <script>
         const firebaseConfig = {
@@ -323,24 +328,17 @@
             document.getElementById('detName').textContent = d.prenom + ' ' + d.nom;
             document.getElementById('detPoste').textContent = d.poste;
             document.getElementById('detNum').textContent = 'Maillot n° ' + d.numero;
-            
             document.getElementById('tabInfos').innerHTML = `
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; background:var(--gray-light); padding:20px; border-radius:15px; text-align:left;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;background:var(--gray-light);padding:20px;border-radius:15px;text-align:left;">
                     <div><small>NAISSANCE</small><p><strong>${d.dateNaissance || '-'}</strong></p></div>
                     <div><small>TAILLE</small><p><strong>${d.taille || '-'} cm</strong></p></div>
                     <div><small>LICENCE</small><p><strong>${isAdmin ? (d.licence || '-') : '••••••'}</strong></p></div>
-                    <div><small>TÉLÉPHONE</small><p><strong>${isAdmin ? (d.telephone || '-') : '••••••'}</strong></p></div>
+                    <div><small>TEL</small><p><strong>${isAdmin ? (d.telephone || '-') : '••••••'}</strong></p></div>
                     <div style="grid-column:span 2"><small>EMAIL</small><p><strong>${isAdmin ? (d.email || '-') : '••••••'}</strong></p></div>
                 </div>`;
-            
-            const sSnap = await db.collection('statsIndiv').where('joueurNom','==',d.prenom+' '+d.nom).get();
-            if(!sSnap.empty) {
-                const s = sSnap.docs[0].data();
-                document.getElementById('tabStats').innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <div style="background:var(--violet);color:white;padding:15px;border-radius:15px;text-align:center;"><span style="font-size:1.5rem;font-weight:900;color:var(--gold);display:block;">${s.totalPts}</span>Points</div>
-                    <div style="background:var(--gray);padding:15px;border-radius:15px;text-align:center;"><span style="font-size:1.5rem;font-weight:900;display:block;">${s.matchs}</span>Matchs</div>
-                </div>`;
-            } else { document.getElementById('tabStats').innerHTML = '<p>Pas de stats.</p>'; }
+            const sS = await db.collection('statsIndiv').where('joueurNom','==',d.prenom+' '+d.nom).get();
+            if(!sS.empty) { const s = sS.docs[0].data(); document.getElementById('tabStats').innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div style="background:var(--violet);color:white;padding:15px;border-radius:15px;text-align:center;"><span style="font-size:1.5rem;font-weight:900;color:var(--gold);display:block;">${s.totalPts}</span>Points</div><div style="background:var(--gray);padding:15px;border-radius:15px;text-align:center;"><span style="font-size:1.5rem;font-weight:900;display:block;">${s.matchs}</span>Matchs</div></div>`; }
+            else { document.getElementById('tabStats').innerHTML = '<p>Pas de stats.</p>'; }
             switchTab('infos'); openModal('player-details');
         }
 
@@ -372,15 +370,15 @@
             openModal('joueur');
         }
 
-        function loadCal() { db.collection('matchs').orderBy('date').onSnapshot(s => { document.getElementById('calendrierBody').innerHTML = s.docs.map(doc => { const m = doc.data(); return `<tr><td>${m.date}</td><td>${m.heure}</td><td>ALCF vs ${m.adversaire}</td><td>${m.lieu}</td><td>${m.salle}</td><td class="admin-only"><button onclick="deleteDoc('matchs','${doc.id}')">🗑️</button></td></tr>`; }).join(''); }); }
-        function loadRes() { db.collection('resultats').orderBy('date','desc').onSnapshot(s => { document.getElementById('resultatsBody').innerHTML = s.docs.map(doc => { const r = doc.data(); return `<tr><td>${r.date}</td><td>${r.adversaire}</td><td>${r.scoreALCF}-${r.scoreAdv}</td><td>${r.scoreALCF>r.scoreAdv?'V':'D'}</td><td class="admin-only"><button onclick="deleteDoc('resultats','${doc.id}')">🗑️</button></td></tr>`; }).join(''); }); }
-        function loadClas() { db.collection('classement').orderBy('position').onSnapshot(s => { document.getElementById('classementBody').innerHTML = s.docs.map(doc => { const c = doc.data(); return `<tr class="${c.equipe.includes('ALCF')?'highlight':''}"><td>${c.position}</td><td>${c.equipe}</td><td>${c.mj}</td><td>${c.victoires}</td><td>${c.defaites}</td><td>${c.points}</td><td class="admin-only"><button onclick="deleteDoc('classement','${doc.id}')">🗑️</button></td></tr>`; }).join(''); }); }
+        function loadCal() { db.collection('matchs').orderBy('date').onSnapshot(s => { document.getElementById('calendrierBody').innerHTML = s.docs.map(doc => { const m = doc.data(); return `<tr><td>${m.date}</td><td>${m.heure}</td><td>ALCF vs ${m.adversaire}</td><td>${m.lieu}</td><td>${m.salle}</td><td class="admin-only"><button class="btn-icon" style="background:var(--danger)" onclick="deleteDoc('matchs','${doc.id}')">🗑️</button></td></tr>`; }).join(''); }); }
+        function loadRes() { db.collection('resultats').orderBy('date','desc').onSnapshot(s => { document.getElementById('resultatsBody').innerHTML = s.docs.map(doc => { const r = doc.data(); return `<tr><td>${r.date}</td><td>${r.adversaire}</td><td>${r.scoreALCF}-${r.scoreAdv}</td><td>${r.scoreALCF>r.scoreAdv?'V':'D'}</td><td class="admin-only"><button class="btn-icon" style="background:var(--danger)" onclick="deleteDoc('resultats','${doc.id}')">🗑️</button></td></tr>`; }).join(''); }); }
+        function loadClas() { db.collection('classement').orderBy('position').onSnapshot(s => { document.getElementById('classementBody').innerHTML = s.docs.map(doc => { const c = doc.data(); return `<tr class="${c.equipe.includes('ALCF')?'highlight':''}"><td>${c.position}</td><td>${c.equipe}</td><td>${c.mj}</td><td>${c.victoires}</td><td>${c.defaites}</td><td>${c.points}</td><td class="admin-only"><button class="btn-icon" style="background:var(--danger)" onclick="deleteDoc('classement','${doc.id}')">🗑️</button></td></tr>`; }).join(''); }); }
         function loadStats() {
-            db.collection('statsIndiv').orderBy('totalPts','desc').onSnapshot(s => { document.getElementById('statsIndivBody').innerHTML = s.docs.map(doc => { const st = doc.data(); return `<tr><td>${st.joueurNom}</td><td>${st.pts3}</td><td>${st.pts2}</td><td>${st.pts1}</td><td>${st.totalPts}</td><td>${st.matchs}</td><td class="admin-only"><button onclick="deleteDoc('statsIndiv','${doc.id}')">🗑️</button></td></tr>`; }).join(''); });
+            db.collection('statsIndiv').orderBy('totalPts','desc').onSnapshot(s => { document.getElementById('statsIndivBody').innerHTML = s.docs.map(doc => { const st = doc.data(); return `<tr><td>${st.joueurNom}</td><td>${st.pts3}</td><td>${st.pts2}</td><td>${st.pts1}</td><td>${st.totalPts}</td><td>${st.matchs}</td><td class="admin-only"><button class="btn-icon" style="background:var(--danger)" onclick="deleteDoc('statsIndiv','${doc.id}')">🗑️</button></td></tr>`; }).join(''); });
             db.collection('joueurs').get().then(s => { document.getElementById('stJoueur').innerHTML = s.docs.map(d => `<option value="${d.data().prenom} ${d.data().nom}">${d.data().prenom} ${d.data().nom}</option>`).join(''); });
         }
         function loadInf() { db.collection('infos').orderBy('createdAt','desc').onSnapshot(s => { document.getElementById('infosGrid').innerHTML = s.docs.map(doc => `<div class="info-card"><h4>${doc.data().titre}</h4><p>${doc.data().contenu}</p><button class="admin-only btn-icon" style="background:var(--danger)" onclick="deleteDoc('infos','${doc.id}')">🗑️</button></div>`).join(''); }); }
-        function loadMsg() { db.collection('messages').orderBy('createdAt','desc').onSnapshot(s => { document.getElementById('messagesContainer').innerHTML = s.docs.map(doc => `<div class="msg-card"><strong>${doc.data().author}</strong><p>${doc.data().texte}</p></div>`).join(''); }); }
+        function loadMsg() { db.collection('messages').orderBy('createdAt','desc').onSnapshot(s => { document.getElementById('messagesContainer').innerHTML = s.docs.map(doc => `<div style="background:white;padding:15px;border-radius:10px;margin-bottom:10px;box-shadow:0 2px 5px rgba(0,0,0,0.05);"><strong>${doc.data().author}</strong><p>${doc.data().texte}</p></div>`).join(''); }); }
 
         async function saveMatch() { await db.collection('matchs').add({date:document.getElementById('matchDate').value, heure:document.getElementById('matchHeure').value, adversaire:document.getElementById('matchAdv').value, lieu:document.getElementById('matchLieu').value, salle:document.getElementById('matchSalle').value}); closeModal('match'); }
         async function saveResultat() { await db.collection('resultats').add({date:document.getElementById('resDate').value, adversaire:document.getElementById('resAdv').value, scoreALCF:parseInt(document.getElementById('resAlcf').value), scoreAdv:parseInt(document.getElementById('resOpp').value)}); closeModal('resultat'); }
