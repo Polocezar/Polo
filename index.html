@@ -44,19 +44,58 @@
         .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 20px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
         .venue-card:hover { background: var(--gold); color: var(--violet); transform: translateY(-3px); }
 
-        /* CHAMPIONNAT AUTO (IFRAME) */
-        .iframe-container { width: 100%; height: 800px; border-radius: 20px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: none; }
+        /* CHAMPIONNAT (OPTIMISÉ) */
+        .iframe-container { width: 100%; height: 900px; border: none; border-radius: 15px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .journee-selector { background: var(--violet); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; justify-content: center; }
+        .journee-selector select { padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; color: var(--violet); cursor: pointer; }
 
-        /* AUTRES STYLES (CALENDRIER, EFFECTIF, ETC.) */
-        .container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
+        /* CALENDRIER INTERACTIF */
+        .calendar-nav { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--gray); gap: 1px; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .calendar-day-head { background: var(--violet); color: white; padding: 12px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; }
+        .calendar-day { background: white; min-height: 120px; padding: 10px; position: relative; transition: 0.2s; cursor: pointer; }
+        .calendar-day:hover { background: #fdfaf2; }
+        .calendar-day.not-current { background: #f9f9f9; color: #ccc; cursor: default; }
+        .calendar-day.today { background: #fff8e1; border: 2px solid var(--gold); }
+        .calendar-date-num { font-weight: 800; font-size: 1rem; margin-bottom: 5px; display: block; }
+        .event-item { font-size: 0.7rem; padding: 4px 6px; border-radius: 4px; margin-bottom: 3px; font-weight: bold; color: white; border: none; width: 100%; text-align: left; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .event-match { background: var(--violet); border-left: 3px solid var(--gold); }
+        .event-entrainement { background: #3498db; border-left: 3px solid #2980b9; }
+        .event-anniversaire { background: #e91e63; border-left: 3px solid #ad1457; }
+
+        /* GRID & CARDS */
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .page-header h2 { color: var(--violet); font-size: 2.2rem; border-bottom: 4px solid var(--gold); padding-bottom: 5px; }
         .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; transition: 0.3s; cursor: pointer; }
-        .player-card:hover { transform: translateY(-8px); border: 1px solid var(--gold); }
+        .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; transition: 0.3s; cursor: pointer; border: 1px solid transparent; }
+        .player-card:hover { transform: translateY(-8px); border-color: var(--gold); }
         .player-img { width: 155px; height: 155px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; object-position: center 10%; margin: 0 auto 15px; display: block; }
-        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; text-decoration: none; display: inline-block; }
+        .player-num-badge { position: absolute; top: 15px; right: 15px; background: var(--gold); color: var(--violet); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; }
+
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .gallery-item { position: relative; border-radius: 15px; overflow: hidden; height: 250px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+
+        /* MODALES */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 24px; padding: 40px; max-width: 600px; width: 100%; position: relative; animation: modalPop 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
+        @keyframes modalPop { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #eee; cursor: pointer; font-size: 20px; font-weight: bold; color: var(--violet); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
+        .form-group label { font-weight: bold; color: var(--violet); font-size: 0.85rem; display: block; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid var(--gray); border-radius: 10px; font-size: 1rem; }
+
+        /* BOUTONS */
+        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; text-decoration: none; display: inline-block; font-size: 0.9rem; }
         .btn-gold { background: var(--gold); color: var(--violet); }
+        .btn-gold:hover { background: #ffbb33; transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 2px solid var(--gold); color: white; }
+        .btn-icon { padding: 8px 15px; border-radius: 8px; color: white; border: none; cursor: pointer; }
+
+        .admin-only { display: none !important; }
+        body.is-admin .admin-only { display: inline-flex !important; }
     </style>
 </head>
 <body>
@@ -80,7 +119,7 @@
         </div>
     </nav>
 
-    <!-- ACCUEIL (RESTAURÉ) -->
+    <!-- ACCUEIL -->
     <div id="page-accueil" class="page active">
         <section class="hero">
             <div class="hero-content">
@@ -89,7 +128,7 @@
                     <h1>BIENVENUE CHEZ<br>LES VIOLETS</h1>
                     <p class="subtitle">Espace officiel ALCF Basket - PNM</p>
                     <div class="hero-btns">
-                        <button onclick="showPage('effectif')" class="btn" style="background:transparent; border:2px solid var(--gold); color:white;">VOIR L'EFFECTIF</button>
+                        <button onclick="showPage('effectif')" class="btn btn-outline">VOIR L'EFFECTIF</button>
                         <button onclick="showPage('championnat')" class="btn btn-gold">CHAMPIONNAT</button>
                     </div>
                     <div style="margin-top:20px;">
@@ -104,34 +143,98 @@
         </section>
     </div>
 
-    <!-- CHAMPIONNAT (AUTOMATIQUE FFBB) -->
+    <!-- CHAMPIONNAT (AVEC SELECTEUR DE JOURNÉE) -->
     <div id="page-championnat" class="page">
-        <div class="container">
+        <div class="container" style="max-width: 100%;">
             <div class="page-header">
-                <h2>🏆 Résultats & Classement Officiel</h2>
-                <p style="color:var(--gray-dark)">Mis à jour en direct par la FFBB</p>
+                <h2>🏆 Championnat PNM - Poule A</h2>
             </div>
-            <!-- Fenêtre automatique sur le site de la ligue -->
-            <iframe class="iframe-container" src="https://competitions.ffbb.com/ligues/ara/competitions/pnm?phase=200000002872829&poule=200000003018577&journee=1"></iframe>
+            
+            <div class="journee-selector">
+                <label>📅 Choisir la journée à afficher :</label>
+                <select id="selectJournee" onchange="updateIframeJournee()">
+                    <!-- Généré par JS de 1 à 22 par exemple -->
+                </select>
+            </div>
+
+            <iframe id="ffbbIframe" class="iframe-container" src="https://competitions.ffbb.com/ligues/ara/competitions/pnm?phase=200000002872829&poule=200000003018577&journee=1"></iframe>
         </div>
     </div>
 
-    <!-- CALENDRIER -->
+    <!-- CALENDRIER INTERACTIF -->
     <div id="page-calendrier" class="page">
-        <div class="container"><h2>📅 Calendrier Interactif</h2><div id="calendarGrid"></div></div>
+        <div class="container">
+            <div class="page-header">
+                <h2>📅 Calendrier de l'équipe</h2>
+                <p class="admin-only" style="font-size:0.9rem; color:var(--violet); font-weight:bold;">💡 Admin : Cliquez sur un jour pour ajouter un événement</p>
+            </div>
+            <div class="calendar-nav">
+                <button class="btn btn-icon" style="background:var(--violet); padding:10px;" onclick="changeMonth(-1)">◀</button>
+                <h3 id="calendarMonthTitle" style="min-width:220px; text-align:center; color:var(--violet); font-size:1.6rem; text-transform: capitalize;">-</h3>
+                <button class="btn btn-icon" style="background:var(--violet); padding:10px;" onclick="changeMonth(1)">▶</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
     </div>
 
     <!-- EFFECTIF -->
     <div id="page-effectif" class="page">
-        <div class="container"><h2>👥 Effectif PNM</h2><div class="players-grid" id="effectifGrid"></div></div>
+        <div class="container">
+            <div class="page-header"><h2>👥 Effectif PNM</h2><button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Joueur</button></div>
+            <div class="players-grid" id="effectifGrid"></div>
+        </div>
     </div>
 
-    <!-- LE RESTE (LOGIN, ETC) -->
-    <div id="page-login" class="page">
-        <div class="container" style="max-width:400px; margin:auto;"><div style="background:white; padding:40px; border-radius:20px; text-align:center;"><h2>Connexion</h2><input type="email" id="loginEmail" style="width:100%; padding:10px; margin:10px 0;"><input type="password" id="loginPassword" style="width:100%; padding:10px; margin:10px 0;"><button class="btn btn-gold" onclick="doLogin()">OK</button></div></div>
+    <!-- GALERIE -->
+    <div id="page-galerie" class="page">
+        <div class="container">
+            <div class="page-header"><h2>📸 Galerie Photos</h2><button class="btn btn-gold admin-only" onclick="openModal('galerie')">+ Photo</button></div>
+            <div class="gallery-grid" id="galleryGrid"></div>
+        </div>
     </div>
 
-    <div id="page-stats" class="page"></div><div id="page-galerie" class="page"></div><div id="page-infos" class="page"></div>
+    <!-- MODALE EVENEMENT -->
+    <div class="modal-overlay" id="modal-match">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('match')">×</button>
+            <h3 id="modalMatchTitle">Événement</h3>
+            <div class="form-grid" style="margin-top:20px;">
+                <div class="form-group full-width"><label>Type</label><select id="matchType" onchange="toggleEventFields()"><option value="Match">🏀 Match</option><option value="Entraînement">⏱ Entraînement</option><option value="Anniversaire">🎂 Anniversaire</option></select></div>
+                <div class="form-group"><label>Date</label><input type="date" id="matchDate"></div>
+                <div class="form-group event-extra"><label>Heure</label><input type="time" id="matchHeure" value="20:00"></div>
+                <div class="form-group full-width"><label id="labelTitre">Titre / Adversaire</label><input type="text" id="matchAdv"></div>
+                <div class="form-group event-extra"><label>Lieu</label><select id="matchLieu"><option>Domicile</option><option>Extérieur</option></select></div>
+                <div class="form-group event-extra"><label>Salle</label><input type="text" id="matchSalle" value="Salle GM4 Firminy"></div>
+            </div>
+            <button class="btn btn-gold" style="margin-top:20px; width:100%" onclick="saveMatch()">Enregistrer</button>
+            <button class="btn" id="btnDelMatch" style="margin-top:10px; width:100%; background:var(--danger); color:white; display:none;" onclick="deleteCurrentMatch()">Supprimer</button>
+        </div>
+    </div>
+
+    <!-- MODALE JOUEUR -->
+    <div class="modal-overlay" id="modal-joueur">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('joueur')">×</button>
+            <h3>Fiche Joueur</h3>
+            <input type="hidden" id="joueurId">
+            <div class="form-grid">
+                <div class="form-group"><label>Prénom</label><input type="text" id="joueurPrenom"></div>
+                <div class="form-group"><label>Nom</label><input type="text" id="joueurNom"></div>
+                <div class="form-group"><label>N° Maillot</label><input type="number" id="joueurNumero"></div>
+                <div class="form-group"><label>Poste</label><select id="joueurPoste"><option value="Meneur">1 - Meneur</option><option value="Arrière">2 - Arrière</option><option value="Ailier">3 - Ailier</option><option value="Ailier Fort">4 - Ailier Fort</option><option value="Pivot">5 - Pivot</option></select></div>
+                <div class="form-group"><label>Taille (cm)</label><input type="number" id="joueurTaille"></div>
+                <div class="form-group"><label>Naissance</label><input type="date" id="joueurDateNaissance"></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Photo URL</label><input type="text" id="joueurPhoto"></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Licence</label><input type="text" id="joueurLicence"></div>
+                <div class="form-group"><label>Téléphone</label><input type="text" id="joueurTel"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="joueurEmail"></div>
+            </div>
+            <button class="btn btn-gold" style="margin-top:20px; width:100%" onclick="saveJoueur()">Sauver</button>
+        </div>
+    </div>
+
+    <!-- MODALE GALERIE -->
+    <div class="modal-overlay" id="modal-galerie"><div class="modal"><button class="modal-close" onclick="closeModal('galerie')">×</button><h3>Photo</h3><div class="form-group" style="margin-top:20px;"><label>URL</label><input type="text" id="galPhotoUrl"></div><div class="form-group"><label>Légende</label><input type="text" id="galLegende"></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="savePhoto()">Ajouter</button></div></div>
 
     <script>
         const firebaseConfig = {
@@ -145,7 +248,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(), auth = firebase.auth();
         const ADMIN = "polocezar@gmail.com";
-        let isAdmin = false;
+        let isAdmin = false, eventsData = [], currentViewDate = new Date(), currentEditId = null;
 
         auth.onAuthStateChanged(u => {
             isAdmin = u && u.email === ADMIN;
@@ -155,7 +258,6 @@
                 document.getElementById('userInfo').textContent = '👤 ' + u.email.split('@')[0];
                 document.getElementById('btnLogin').style.display='none';
                 document.getElementById('btnLogout').style.display='inline-flex';
-                if(document.getElementById('page-login').classList.contains('active')) showPage('accueil');
             }
         });
 
@@ -163,20 +265,77 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const target = document.getElementById('page-'+id);
             if (target) target.classList.add('active');
+            if(id==='calendrier') loadCalendar();
             if(id==='effectif') loadEff();
+            if(id==='championnat') initChampionnat();
             window.scrollTo(0,0);
         }
 
-        function loadEff() {
-            db.collection('joueurs').orderBy('numero').onSnapshot(snap => {
-                document.getElementById('effectifGrid').innerHTML = snap.docs.map(doc => {
-                    const j = doc.data();
-                    return `<div class="player-card"><img src="${j.photo || 'logo-alcf.png'}" class="player-img"><h4>${j.prenom} ${j.nom}</h4><p>${j.poste}</p></div>`;
-                }).join('');
-            });
+        /* LOGIQUE CHAMPIONNAT AUTOMATIQUE */
+        function initChampionnat() {
+            const select = document.getElementById('selectJournee');
+            if(select.options.length === 0) {
+                for(let i=1; i<=22; i++) {
+                    let opt = document.createElement('option');
+                    opt.value = i;
+                    opt.innerHTML = "Journée " + i;
+                    select.appendChild(opt);
+                }
+            }
         }
 
-        async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch { alert('Erreur'); } }
+        function updateIframeJournee() {
+            const j = document.getElementById('selectJournee').value;
+            const iframe = document.getElementById('ffbbIframe');
+            iframe.src = `https://competitions.ffbb.com/ligues/ara/competitions/pnm?phase=200000002872829&poule=200000003018577&journee=${j}`;
+        }
+
+        /* CALENDRIER */
+        function loadCalendar() {
+            db.collection('matchs').onSnapshot(snap => {
+                eventsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderCalendar();
+            });
+        }
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+            const m = currentViewDate.getMonth(), y = currentViewDate.getFullYear();
+            document.getElementById('calendarMonthTitle').textContent = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(currentViewDate);
+            ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].forEach(d => grid.innerHTML += `<div class="calendar-day-head">${d}</div>`);
+            const firstDay = new Date(y, m, 1).getDay();
+            const offset = firstDay === 0 ? 6 : firstDay - 1;
+            const daysInMonth = new Date(y, m + 1, 0).getDate();
+            for (let i = 0; i < offset; i++) grid.innerHTML += `<div class="calendar-day not-current"></div>`;
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const isToday = new Date().toISOString().split('T')[0] === dateStr;
+                let evHtml = '';
+                eventsData.filter(e => e.date === dateStr).forEach(e => {
+                    const typeClass = 'event-' + (e.type || 'match').toLowerCase().replace('é','e');
+                    const txt = e.type === 'Anniversaire' ? e.matchAdv : `${e.heure} ${e.matchAdv || ''}`;
+                    evHtml += `<button class="event-item ${typeClass}" onclick="event.stopPropagation(); editMatch('${e.id}')">${txt}</button>`;
+                });
+                grid.innerHTML += `<div class="calendar-day ${isToday?'today':''}" onclick="addNewEvent('${dateStr}')"><span class="calendar-date-num">${day}</span>${evHtml}</div>`;
+            }
+        }
+        function toggleEventFields() {
+            const type = document.getElementById('matchType').value;
+            const extras = document.querySelectorAll('.event-extra');
+            if (type === 'Anniversaire') { extras.forEach(el => el.style.display = 'none'); document.getElementById('labelTitre').textContent = "Message d'anniversaire"; }
+            else { extras.forEach(el => el.style.display = 'block'); document.getElementById('labelTitre').textContent = "Titre / Adversaire"; }
+        }
+        function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
+        function addNewEvent(date) { if(!isAdmin) return; currentEditId = null; document.getElementById('matchDate').value = date; document.getElementById('matchType').value = 'Match'; toggleEventFields(); document.getElementById('matchAdv').value = ''; document.getElementById('btnDelMatch').style.display = 'none'; openModal('match'); }
+        async function editMatch(id) { if(!isAdmin) return; const d = eventsData.find(e => e.id === id); currentEditId = id; document.getElementById('matchType').value = d.type || 'Match'; toggleEventFields(); document.getElementById('matchDate').value = d.date; document.getElementById('matchHeure').value = d.heure || '20:00'; document.getElementById('matchAdv').value = d.matchAdv || ''; document.getElementById('btnDelMatch').style.display = 'block'; openModal('match'); }
+        async function saveMatch() { const data = { type: document.getElementById('matchType').value, date: document.getElementById('matchDate').value, heure: document.getElementById('matchHeure').value, matchAdv: document.getElementById('matchAdv').value, lieu: document.getElementById('matchLieu').value, salle: document.getElementById('matchSalle').value }; if(currentEditId) await db.collection('matchs').doc(currentEditId).update(data); else await db.collection('matchs').add(data); closeModal('match'); }
+        async function deleteCurrentMatch() { if(confirm('Supprimer?')) { await db.collection('matchs').doc(currentEditId).delete(); closeModal('match'); } }
+
+        /* EFFECTIF */
+        function loadEff() { db.collection('joueurs').orderBy('numero').onSnapshot(snap => { document.getElementById('effectifGrid').innerHTML = snap.docs.map(doc => { const j = doc.data(); return `<div class="player-card" onclick="openModal('joueur')"><div class="player-num-badge">${j.numero || '0'}</div><img src="${j.photo || 'logo-alcf.png'}" class="player-img"><h4>${j.prenom} ${j.nom}</h4><p>${j.poste}</p></div>`; }).join(''); }); }
+        async function saveJoueur() { const id = document.getElementById('joueurId').value, data = { prenom: document.getElementById('joueurPrenom').value, nom: document.getElementById('joueurNom').value, numero: parseInt(document.getElementById('joueurNumero').value)||0, poste: document.getElementById('joueurPoste').value, taille: document.getElementById('joueurTaille').value, dateNaissance: document.getElementById('joueurDateNaissance').value, photo: document.getElementById('joueurPhoto').value }; if(id) await db.collection('joueurs').doc(id).update(data); else await db.collection('joueurs').add(data); closeModal('joueur'); }
+
+        function openModal(id) { document.getElementById('modal-'+id).classList.add('active'); }
+        function closeModal(id) { document.getElementById('modal-'+id).classList.remove('active'); if(id==='joueur') document.getElementById('joueurId').value=''; }
         function doLogout() { auth.signOut(); location.reload(); }
 
         showPage('accueil');
