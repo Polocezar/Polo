@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -29,7 +30,7 @@
         /* GESTION DES PAGES */
         .page { display: none; width: 100%; min-height: calc(100vh - 102px); background: var(--gray-light); }
         .page.active { display: block !important; }
-        #page-accueil { background: var(--violet); } /* L'accueil reste violet sans barre blanche */
+        #page-accueil { background: var(--violet); }
 
         /* HERO ACCUEIL */
         .hero { background: linear-gradient(135deg, var(--violet), #4a1a6b); color: white; padding: 60px 4%; display: flex; align-items: center; }
@@ -146,15 +147,7 @@
         </div>
     </div>
 
-    <!-- PAGE : EFFECTIF -->
-    <div id="page-effectif" class="page">
-        <div class="container">
-            <div class="page-header"><h2>👥 Effectif PNM</h2><button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Joueur</button></div>
-            <div class="players-grid" id="effectifGrid"></div>
-        </div>
-    </div>
-
-    <!-- MODALE EVENEMENT (OPTIONS ÉTENDUES) -->
+    <!-- MODALE EVENEMENT (DYNAMIQUE) -->
     <div class="modal-overlay" id="modal-match">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('match')">×</button>
@@ -162,7 +155,7 @@
             <div class="form-grid" style="margin-top:20px;">
                 <div class="form-group full-width">
                     <label>Type d'événement</label>
-                    <select id="matchType">
+                    <select id="matchType" onchange="toggleEventFields()">
                         <option value="Match">🏀 Match</option>
                         <option value="Entraînement">⏱ Entraînement</option>
                         <option value="Anniversaire">🎂 Anniversaire</option>
@@ -171,18 +164,26 @@
                     </select>
                 </div>
                 <div class="form-group"><label>Date</label><input type="date" id="matchDate"></div>
-                <div class="form-group"><label>Heure</label><input type="time" id="matchHeure" value="20:00"></div>
-                <div class="form-group full-width"><label>Titre / Description</label><input type="text" id="matchAdv" placeholder="Ex: Match vs Saint-Priest ou Repas d'équipe"></div>
-                <div class="form-group"><label>Lieu</label><select id="matchLieu"><option>Domicile</option><option>Extérieur</option></select></div>
-                <div class="form-group"><label>Salle / Lieu</label><input type="text" id="matchSalle" value="Salle GM4 Firminy"></div>
+                
+                <!-- CHAMPS À CACHER POUR ANNIVERSAIRE -->
+                <div class="form-group event-extra"><label>Heure</label><input type="time" id="matchHeure" value="20:00"></div>
+                
+                <div class="form-group full-width">
+                    <label id="labelTitre">Titre / Adversaire</label>
+                    <input type="text" id="matchAdv" placeholder="Ex: Match vs Saint-Priest ou Joyeux Anniversaire...">
+                </div>
+
+                <div class="form-group event-extra"><label>Lieu</label><select id="matchLieu"><option>Domicile</option><option>Extérieur</option></select></div>
+                <div class="form-group event-extra"><label>Salle / Lieu</label><input type="text" id="matchSalle" value="Salle GM4 Firminy"></div>
             </div>
             <button class="btn btn-gold" style="margin-top:20px; width:100%" onclick="saveMatch()">Enregistrer</button>
             <button class="btn" id="btnDelMatch" style="margin-top:10px; width:100%; background:var(--danger); color:white; display:none;" onclick="deleteCurrentMatch()">Supprimer</button>
         </div>
     </div>
 
-    <!-- LE RESTE DES PAGES ET MODALES (Effectif, Galerie, Stats, etc.) -->
-    <div id="page-galerie" class="page"><div class="container"><div class="page-header"><h2>📸 Galerie</h2></div><div id="galleryGrid"></div></div></div>
+    <!-- LE RESTE DES PAGES -->
+    <div id="page-effectif" class="page"><div class="container"><div class="page-header"><h2>👥 Effectif</h2><button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Joueur</button></div><div class="players-grid" id="effectifGrid"></div></div></div>
+    <div id="page-galerie" class="page"><div class="container"><h2>📸 Galerie</h2><div id="galleryGrid"></div></div></div>
     <div id="page-resultats" class="page"><div class="container"><h2>📊 Résultats</h2></div></div>
     <div id="page-classement" class="page"><div class="container"><h2>🥇 Classement</h2></div></div>
     <div id="page-stats" class="page"><div class="container"><h2>📈 Stats</h2></div></div>
@@ -222,13 +223,25 @@
             const target = document.getElementById('page-'+id);
             if (target) target.classList.add('active');
             if (document.getElementById('nav-'+id)) document.getElementById('nav-'+id).classList.add('active');
-            loadData(id);
+            if(id==='calendrier') loadCalendar();
             window.scrollTo(0,0);
         }
 
-        function loadData(id) {
-            if(id==='calendrier') loadCalendar();
-            if(id==='effectif') loadEff();
+        // GESTION DYNAMIQUE DES CHAMPS MODALE
+        function toggleEventFields() {
+            const type = document.getElementById('matchType').value;
+            const extras = document.querySelectorAll('.event-extra');
+            const labelTitre = document.getElementById('labelTitre');
+            
+            if (type === 'Anniversaire') {
+                extras.forEach(el => el.style.display = 'none');
+                labelTitre.textContent = "Message d'anniversaire";
+                document.getElementById('matchAdv').placeholder = "Ex: Joyeux anniversaire Romario ! 🎂";
+            } else {
+                extras.forEach(el => el.style.display = 'block');
+                labelTitre.textContent = "Titre / Adversaire";
+                document.getElementById('matchAdv').placeholder = "Ex: Match vs Saint-Priest";
+            }
         }
 
         function loadCalendar() {
@@ -254,19 +267,43 @@
                 let evHtml = '';
                 eventsData.filter(e => e.date === dateStr).forEach(e => {
                     const typeClass = 'event-' + (e.type || 'match').toLowerCase().replace('é','e');
-                    evHtml += `<button class="event-item ${typeClass}" onclick="event.stopPropagation(); editMatch('${e.id}')">${e.heure} ${e.matchAdv || e.adversaire || ''}</button>`;
+                    const text = e.type === 'Anniversaire' ? e.matchAdv : `${e.heure} ${e.matchAdv || e.adversaire || ''}`;
+                    evHtml += `<button class="event-item ${typeClass}" onclick="event.stopPropagation(); editMatch('${e.id}')">${text}</button>`;
                 });
                 grid.innerHTML += `<div class="calendar-day ${isToday?'today':''}" onclick="addNewEvent('${dateStr}')"><span class="calendar-date-num">${day}</span>${evHtml}</div>`;
             }
         }
 
         function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
-        function addNewEvent(date) { if(!isAdmin) return; currentEditId = null; document.getElementById('matchDate').value = date; document.getElementById('matchAdv').value = ''; document.getElementById('btnDelMatch').style.display = 'none'; openModal('match'); }
-        async function editMatch(id) { if(!isAdmin) return; const d = eventsData.find(e => e.id === id); currentEditId = id; document.getElementById('matchType').value = d.type || 'Match'; document.getElementById('matchDate').value = d.date; document.getElementById('matchHeure').value = d.heure; document.getElementById('matchAdv').value = d.matchAdv || d.adversaire || ''; document.getElementById('btnDelMatch').style.display = 'block'; openModal('match'); }
-        async function saveMatch() { const data = { type: document.getElementById('matchType').value, date: document.getElementById('matchDate').value, heure: document.getElementById('matchHeure').value, matchAdv: document.getElementById('matchAdv').value, lieu: document.getElementById('matchLieu').value, salle: document.getElementById('matchSalle').value }; if(currentEditId) await db.collection('matchs').doc(currentEditId).update(data); else await db.collection('matchs').add(data); closeModal('match'); }
-        async function deleteCurrentMatch() { if(confirm('Supprimer?')) { await db.collection('matchs').doc(currentEditId).delete(); closeModal('match'); } }
+        function addNewEvent(date) { if(!isAdmin) return; currentEditId = null; document.getElementById('matchDate').value = date; document.getElementById('matchType').value = 'Match'; toggleEventFields(); document.getElementById('matchAdv').value = ''; document.getElementById('btnDelMatch').style.display = 'none'; openModal('match'); }
+        
+        async function editMatch(id) { 
+            if(!isAdmin) return; 
+            const d = eventsData.find(e => e.id === id); 
+            currentEditId = id; 
+            document.getElementById('matchType').value = d.type || 'Match'; 
+            toggleEventFields();
+            document.getElementById('matchDate').value = d.date; 
+            document.getElementById('matchHeure').value = d.heure || '20:00'; 
+            document.getElementById('matchAdv').value = d.matchAdv || d.adversaire || ''; 
+            document.getElementById('btnDelMatch').style.display = 'block'; 
+            openModal('match'); 
+        }
 
-        function loadEff() { db.collection('joueurs').orderBy('numero').onSnapshot(snap => { document.getElementById('effectifGrid').innerHTML = snap.docs.map(doc => { const j = doc.data(); return `<div class="player-card"><div class="player-num-badge">${j.numero || '0'}</div><img src="${j.photo || 'logo-alcf.png'}" class="player-img"><h4>${j.prenom} ${j.nom}</h4><p>${j.poste}</p></div>`; }).join(''); }); }
+        async function saveMatch() { 
+            const data = { 
+                type: document.getElementById('matchType').value, 
+                date: document.getElementById('matchDate').value, 
+                heure: document.getElementById('matchHeure').value, 
+                matchAdv: document.getElementById('matchAdv').value, 
+                lieu: document.getElementById('matchLieu').value, 
+                salle: document.getElementById('matchSalle').value 
+            }; 
+            if(currentEditId) await db.collection('matchs').doc(currentEditId).update(data); else await db.collection('matchs').add(data); 
+            closeModal('match'); 
+        }
+
+        async function deleteCurrentMatch() { if(confirm('Supprimer?')) { await db.collection('matchs').doc(currentEditId).delete(); closeModal('match'); } }
         function openModal(id) { document.getElementById('modal-'+id).classList.add('active'); }
         function closeModal(id) { document.getElementById('modal-'+id).classList.remove('active'); }
         async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch { alert('Erreur'); } }
