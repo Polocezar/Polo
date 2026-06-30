@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14,7 +15,7 @@
             --danger: #e74c3c; --success: #27ae60;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--gray-light); color: #111827; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray-light); color: #111827; overflow-x: hidden; }
 
         /* NAVBAR */
         .navbar { background: linear-gradient(135deg, var(--violet), #4a1a6b); padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -24,41 +25,38 @@
         .nav-menu { display: flex; align-items: center; gap: 5px; }
         .nav-menu a { color: white; text-decoration: none; padding: 8px 15px; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 0.95rem; }
         .nav-menu a:hover, .nav-menu a.active { color: var(--gold-light); background: rgba(255,255,255,0.1); }
+        .user-info { color: var(--gold-light); margin: 0 15px; font-weight: bold; }
 
-        /* GESTION DES PAGES */
-        .page { display: none; width: 100%; min-height: 90vh; }
+        /* PAGE SYSTEM */
+        .page { display: none; width: 100%; min-height: 90vh; background: var(--gray-light); }
         .page.active { display: block !important; }
+        #page-accueil { background: var(--violet); }
+
+        /* HERO ACCUEIL */
+        .hero { background: linear-gradient(135deg, var(--violet), #4a1a6b); color: white; padding: 60px 4%; min-height: 85vh; display: flex; align-items: center; }
+        .hero-content { display: grid; grid-template-columns: 350px 1fr 500px; gap: 40px; max-width: 1700px; margin: 0 auto; align-items: center; width: 100%; }
+        .hero-logo { width: 100%; max-width: 320px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
+        .hero-text { text-align: center; }
+        .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
+        .hero .subtitle { color: var(--gold-light); font-size: 1.8rem; margin-bottom: 35px; font-weight: 600; }
+        .hero-btns { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        .hero-team-img { width: 100%; max-width: 500px; border: 6px solid var(--gold); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 20px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
+        .venue-card:hover { background: var(--gold); color: var(--violet); transform: translateY(-3px); }
+
+        /* CHAMPIONNAT AUTO (IFRAME) */
+        .iframe-container { width: 100%; height: 800px; border-radius: 20px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: none; }
+
+        /* AUTRES STYLES (CALENDRIER, EFFECTIF, ETC.) */
         .container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
-
-        /* CHAMPIONNAT PAGE */
-        .comp-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; }
-        .section-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        
-        /* MATCHS JOURNÉE */
-        .journee-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--violet); color: white; padding: 10px 20px; border-radius: 12px; }
-        .match-row { display: grid; grid-template-columns: 1fr 40px 20px 40px 1fr; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--gray-light); text-align: center; font-size: 0.95rem; }
-        .match-row span { font-weight: bold; color: var(--violet); }
-        .score-box { background: #eee; padding: 5px; border-radius: 5px; font-weight: 900; width: 35px; }
-        .score-box.win { background: var(--gold); color: var(--violet); }
-
-        /* TABLEAU CLASSEMENT */
-        .ranking-table { width: 100%; border-collapse: collapse; }
-        .ranking-table th { font-size: 0.75rem; color: var(--gray-dark); text-transform: uppercase; padding: 10px; border-bottom: 2px solid var(--gray-light); text-align: left; }
-        .ranking-table td { padding: 12px 10px; border-bottom: 1px solid var(--gray-light); font-size: 0.9rem; }
-        .row-me { background: #fdf6ec !important; font-weight: 800; border-left: 4px solid var(--gold); }
-
-        /* MODALES */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-overlay.active { display: flex; }
-        .modal { background: white; border-radius: 24px; padding: 35px; max-width: 500px; width: 100%; position: relative; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--violet); }
-        .form-group input { width: 100%; padding: 10px; border: 2px solid var(--gray); border-radius: 10px; }
-
-        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; text-transform: uppercase; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-header h2 { color: var(--violet); font-size: 2.2rem; border-bottom: 4px solid var(--gold); padding-bottom: 5px; }
+        .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; transition: 0.3s; cursor: pointer; }
+        .player-card:hover { transform: translateY(-8px); border: 1px solid var(--gold); }
+        .player-img { width: 155px; height: 155px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; object-position: center 10%; margin: 0 auto 15px; display: block; }
+        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; text-decoration: none; display: inline-block; }
         .btn-gold { background: var(--gold); color: var(--violet); }
-        .admin-only { display: none !important; }
-        body.is-admin .admin-only { display: inline-flex !important; }
     </style>
 </head>
 <body>
@@ -70,95 +68,70 @@
         </a>
         <div class="nav-menu">
             <a onclick="showPage('accueil')" id="nav-accueil">Accueil</a>
-            <a onclick="showPage('calendrier')" id="nav-calendrier">Mon Calendrier</a>
+            <a onclick="showPage('calendrier')" id="nav-calendrier">Calendrier</a>
             <a onclick="showPage('championnat')" id="nav-championnat">Championnat</a>
             <a onclick="showPage('effectif')" id="nav-effectif">Effectif</a>
             <a onclick="showPage('stats')" id="nav-stats">Stats</a>
             <a onclick="showPage('galerie')" id="nav-galerie">Galerie</a>
-            <a onclick="showPage('messagerie')" id="nav-messagerie">Messages</a>
-            <a class="btn btn-gold" style="padding:8px 15px; font-size:0.7rem;" onclick="showPage('login')" id="btnLogin">Connexion</a>
-            <a class="btn" style="padding:8px 15px; font-size:0.7rem; background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Sortir</a>
+            <a onclick="showPage('infos')" id="nav-infos">Infos</a>
+            <span class="user-info" id="userInfo" style="display:none"></span>
+            <a class="btn btn-gold" style="padding:8px 15px; font-size:0.8rem;" onclick="showPage('login')" id="btnLogin">Connexion</a>
+            <a class="btn" style="padding:8px 15px; font-size:0.8rem; background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Sortir</a>
         </div>
     </nav>
 
-    <!-- PAGE CHAMPIONNAT (RESULTATS POULE + CLASSEMENT) -->
+    <!-- ACCUEIL (RESTAURÉ) -->
+    <div id="page-accueil" class="page active">
+        <section class="hero">
+            <div class="hero-content">
+                <img src="logo-alcf.png" class="hero-logo">
+                <div class="hero-text">
+                    <h1>BIENVENUE CHEZ<br>LES VIOLETS</h1>
+                    <p class="subtitle">Espace officiel ALCF Basket - PNM</p>
+                    <div class="hero-btns">
+                        <button onclick="showPage('effectif')" class="btn" style="background:transparent; border:2px solid var(--gold); color:white;">VOIR L'EFFECTIF</button>
+                        <button onclick="showPage('championnat')" class="btn btn-gold">CHAMPIONNAT</button>
+                    </div>
+                    <div style="margin-top:20px;">
+                        <a href="https://www.google.com/maps/search/?api=1&query=1+rue+des+noyers+42700+Firminy" target="_blank" class="venue-card">
+                            <span style="font-size:1.8rem;">📍</span>
+                            <div style="text-align:left;"><strong style="display:block;">Salle GM4 Firminy</strong><small>1 Rue des Noyers, 42700 Firminy</small></div>
+                        </a>
+                    </div>
+                </div>
+                <img src="equipe-2025-2026.png" class="hero-team-img">
+            </div>
+        </section>
+    </div>
+
+    <!-- CHAMPIONNAT (AUTOMATIQUE FFBB) -->
     <div id="page-championnat" class="page">
         <div class="container">
             <div class="page-header">
-                <h2>🏆 Championnat PNM - Poule A</h2>
-                <a href="https://competitions.ffbb.com/ligues/ara/competitions/pnm?phase=200000002872829&poule=200000003018577" target="_blank" class="btn btn-gold" style="font-size:0.7rem;">Site Officiel FFBB ↗</a>
+                <h2>🏆 Résultats & Classement Officiel</h2>
+                <p style="color:var(--gray-dark)">Mis à jour en direct par la FFBB</p>
             </div>
-
-            <div class="comp-grid">
-                <!-- Résultats de la journée -->
-                <div class="section-card">
-                    <div class="journee-nav">
-                        <button style="background:none; border:none; color:white; cursor:pointer;" onclick="changeJournee(-1)">◀</button>
-                        <span id="journeeTitle" style="font-weight:bold; font-size:1.1rem;">Journée 1</span>
-                        <button style="background:none; border:none; color:white; cursor:pointer;" onclick="changeJournee(1)">▶</button>
-                    </div>
-                    <div class="admin-only" style="margin-bottom:15px; width:100%">
-                        <button class="btn btn-gold" style="width:100%;" onclick="openModal('match-championnat')">+ Ajouter un match à la journée</button>
-                    </div>
-                    <div id="matchsJourneeList">
-                        <!-- Liste des matchs de la poule -->
-                    </div>
-                </div>
-
-                <!-- Classement -->
-                <div class="section-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                        <h3 style="color:var(--violet)">Classement Officiel</h3>
-                        <button class="btn btn-gold admin-only" style="padding:5px 12px; font-size:0.7rem;" onclick="openModal('classement')">Editer</button>
-                    </div>
-                    <table class="ranking-table">
-                        <thead><tr><th>Pos</th><th>Équipe</th><th>V</th><th>D</th><th>Pts</th></tr></thead>
-                        <tbody id="rankingBody"></tbody>
-                    </table>
-                </div>
-            </div>
+            <!-- Fenêtre automatique sur le site de la ligue -->
+            <iframe class="iframe-container" src="https://competitions.ffbb.com/ligues/ara/competitions/pnm?phase=200000002872829&poule=200000003018577&journee=1"></iframe>
         </div>
     </div>
 
-    <!-- MODALE CLASSEMENT -->
-    <div class="modal-overlay" id="modal-classement">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal('classement')">×</button>
-            <h3>Mettre à jour le classement</h3>
-            <div class="form-group"><label>Nom de l'équipe</label><input type="text" id="rankEquipe" placeholder="Ex: MANTAILLE"></div>
-            <div class="form-group"><label>Position</label><input type="number" id="rankPos"></div>
-            <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="form-group"><label>Victoires</label><input type="number" id="rankV"></div>
-                <div class="form-group"><label>Défaites</label><input type="number" id="rankD"></div>
-            </div>
-            <div class="form-group"><label>Points</label><input type="number" id="rankPts"></div>
-            <button class="btn btn-gold" style="width:100%" onclick="saveRanking()">Enregistrer l'équipe</button>
-        </div>
+    <!-- CALENDRIER -->
+    <div id="page-calendrier" class="page">
+        <div class="container"><h2>📅 Calendrier Interactif</h2><div id="calendarGrid"></div></div>
     </div>
 
-    <!-- MODALE MATCH CHAMPIONNAT -->
-    <div class="modal-overlay" id="modal-match-championnat">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal('match-championnat')">×</button>
-            <h3>Match de la poule</h3>
-            <div class="form-group"><label>Journée</label><input type="number" id="matchJ" value="1"></div>
-            <div class="form-group"><label>Équipe Domicile</label><input type="text" id="matchDom"></div>
-            <div class="form-group"><label>Équipe Extérieur</label><input type="text" id="matchExt"></div>
-            <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="form-group"><label>Score Dom</label><input type="number" id="scoreDom"></div>
-                <div class="form-group"><label>Score Ext</label><input type="number" id="scoreExt"></div>
-            </div>
-            <button class="btn btn-gold" style="width:100%" onclick="saveMatchChampionnat()">Enregistrer</button>
-        </div>
+    <!-- EFFECTIF -->
+    <div id="page-effectif" class="page">
+        <div class="container"><h2>👥 Effectif PNM</h2><div class="players-grid" id="effectifGrid"></div></div>
     </div>
 
-    <!-- LOGIN -->
-    <div id="page-login" class="page"><div class="container" style="max-width:400px;margin:auto;"><div class="section-card"><h2>Connexion Admin</h2><input type="email" id="loginEmail" placeholder="Email" style="width:100%;padding:12px;margin:10px 0;"><input type="password" id="loginPassword" placeholder="Pass" style="width:100%;padding:12px;margin:10px 0;"><button class="btn btn-gold" style="width:100%" onclick="doLogin()">OK</button></div></div></div>
+    <!-- LE RESTE (LOGIN, ETC) -->
+    <div id="page-login" class="page">
+        <div class="container" style="max-width:400px; margin:auto;"><div style="background:white; padding:40px; border-radius:20px; text-align:center;"><h2>Connexion</h2><input type="email" id="loginEmail" style="width:100%; padding:10px; margin:10px 0;"><input type="password" id="loginPassword" style="width:100%; padding:10px; margin:10px 0;"><button class="btn btn-gold" onclick="doLogin()">OK</button></div></div>
+    </div>
 
-    <!-- PAGES VIDES POUR LE MOMENT -->
-    <div id="page-accueil" class="page active"></div>
-    <div id="page-calendrier" class="page"><div class="container"><h2>Mon Calendrier</h2><div id="calendarGrid"></div></div></div>
-    <div id="page-effectif" class="page"></div><div id="page-stats" class="page"></div><div id="page-galerie" class="page"></div><div id="page-messagerie" class="page"></div>
+    <div id="page-stats" class="page"></div><div id="page-galerie" class="page"></div><div id="page-infos" class="page"></div>
 
     <script>
         const firebaseConfig = {
@@ -172,69 +145,39 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(), auth = firebase.auth();
         const ADMIN = "polocezar@gmail.com";
-        let isAdmin = false, currentJ = 1;
+        let isAdmin = false;
 
         auth.onAuthStateChanged(u => {
             isAdmin = u && u.email === ADMIN;
             document.body.classList.toggle('is-admin', isAdmin);
             if(u) {
+                document.getElementById('userInfo').style.display='inline';
+                document.getElementById('userInfo').textContent = '👤 ' + u.email.split('@')[0];
                 document.getElementById('btnLogin').style.display='none';
                 document.getElementById('btnLogout').style.display='inline-flex';
                 if(document.getElementById('page-login').classList.contains('active')) showPage('accueil');
             }
         });
 
-        async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch { alert('Erreur'); } }
-        function doLogout() { auth.signOut(); location.reload(); }
-
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-'+id).classList.add('active');
-            if(id === 'championnat') { loadRanking(); loadJournee(); }
+            const target = document.getElementById('page-'+id);
+            if (target) target.classList.add('active');
+            if(id==='effectif') loadEff();
+            window.scrollTo(0,0);
         }
 
-        /* LOGIQUE CHAMPIONNAT */
-        function loadRanking() {
-            db.collection('pouleClassement').orderBy('pos','asc').onSnapshot(snap => {
-                document.getElementById('rankingBody').innerHTML = snap.docs.map(doc => {
-                    const d = doc.data();
-                    const isMe = d.nom.includes('FIRMINY') || d.nom.includes('ALCF');
-                    return `<tr class="${isMe?'row-me':''}"><td>${d.pos}</td><td>${d.nom}</td><td>${d.v}</td><td>${d.d}</td><td>${d.pts}</td></tr>`;
+        function loadEff() {
+            db.collection('joueurs').orderBy('numero').onSnapshot(snap => {
+                document.getElementById('effectifGrid').innerHTML = snap.docs.map(doc => {
+                    const j = doc.data();
+                    return `<div class="player-card"><img src="${j.photo || 'logo-alcf.png'}" class="player-img"><h4>${j.prenom} ${j.nom}</h4><p>${j.poste}</p></div>`;
                 }).join('');
             });
         }
 
-        function loadJournee() {
-            document.getElementById('journeeTitle').textContent = `Journée ${currentJ}`;
-            db.collection('pouleMatchs').where('j','==',currentJ).onSnapshot(snap => {
-                if(snap.empty) { document.getElementById('matchsJourneeList').innerHTML = '<p style="text-align:center; padding:20px;">Aucun match saisi pour cette journée.</p>'; return; }
-                document.getElementById('matchsJourneeList').innerHTML = snap.docs.map(doc => {
-                    const m = doc.data();
-                    return `<div class="match-row">
-                        <div style="text-align:right">${m.dom}</div>
-                        <div class="score-box ${m.sDom > m.sExt ? 'win' : ''}">${m.sDom || 0}</div>
-                        <div>-</div>
-                        <div class="score-box ${m.sExt > m.sDom ? 'win' : ''}">${m.sExt || 0}</div>
-                        <div style="text-align:left">${m.ext}</div>
-                    </div>`;
-                }).join('');
-            });
-        }
-
-        function changeJournee(v) { currentJ += v; if(currentJ < 1) currentJ = 1; loadJournee(); }
-
-        async function saveRanking() {
-            const data = { nom: document.getElementById('rankEquipe').value.toUpperCase(), pos: parseInt(document.getElementById('rankPos').value), v: parseInt(document.getElementById('rankV').value), d: parseInt(document.getElementById('rankD').value), pts: parseInt(document.getElementById('rankPts').value) };
-            await db.collection('pouleClassement').add(data); closeModal('classement');
-        }
-
-        async function saveMatchChampionnat() {
-            const data = { j: parseInt(document.getElementById('matchJ').value), dom: document.getElementById('matchDom').value, ext: document.getElementById('matchExt').value, sDom: parseInt(document.getElementById('scoreDom').value), sExt: parseInt(document.getElementById('scoreExt').value) };
-            await db.collection('pouleMatchs').add(data); closeModal('match-championnat');
-        }
-
-        function openModal(id) { document.getElementById('modal-'+id).classList.add('active'); }
-        function closeModal(id) { document.getElementById('modal-'+id).classList.remove('active'); }
+        async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch { alert('Erreur'); } }
+        function doLogout() { auth.signOut(); location.reload(); }
 
         showPage('accueil');
     </script>
