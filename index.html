@@ -11,10 +11,10 @@
         :root {
             --violet: #2d1048; --violet-light: #4a1a6b; --gold: #f5a623; --gold-light: #ffd700;
             --white: #ffffff; --gray-light: #f5f5f5; --gray: #e0e0e0; --gray-dark: #666;
-            --danger: #e74c3c; --success: #27ae60;
+            --danger: #e74c3c; --success: #27ae60; --info: #3498db;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--gray-light); color: #111827; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--violet); color: #111827; overflow-x: hidden; }
 
         /* NAVBAR */
         .navbar { background: linear-gradient(135deg, var(--violet), #4a1a6b); padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -26,14 +26,15 @@
         .nav-menu a:hover, .nav-menu a.active { color: var(--gold-light); background: rgba(255,255,255,0.1); }
         .user-info { color: var(--gold-light); margin: 0 15px; font-weight: bold; }
 
-        /* GESTION DES PAGES (L'ERREUR ÉTAIT ICI) */
-        .page { display: none; width: 100%; min-height: 90vh; }
+        /* GESTION DES PAGES */
+        .page { display: none; width: 100%; min-height: calc(100vh - 102px); background: var(--gray-light); }
         .page.active { display: block !important; }
+        #page-accueil { background: var(--violet); } /* L'accueil reste violet sans barre blanche */
 
         /* HERO ACCUEIL */
-        .hero { background: linear-gradient(135deg, var(--violet), #4a1a6b); color: white; padding: 60px 4%; min-height: 85vh; display: flex; align-items: center; }
+        .hero { background: linear-gradient(135deg, var(--violet), #4a1a6b); color: white; padding: 60px 4%; display: flex; align-items: center; }
         .hero-content { display: grid; grid-template-columns: 350px 1fr 500px; gap: 40px; max-width: 1700px; margin: 0 auto; align-items: center; width: 100%; }
-        .hero-logo { width: 100%; max-width: 320px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
+        .hero-logo { width: 100%; max-width: 340px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
         .hero-text { text-align: center; }
         .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 15px; font-weight: 900; }
         .hero .subtitle { color: var(--gold-light); font-size: 1.8rem; margin-bottom: 35px; font-weight: 600; }
@@ -51,22 +52,18 @@
         .calendar-day.not-current { background: #f9f9f9; color: #ccc; cursor: default; }
         .calendar-day.today { background: #fff8e1; border: 2px solid var(--gold); }
         .calendar-date-num { font-weight: 800; font-size: 1rem; margin-bottom: 5px; display: block; }
+        
+        /* ÉVÉNEMENTS COULEURS */
         .event-item { font-size: 0.7rem; padding: 4px 6px; border-radius: 4px; margin-bottom: 3px; font-weight: bold; color: white; border: none; width: 100%; text-align: left; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         .event-match { background: var(--violet); border-left: 3px solid var(--gold); }
-        .event-training { background: #3498db; border-left: 3px solid #2980b9; }
+        .event-entrainement { background: var(--info); border-left: 3px solid #2980b9; }
+        .event-anniversaire { background: #e91e63; border-left: 3px solid #ad1457; }
+        .event-repas { background: #27ae60; border-left: 3px solid #1e8449; }
+        .event-animation { background: #f39c12; border-left: 3px solid #d35400; }
 
-        /* CONTAINERS */
         .container { max-width: 1400px; margin: 0 auto; padding: 40px; }
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .page-header h2 { color: var(--violet); font-size: 2.2rem; border-bottom: 4px solid var(--gold); padding-bottom: 5px; }
-
-        /* EFFECTIF & GALERIE */
-        .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; cursor: pointer; transition: 0.3s; }
-        .player-img { width: 155px; height: 155px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; object-position: center 10%; margin: 0 auto 15px; display: block; }
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .gallery-item { position: relative; border-radius: 15px; overflow: hidden; height: 250px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
 
         /* MODALES */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
@@ -83,7 +80,6 @@
         .btn-gold:hover { background: #ffbb33; transform: translateY(-2px); }
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: inline-flex !important; }
-        .toast { position: fixed; bottom: 30px; right: 30px; padding: 15px 30px; border-radius: 50px; color: white; font-weight: bold; z-index: 5000; display: none; }
     </style>
 </head>
 <body>
@@ -121,6 +117,7 @@
                         <button onclick="showPage('effectif')" class="btn btn-gold" style="background:transparent; border:2px solid var(--gold); color:white;">L'Effectif</button>
                         <button onclick="showPage('calendrier')" class="btn btn-gold">Calendrier</button>
                     </div>
+                    <div class="next-match-box">🔴 Prochain match : <span id="nextMatchText">Chargement...</span></div>
                     <div style="margin-top:20px;">
                         <a href="https://www.google.com/maps/search/?api=1&query=1+rue+des+noyers+42700+Firminy" target="_blank" class="venue-card">
                             <span style="font-size:1.8rem;">📍</span>
@@ -157,74 +154,41 @@
         </div>
     </div>
 
-    <!-- PAGE : GALERIE -->
-    <div id="page-galerie" class="page">
-        <div class="container">
-            <div class="page-header"><h2>📸 Galerie Photos</h2><button class="btn btn-gold admin-only" onclick="openModal('galerie')">+ Photo</button></div>
-            <div class="gallery-grid" id="galleryGrid"></div>
-        </div>
-    </div>
-
-    <!-- PAGE : LOGIN -->
-    <div id="page-login" class="page">
-        <div style="max-width:400px; margin:80px auto; background:white; padding:40px; border-radius:24px; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,0.1);">
-            <h2 style="color:var(--violet); margin-bottom:20px;">Connexion</h2>
-            <div class="form-group"><label>Email</label><input type="email" id="loginEmail"></div>
-            <div class="form-group"><label>Pass</label><input type="password" id="loginPassword"></div>
-            <button class="btn btn-gold" onclick="doLogin()" style="width:100%; margin-top:15px;">Se connecter</button>
-        </div>
-    </div>
-
-    <!-- AUTRES PAGES (STUBS) -->
-    <div id="page-resultats" class="page"><div class="container"><h2>📊 Résultats</h2></div></div>
-    <div id="page-classement" class="page"><div class="container"><h2>🥇 Classement</h2></div></div>
-    <div id="page-stats" class="page"><div class="container"><h2>📈 Statistiques</h2></div></div>
-    <div id="page-infos" class="page"><div class="container"><h2>📌 Infos Club</h2></div></div>
-    <div id="page-messagerie" class="page"><div class="container"><h2>💬 Messagerie</h2></div></div>
-
-    <!-- MODALE EVENEMENT CALENDRIER -->
+    <!-- MODALE EVENEMENT (OPTIONS ÉTENDUES) -->
     <div class="modal-overlay" id="modal-match">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('match')">×</button>
             <h3 id="modalMatchTitle">Nouvel événement</h3>
             <div class="form-grid" style="margin-top:20px;">
-                <div class="form-group full-width"><label>Type</label><select id="matchType"><option value="Match">🏀 Match</option><option value="Entraînement">⏱ Entraînement</option></select></div>
+                <div class="form-group full-width">
+                    <label>Type d'événement</label>
+                    <select id="matchType">
+                        <option value="Match">🏀 Match</option>
+                        <option value="Entraînement">⏱ Entraînement</option>
+                        <option value="Anniversaire">🎂 Anniversaire</option>
+                        <option value="Repas">🍴 Repas Club</option>
+                        <option value="Animation">🎭 Animation / Soirée</option>
+                    </select>
+                </div>
                 <div class="form-group"><label>Date</label><input type="date" id="matchDate"></div>
                 <div class="form-group"><label>Heure</label><input type="time" id="matchHeure" value="20:00"></div>
-                <div class="form-group full-width"><label>Titre / Adversaire</label><input type="text" id="matchAdv"></div>
+                <div class="form-group full-width"><label>Titre / Description</label><input type="text" id="matchAdv" placeholder="Ex: Match vs Saint-Priest ou Repas d'équipe"></div>
                 <div class="form-group"><label>Lieu</label><select id="matchLieu"><option>Domicile</option><option>Extérieur</option></select></div>
-                <div class="form-group"><label>Salle</label><input type="text" id="matchSalle" value="Salle GM4 Firminy"></div>
+                <div class="form-group"><label>Salle / Lieu</label><input type="text" id="matchSalle" value="Salle GM4 Firminy"></div>
             </div>
             <button class="btn btn-gold" style="margin-top:20px; width:100%" onclick="saveMatch()">Enregistrer</button>
             <button class="btn" id="btnDelMatch" style="margin-top:10px; width:100%; background:var(--danger); color:white; display:none;" onclick="deleteCurrentMatch()">Supprimer</button>
         </div>
     </div>
 
-    <!-- MODALE JOUEUR -->
-    <div class="modal-overlay" id="modal-joueur">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal('joueur')">×</button>
-            <h3>Fiche Joueur</h3>
-            <input type="hidden" id="joueurId">
-            <div class="form-grid">
-                <div class="form-group"><label>Prénom</label><input type="text" id="joueurPrenom"></div>
-                <div class="form-group"><label>Nom</label><input type="text" id="joueurNom"></div>
-                <div class="form-group"><label>N° Maillot</label><input type="number" id="joueurNumero"></div>
-                <div class="form-group">
-                    <label>Poste</label>
-                    <select id="joueurPoste">
-                        <option value="Meneur">1 - Meneur</option>
-                        <option value="Arrière">2 - Arrière</option>
-                        <option value="Ailier">3 - Ailier</option>
-                        <option value="Ailier Fort">4 - Ailier Fort</option>
-                        <option value="Pivot">5 - Pivot</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Photo URL</label><input type="text" id="joueurPhoto"></div>
-            </div>
-            <button class="btn btn-gold" style="margin-top:20px; width:100%" onclick="saveJoueur()">Sauver</button>
-        </div>
-    </div>
+    <!-- LE RESTE DES PAGES ET MODALES (Effectif, Galerie, Stats, etc.) -->
+    <div id="page-galerie" class="page"><div class="container"><div class="page-header"><h2>📸 Galerie</h2></div><div id="galleryGrid"></div></div></div>
+    <div id="page-resultats" class="page"><div class="container"><h2>📊 Résultats</h2></div></div>
+    <div id="page-classement" class="page"><div class="container"><h2>🥇 Classement</h2></div></div>
+    <div id="page-stats" class="page"><div class="container"><h2>📈 Stats</h2></div></div>
+    <div id="page-infos" class="page"><div class="container"><h2>📌 Infos</h2></div></div>
+    <div id="page-messagerie" class="page"><div class="container"><h2>💬 Messagerie</h2></div></div>
+    <div id="page-login" class="page"><div class="container"><div style="max-width:400px;margin:auto;text-align:center;"><h2>Connexion</h2><input type="email" id="loginEmail" placeholder="Email" style="width:100%;padding:10px;margin:10px 0;"><input type="password" id="loginPassword" placeholder="Pass" style="width:100%;padding:10px;margin:10px 0;"><button class="btn btn-gold" onclick="doLogin()">OK</button></div></div></div>
 
     <script>
         const firebaseConfig = {
@@ -267,7 +231,6 @@
             if(id==='effectif') loadEff();
         }
 
-        /* CALENDRIER INTERACTIF */
         function loadCalendar() {
             db.collection('matchs').onSnapshot(snap => {
                 eventsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -280,66 +243,30 @@
             grid.innerHTML = '';
             const m = currentViewDate.getMonth(), y = currentViewDate.getFullYear();
             document.getElementById('calendarMonthTitle').textContent = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(currentViewDate);
-
             ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].forEach(d => grid.innerHTML += `<div class="calendar-day-head">${d}</div>`);
-
             const firstDay = new Date(y, m, 1).getDay();
             const offset = firstDay === 0 ? 6 : firstDay - 1;
             const daysInMonth = new Date(y, m + 1, 0).getDate();
-
             for (let i = 0; i < offset; i++) grid.innerHTML += `<div class="calendar-day not-current"></div>`;
-
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
                 const isToday = new Date().toISOString().split('T')[0] === dateStr;
                 let evHtml = '';
                 eventsData.filter(e => e.date === dateStr).forEach(e => {
-                    evHtml += `<button class="event-item ${e.type==='Entraînement'?'event-training':'event-match'}" onclick="event.stopPropagation(); editMatch('${e.id}')">${e.heure} ${e.matchAdv || e.adversaire || ''}</button>`;
+                    const typeClass = 'event-' + (e.type || 'match').toLowerCase().replace('é','e');
+                    evHtml += `<button class="event-item ${typeClass}" onclick="event.stopPropagation(); editMatch('${e.id}')">${e.heure} ${e.matchAdv || e.adversaire || ''}</button>`;
                 });
                 grid.innerHTML += `<div class="calendar-day ${isToday?'today':''}" onclick="addNewEvent('${dateStr}')"><span class="calendar-date-num">${day}</span>${evHtml}</div>`;
             }
         }
 
         function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
-
-        function addNewEvent(date) {
-            if(!isAdmin) return;
-            currentEditId = null;
-            document.getElementById('matchDate').value = date;
-            document.getElementById('matchAdv').value = '';
-            document.getElementById('btnDelMatch').style.display = 'none';
-            openModal('match');
-        }
-
-        async function editMatch(id) {
-            if(!isAdmin) return;
-            const d = eventsData.find(e => e.id === id);
-            currentEditId = id;
-            document.getElementById('matchType').value = d.type || 'Match';
-            document.getElementById('matchDate').value = d.date;
-            document.getElementById('matchHeure').value = d.heure;
-            document.getElementById('matchAdv').value = d.matchAdv || d.adversaire || '';
-            document.getElementById('btnDelMatch').style.display = 'block';
-            openModal('match');
-        }
-
-        async function saveMatch() {
-            const data = { type: document.getElementById('matchType').value, date: document.getElementById('matchDate').value, heure: document.getElementById('matchHeure').value, matchAdv: document.getElementById('matchAdv').value, lieu: document.getElementById('matchLieu').value, salle: document.getElementById('matchSalle').value };
-            if(currentEditId) await db.collection('matchs').doc(currentEditId).update(data); else await db.collection('matchs').add(data);
-            closeModal('match');
-        }
-
+        function addNewEvent(date) { if(!isAdmin) return; currentEditId = null; document.getElementById('matchDate').value = date; document.getElementById('matchAdv').value = ''; document.getElementById('btnDelMatch').style.display = 'none'; openModal('match'); }
+        async function editMatch(id) { if(!isAdmin) return; const d = eventsData.find(e => e.id === id); currentEditId = id; document.getElementById('matchType').value = d.type || 'Match'; document.getElementById('matchDate').value = d.date; document.getElementById('matchHeure').value = d.heure; document.getElementById('matchAdv').value = d.matchAdv || d.adversaire || ''; document.getElementById('btnDelMatch').style.display = 'block'; openModal('match'); }
+        async function saveMatch() { const data = { type: document.getElementById('matchType').value, date: document.getElementById('matchDate').value, heure: document.getElementById('matchHeure').value, matchAdv: document.getElementById('matchAdv').value, lieu: document.getElementById('matchLieu').value, salle: document.getElementById('matchSalle').value }; if(currentEditId) await db.collection('matchs').doc(currentEditId).update(data); else await db.collection('matchs').add(data); closeModal('match'); }
         async function deleteCurrentMatch() { if(confirm('Supprimer?')) { await db.collection('matchs').doc(currentEditId).delete(); closeModal('match'); } }
 
-        function loadEff() {
-            db.collection('joueurs').orderBy('numero').onSnapshot(snap => {
-                document.getElementById('effectifGrid').innerHTML = snap.docs.map(doc => {
-                    const j = doc.data();
-                    return `<div class="player-card"><div class="player-num-badge">${j.numero || '0'}</div><img src="${j.photo || 'logo-alcf.png'}" class="player-img"><h4>${j.prenom} ${j.nom}</h4><p>${j.poste}</p></div>`;
-                }).join('');
-            });
-        }
-
+        function loadEff() { db.collection('joueurs').orderBy('numero').onSnapshot(snap => { document.getElementById('effectifGrid').innerHTML = snap.docs.map(doc => { const j = doc.data(); return `<div class="player-card"><div class="player-num-badge">${j.numero || '0'}</div><img src="${j.photo || 'logo-alcf.png'}" class="player-img"><h4>${j.prenom} ${j.nom}</h4><p>${j.poste}</p></div>`; }).join(''); }); }
         function openModal(id) { document.getElementById('modal-'+id).classList.add('active'); }
         function closeModal(id) { document.getElementById('modal-'+id).classList.remove('active'); }
         async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch { alert('Erreur'); } }
