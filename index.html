@@ -31,14 +31,14 @@
         .hero-content { display: grid; grid-template-columns: 350px 1fr 500px; gap: 40px; max-width: 1700px; margin: 0 auto; align-items: center; width: 100%; }
         .hero-logo { width: 100%; max-width: 320px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
         .hero-text { text-align: center; }
-        .hero h1 { font-size: 3.2rem; line-height: 1.1; margin-bottom: 15px; font-weight: 900; }
-        .hero .subtitle { color: var(--gold-light); font-size: 1.6rem; margin-bottom: 25px; font-weight: 600; }
-        .next-match-box { background: linear-gradient(90deg, var(--gold), #ffbb33); color: var(--violet); padding: 15px 30px; border-radius: 50px; font-weight: 800; display: inline-block; box-shadow: 0 10px 20px rgba(0,0,0,0.2); margin-bottom: 25px; }
+        .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 15px; font-weight: 900; }
+        .hero .subtitle { color: var(--gold-light); font-size: 1.8rem; margin-bottom: 25px; font-weight: 600; }
+        .next-match-box { background: linear-gradient(90deg, var(--gold), #ffbb33); color: var(--violet); padding: 15px 30px; border-radius: 50px; font-weight: 800; display: inline-block; box-shadow: 0 10px 20px rgba(0,0,0,0.2); margin-bottom: 30px; }
         .hero-team-img { width: 100%; max-width: 500px; border: 6px solid var(--gold); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         
         /* BOUTONS HERO & VENUE */
         .hero-btns { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
-        .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 15px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
+        .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 15px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; margin-top: 10px; }
         .venue-card:hover { background: var(--gold); color: var(--violet); transform: translateY(-3px); }
 
         /* PAGE SYSTEM */
@@ -53,6 +53,7 @@
         .data-table { width: 100%; border-collapse: collapse; }
         .data-table th { background: var(--violet); color: var(--gold-light); padding: 15px; text-align: left; }
         .data-table td { padding: 15px; border-bottom: 1px solid var(--gray); }
+        .highlight td { background: #fdf6ec !important; font-weight: bold; }
         .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; cursor: pointer; transition: 0.3s; }
         .player-card:hover { transform: translateY(-8px); border: 1px solid var(--gold); }
@@ -76,7 +77,6 @@
         .btn-icon { padding: 8px 15px; border-radius: 8px; color: white; border: none; cursor: pointer; }
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: inline-flex !important; }
-        .toast { position: fixed; bottom: 30px; right: 30px; padding: 15px 30px; border-radius: 50px; color: white; font-weight: bold; z-index: 5000; display: none; }
     </style>
 </head>
 <body>
@@ -109,15 +109,23 @@
                 <div class="hero-text">
                     <h1>BIENVENUE CHEZ<br>LES VIOLETS</h1>
                     <p class="subtitle">Espace officiel ALCF Basket - PNM</p>
+                    
+                    <!-- LES BOUTONS HERO -->
                     <div class="hero-btns">
                         <button onclick="showPage('effectif')" class="btn btn-gold">L'Effectif</button>
                         <button onclick="showPage('calendrier')" class="btn btn-gold">Calendrier</button>
                     </div>
+
                     <div class="next-match-box">🔴 Prochain match : <span id="nextMatchText">Chargement...</span></div>
+                    
+                    <!-- LA CARTE SALLE GM4 -->
                     <div style="margin-top:20px;">
                         <a href="https://www.google.com/maps/search/?api=1&query=1+rue+des+noyers+42700+Firminy" target="_blank" class="venue-card">
-                            <span>📍</span>
-                            <div style="text-align:left;"><strong style="display:block;">Salle GM4 Firminy</strong><small>1 Rue des Noyers, 42700 Firminy</small></div>
+                            <span style="font-size:1.5rem;">📍</span>
+                            <div style="text-align:left;">
+                                <strong style="display:block; font-size:1.1rem;">Salle GM4 Firminy</strong>
+                                <small style="opacity:0.9;">1 Rue des Noyers, 42700 Firminy</small>
+                            </div>
                         </a>
                     </div>
                 </div>
@@ -192,7 +200,7 @@
         </div>
     </div>
 
-    <!-- MODALE JOUEUR -->
+    <!-- MODALES -->
     <div class="modal-overlay" id="modal-joueur">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('joueur')">×</button>
@@ -223,7 +231,6 @@
         </div>
     </div>
 
-    <!-- MODALE DETAILS JOUEUR -->
     <div class="modal-overlay" id="modal-player-details">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('player-details')">×</button>
@@ -236,8 +243,8 @@
                 </div>
             </div>
             <div style="display:flex; justify-content:space-around; margin-bottom:20px; border-bottom:2px solid var(--gray);">
-                <button class="player-tabs-btn" id="btnInf" onclick="switchTab('infos')">🪪 Infos</button>
-                <button class="player-tabs-btn" id="btnSta" onclick="switchTab('stats')">📈 Stats</button>
+                <button class="player-tabs-btn active" id="btnInf" onclick="switchTab('infos')" style="background:none; border:none; border-bottom:3px solid transparent; padding:10px; font-weight:bold; cursor:pointer;">🪪 Infos</button>
+                <button class="player-tabs-btn" id="btnSta" onclick="switchTab('stats')" style="background:none; border:none; border-bottom:3px solid transparent; padding:10px; font-weight:bold; cursor:pointer;">📈 Stats</button>
             </div>
             <div id="tabInfos"></div><div id="tabStats" style="display:none"></div>
         </div>
@@ -247,7 +254,7 @@
     <div class="modal-overlay" id="modal-match"><div class="modal"><button class="modal-close" onclick="closeModal('match')">×</button><h3>Match</h3><input type="hidden" id="matchId"><div class="form-grid"><div class="form-group"><label>Date</label><input type="date" id="matchDate"></div><div class="form-group"><label>Heure</label><input type="time" id="matchHeure"></div><div class="form-group" style="grid-column:span 2"><label>Adversaire</label><input type="text" id="matchAdv"></div><div class="form-group"><label>Lieu</label><select id="matchLieu"><option>Domicile</option><option>Extérieur</option></select></div><div class="form-group"><label>Salle</label><input type="text" id="matchSalle"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveMatch()">Sauver</button></div></div>
     <div class="modal-overlay" id="modal-resultat"><div class="modal"><button class="modal-close" onclick="closeModal('resultat')">×</button><h3>Résultat</h3><input type="hidden" id="resultatId"><div class="form-grid"><div class="form-group" style="grid-column:span 2"><label>Adversaire</label><input type="text" id="resAdv"></div><div class="form-group"><label>ALCF</label><input type="number" id="resAlcf"></div><div class="form-group"><label>Adv</label><input type="number" id="resOpp"></div><div class="form-group" style="grid-column:span 2"><label>Date</label><input type="date" id="resDate"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveResultat()">Sauver</button></div></div>
     <div class="modal-overlay" id="modal-classement"><div class="modal"><button class="modal-close" onclick="closeModal('classement')">×</button><h3>Equipe</h3><input type="hidden" id="classementId"><div class="form-grid"><div class="form-group"><label>Pos</label><input type="number" id="clPos"></div><div class="form-group"><label>Nom</label><input type="text" id="clNom"></div><div class="form-group"><label>MJ</label><input type="number" id="clMJ"></div><div class="form-group"><label>V</label><input type="number" id="clV"></div><div class="form-group"><label>D</label><input type="number" id="clD"></div><div class="form-group"><label>Pts</label><input type="number" id="clPts"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveClassement()">Sauver</button></div></div>
-    <div class="modal-overlay" id="modal-info"><div class="modal"><button class="modal-close" onclick="closeModal('info')">×</button><h3>Info Club</h3><input type="hidden" id="infoId"><div class="form-group"><label>Titre</label><input type="text" id="infoTitre"></div><div class="form-group"><label>Texte</label><textarea id="infoContenu"></textarea></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveInfo()">Sauver</button></div></div>
+    <div class="modal-overlay" id="modal-info"><div class="modal"><button class="modal-close" onclick="closeModal('info')">×</button><h3>Info</h3><input type="hidden" id="infoId"><div class="form-group"><label>Titre</label><input type="text" id="infoTitre"></div><div class="form-group"><label>Texte</label><textarea id="infoContenu"></textarea></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveInfo()">Sauver</button></div></div>
     <div class="modal-overlay" id="modal-message"><div class="modal"><button class="modal-close" onclick="closeModal('message')">×</button><h3>Message</h3><textarea id="msgTexte" style="width:100%;height:100px;"></textarea><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveMsg()">Envoyer</button></div></div>
     <div class="modal-overlay" id="modal-statsIndiv"><div class="modal"><button class="modal-close" onclick="closeModal('statsIndiv')">×</button><h3>Stats</h3><input type="hidden" id="statsId"><div class="form-grid"><div class="form-group" style="grid-column:span 2"><label>Joueur</label><select id="stJoueur"></select></div><div class="form-group"><label>3pt</label><input type="number" id="st3"></div><div class="form-group"><label>2pt</label><input type="number" id="st2"></div><div class="form-group"><label>LF</label><input type="number" id="st1"></div><div class="form-group"><label>MJ</label><input type="number" id="stMJ"></div><div class="form-group"><label>Fautes</label><input type="number" id="stF"></div></div><button class="btn btn-gold" style="width:100%;margin-top:20px" onclick="saveStatsIndiv()">Sauver</button></div></div>
 
@@ -377,7 +384,7 @@
             db.collection('statsIndiv').orderBy('totalPts','desc').onSnapshot(s => { document.getElementById('statsIndivBody').innerHTML = s.docs.map(doc => { const st = doc.data(); return `<tr><td>${st.joueurNom}</td><td>${st.pts3}</td><td>${st.pts2}</td><td>${st.pts1}</td><td>${st.totalPts}</td><td>${st.matchs}</td><td class="admin-only"><button class="btn-icon" style="background:var(--danger)" onclick="deleteDoc('statsIndiv','${doc.id}')">🗑️</button></td></tr>`; }).join(''); });
             db.collection('joueurs').get().then(s => { document.getElementById('stJoueur').innerHTML = s.docs.map(d => `<option value="${d.data().prenom} ${d.data().nom}">${d.data().prenom} ${d.data().nom}</option>`).join(''); });
         }
-        function loadInf() { db.collection('infos').orderBy('createdAt','desc').onSnapshot(s => { document.getElementById('infosGrid').innerHTML = s.docs.map(doc => `<div class="info-card"><h4>${doc.data().titre}</h4><p>${doc.data().contenu}</p><button class="admin-only btn-icon" style="background:var(--danger)" onclick="deleteDoc('infos','${doc.id}')">🗑️</button></div>`).join(''); }); }
+        function loadInf() { db.collection('infos').orderBy('createdAt','desc').onSnapshot(s => { document.getElementById('infosGrid').innerHTML = s.docs.map(doc => `<div class="info-card" style="background:white;padding:20px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.05);"><h4>${doc.data().titre}</h4><p>${doc.data().contenu}</p><button class="admin-only btn-icon" style="background:var(--danger);margin-top:10px;" onclick="deleteDoc('infos','${doc.id}')">🗑️</button></div>`).join(''); }); }
         function loadMsg() { db.collection('messages').orderBy('createdAt','desc').onSnapshot(s => { document.getElementById('messagesContainer').innerHTML = s.docs.map(doc => `<div style="background:white;padding:15px;border-radius:10px;margin-bottom:10px;box-shadow:0 2px 5px rgba(0,0,0,0.05);"><strong>${doc.data().author}</strong><p>${doc.data().texte}</p></div>`).join(''); }); }
 
         async function saveMatch() { await db.collection('matchs').add({date:document.getElementById('matchDate').value, heure:document.getElementById('matchHeure').value, adversaire:document.getElementById('matchAdv').value, lieu:document.getElementById('matchLieu').value, salle:document.getElementById('matchSalle').value}); closeModal('match'); }
@@ -395,9 +402,12 @@
             document.getElementById('tabStats').style.display = t==='stats'?'block':'none';
             document.getElementById('btnInf').classList.toggle('active', t==='infos');
             document.getElementById('btnSta').classList.toggle('active', t==='stats');
+            document.getElementById('btnInf').style.borderBottomColor = t==='infos'?'var(--violet)':'transparent';
+            document.getElementById('btnSta').style.borderBottomColor = t==='stats'?'var(--violet)':'transparent';
         }
 
         showPage('accueil');
     </script>
 </body>
 </html>
+```
