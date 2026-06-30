@@ -17,8 +17,13 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; overflow-x: hidden; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f5f5f5; 
+            overflow-x: hidden; 
+        }
 
+        /* ==================== NAVBAR ==================== */
         .navbar {
             background: linear-gradient(135deg, var(--violet), #4a1a6b);
             padding: 15px 40px;
@@ -36,13 +41,16 @@
             text-decoration: none;
         }
 
-        .nav-logo img { height: 60px; }
+        .nav-logo img { 
+            height: 72px; 
+        }
 
         .nav-logo span {
-            font-size: 1.6rem;
-            font-weight: bold;
+            font-size: 2.2rem;
+            font-weight: 800;
             color: #ffd700;
-            margin-left: 10px;
+            margin-left: 14px;
+            letter-spacing: 0.5px;
         }
 
         .nav-menu a {
@@ -57,7 +65,7 @@
             color: var(--gold);
         }
 
-        /* HERO - NOUVELLE STRUCTURE ULTRA-STABLE */
+        /* ==================== HERO ==================== */
         .hero {
             background: linear-gradient(135deg, var(--violet), #4a1a6b);
             color: white;
@@ -65,20 +73,20 @@
             display: flex;
             align-items: center;
             padding: 40px 4%;
-            overflow: hidden; /* Empêche tout bug d'agrandissement du logo */
+            overflow: hidden;
         }
 
         .hero-content {
             display: grid;
-            grid-template-columns: 450px 1fr 450px; /* Colonnes bien définies */
-            gap: 20px;
-            max-width: 1800px;
+            grid-template-columns: 380px 1fr 520px; /* Logo plus petit, photo plus grande */
+            gap: 35px;
+            max-width: 1850px;
             width: 100%;
             margin: 0 auto;
             align-items: center;
         }
 
-        /* LOGO - EFFET DE FORCE BRUTE */
+        /* ==================== LOGO CENTRAL ==================== */
         .logo-wrapper {
             display: flex;
             justify-content: center;
@@ -88,20 +96,19 @@
 
         .logo {
             width: 100%;
-            max-width: 420px;
+            max-width: 340px;        /* Réduit */
             height: auto;
             display: block;
-            /* Le transform scale(1.5) force le logo à zoomer à travers son espace transparent */
-            transform: scale(1.5); 
+            transform: scale(1.18);  /* Zoom réduit */
             filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.7));
             transition: transform 0.3s ease;
         }
 
         .logo:hover {
-            transform: scale(1.55);
+            transform: scale(1.22);
         }
 
-        /* TEXTE CENTRAL */
+        /* ==================== TEXTE CENTRAL ==================== */
         .main-content { 
             text-align: center;
             z-index: 2;
@@ -122,7 +129,7 @@
         }
 
         .hero h1 {
-            font-size: 4rem;
+            font-size: 3.6rem;      /* Légèrement réduit */
             line-height: 1.1;
             margin-bottom: 15px;
             font-weight: 800;
@@ -136,13 +143,13 @@
             font-weight: 600;
         }
 
-        /* BOUTONS CORRIGÉS (Pas de chevauchement possible) */
+        /* ==================== BOUTONS ==================== */
         .hero-buttons {
             margin-bottom: 15px;
         }
 
         .btn {
-            display: inline-block; /* <-- FIX CRUCIAL : force le bouton à respecter ses marges et sa taille */
+            display: inline-block;
             padding: 14px 30px;
             border-radius: 50px;
             font-weight: bold;
@@ -180,6 +187,7 @@
             box-shadow: 0 10px 20px rgba(245, 166, 35, 0.4);
         }
 
+        /* ==================== PROCHAIN MATCH ==================== */
         .next-match {
             background: linear-gradient(90deg, var(--gold), #ffbb33);
             color: #2d1048;
@@ -191,7 +199,7 @@
             box-shadow: 0 10px 25px rgba(245, 166, 35, 0.3);
         }
 
-        /* PHOTO D'ÉQUIPE */
+        /* ==================== PHOTO D'ÉQUIPE ==================== */
         .team-photo-container {
             display: flex;
             flex-direction: column;
@@ -200,7 +208,7 @@
 
         .team-photo {
             width: 100%;
-            max-width: 430px;
+            max-width: 500px;       /* Agrandi */
             border: 6px solid var(--gold);
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
@@ -211,17 +219,25 @@
             transform: scale(1.02);
         }
 
-        /* RESPONSIVE DESIGN */
+        .team-photo-caption {
+            text-align: center;
+            margin-top: 15px;
+            opacity: 0.8;
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
         @media (max-width: 1350px) {
             .hero-content {
-                grid-template-columns: 1fr; /* Passage sur une seule colonne */
+                grid-template-columns: 1fr;
                 gap: 50px;
                 max-width: 700px;
             }
 
             .logo {
                 max-width: 250px;
-                transform: scale(1.2); /* Zoom plus doux sur mobile */
+                transform: scale(1.2);
             }
 
             .logo:hover {
@@ -231,11 +247,16 @@
             .hero h1 {
                 font-size: 3rem;
             }
+
+            .team-photo {
+                max-width: 450px;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- ==================== NAVIGATION ==================== -->
     <nav class="navbar">
         <a href="#" class="nav-logo">
             <img src="logo-alcf.png" alt="Logo AL Chazeau Fayol Basket">
@@ -253,6 +274,7 @@
         </div>
     </nav>
 
+    <!-- ==================== HERO ==================== -->
     <section class="hero" id="hero">
         <div class="hero-content">
             
@@ -287,9 +309,7 @@
             <!-- PHOTO COLONNE DROITE -->
             <div class="team-photo-container">
                 <img src="equipe-2025-2026.png" alt="Équipe AL Chazeau Fayol" class="team-photo">
-                <p style="text-align:center; margin-top:15px; opacity:0.8; font-style: italic; font-size: 0.95rem;">
-                    Équipe PNM – AL Chazeau Fayol Basket
-                </p>
+                <p class="team-photo-caption">Équipe PNM – AL Chazeau Fayol Basket</p>
             </div>
 
         </div>
