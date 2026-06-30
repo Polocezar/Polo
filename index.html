@@ -754,32 +754,6 @@
         </div>
     </div>
 
-    <!-- MODAL DETAILS JOUEUR (INTERACTIF) -->
-    <div class="modal-overlay" id="modal-player-details">
-        <div class="modal" style="max-width: 600px;">
-            <button class="modal-close-btn" onclick="closeModal('player-details')">×</button>
-            <div class="player-details-header" style="display: flex; align-items: center; gap: 20px; border-bottom: 2px solid var(--gray); padding-bottom: 20px; margin-bottom: 20px;">
-                <img id="detailPlayerPhoto" class="player-photo" style="margin: 0; width: 110px; height: 110px;" src="" alt="">
-                <div style="text-align: left;">
-                    <h3 id="detailPlayerName" style="margin-bottom: 5px; color: var(--violet); font-size: 1.7rem; font-weight: 800;">-</h3>
-                    <p id="detailPlayerPoste" style="color: var(--gold); font-weight: bold; text-transform: uppercase; font-size: 0.85rem;">-</p>
-                    <p id="detailPlayerNumero" style="font-weight: 800; color: var(--violet-light);">Maillot n° -</p>
-                </div>
-            </div>
-            
-            <div style="display: flex; border-bottom: 2px solid var(--gray); margin-bottom: 20px; justify-content: space-around;">
-                <button class="player-tabs-btn active" id="tab-btn-infos" onclick="switchPlayerTab('infos')">🪪 Informations</button>
-                <button class="player-tabs-btn" id="tab-btn-stats" onclick="switchPlayerTab('stats')">📈 Statistiques</button>
-            </div>
-
-            <div id="player-tab-infos" style="display: block;"></div>
-            <div id="player-tab-stats" style="display: none;"></div>
-
-            <div class="form-actions" style="margin-top: 25px;">
-                <button class="btn btn-gold" onclick="closeModal('player-details')" style="width:100%">Fermer</button>
-            </div>
-        </div>
-    </div>
 
     <!-- AUTRES MODALS (ADMIN) -->
     <div class="modal-overlay" id="modal-match"><div class="modal"><h3>📅 Match</h3><input type="hidden" id="matchId"><div class="form-group"><label>Date</label><input type="date" id="matchDate"></div><div class="form-group"><label>Heure</label><input type="time" id="matchHeure"></div><div class="form-group"><label>Adversaire</label><input type="text" id="matchAdversaire"></div><div class="form-group"><label>Lieu</label><select id="matchLieu"><option value="Domicile">Domicile</option><option value="Extérieur">Extérieur</option></select></div><div class="form-group"><label>Salle</label><input type="text" id="matchSalle"></div><div class="form-actions"><button class="btn btn-gold" onclick="saveMatch()">Sauver</button></div></div></div>
@@ -930,18 +904,22 @@
             document.getElementById('detailPlayerNumero').textContent = 'Maillot n° ' + j.numero;
             document.getElementById('detailPlayerPhoto').src = j.photo || 'logo-alcf.png';
 
-            // INFOS (Protection Admin)
+            // INFOS (Protection Admin + Correction des liens vides)
             const showPrivate = isAdmin;
+            const phone = j.telephone || 'Non renseigné';
+            const email = j.email || 'Non renseigné';
+            const licence = j.licence || 'N/A';
+
             document.getElementById('player-tab-infos').innerHTML = `
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; background:var(--gray-light); padding:20px; border-radius:15px;">
-                    <div><small>NAISSANCE</small><p><strong>${j.dateNaissance ? formatDate(j.dateNaissance) : '-'} (${age} ans)</strong></p></div>
-                    <div><small>TAILLE</small><p><strong>${j.taille || '-'} cm</strong></p></div>
-                    <div><small>LICENCE</small><p><strong>${showPrivate ? (j.licence || 'N/A') : '••••••'}</strong></p></div>
-                    <div><small>TÉLÉPHONE</small><p><strong>${showPrivate ? `<a href="tel:${j.telephone}">${j.telephone}</a>` : '••••••'}</strong></p></div>
-                    <div style="grid-column: span 2;"><small>EMAIL</small><p><strong>${showPrivate ? `<a href="mailto:${j.email}">${j.email}</a>` : '••••••'}</strong></p></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; background:var(--gray-light); padding:20px; border-radius:15px; text-align: left;">
+                    <div><small style="color:var(--gray-dark); font-weight:bold;">NAISSANCE</small><p><strong>${j.dateNaissance ? formatDate(j.dateNaissance) : '-'} (${age} ans)</strong></p></div>
+                    <div><small style="color:var(--gray-dark); font-weight:bold;">TAILLE</small><p><strong>${j.taille ? j.taille + ' cm' : '-'}</strong></p></div>
+                    <div><small style="color:var(--gray-dark); font-weight:bold;">LICENCE</small><p><strong>${showPrivate ? licence : '••••••'}</strong></p></div>
+                    <div><small style="color:var(--gray-dark); font-weight:bold;">TÉLÉPHONE</small><p><strong>${showPrivate && j.telephone ? `<a href="tel:${j.telephone}" style="color:var(--violet); text-decoration:none;">${j.telephone}</a>` : (showPrivate ? 'Non renseigné' : '••••••')}</strong></p></div>
+                    <div style="grid-column: span 2;"><small style="color:var(--gray-dark); font-weight:bold;">EMAIL</small><p><strong>${showPrivate && j.email ? `<a href="mailto:${j.email}" style="color:var(--violet); text-decoration:none;">${j.email}</a>` : (showPrivate ? 'Non renseigné' : '••••••')}</strong></p></div>
                 </div>`;
 
-            // STATS
+            // STATS (Identique mais on s'assure de l'alignement)
             const sSnap = await db.collection('statsIndiv').where('joueurNom', '==', j.prenom + ' ' + j.nom).get();
             if(!sSnap.empty) {
                 const s = sSnap.docs[0].data();
@@ -954,11 +932,11 @@
                         <div class="m-stat-card"><span class="val">${s.tempsJeu||0}</span><span class="lab">Minutes</span></div>
                     </div>
                     <div style="background:var(--gray-light); padding:15px; border-radius:15px; text-align:center;">
-                        <p>🎯 3pts : <strong>${s.pts3}</strong>  |  ✌️ 2pts : <strong>${s.pts2}</strong>  |  ☝️ LF : <strong>${s.pts1}</strong></p>
+                        <p style="font-weight:600;">🎯 3pts : ${s.pts3}  |  ✌️ 2pts : ${s.pts2}  |  ☝️ LF : ${s.pts1}</p>
                         <p style="margin-top:10px; color:var(--danger); font-weight:bold;">🟥 Fautes : ${s.fautes}</p>
                     </div>`;
             } else {
-                document.getElementById('player-tab-stats').innerHTML = '<p style="text-align:center; padding:20px;">Aucune stat enregistrée.</p>';
+                document.getElementById('player-tab-stats').innerHTML = '<p style="text-align:center; padding:20px; color:var(--gray-dark);">Aucune stat pour le moment.</p>';
             }
 
             switchPlayerTab('infos');
