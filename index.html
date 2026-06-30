@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,10 +11,10 @@
         :root {
             --violet: #2d1048; --violet-light: #4a1a6b; --gold: #f5a623; --gold-light: #ffd700;
             --white: #ffffff; --gray-light: #f5f5f5; --gray: #e0e0e0; --gray-dark: #666;
-            --danger: #e74c3c; --success: #27ae60; --info: #3498db;
+            --danger: #e74c3c; --success: #27ae60;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--violet); color: #111827; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gray-light); color: #111827; }
 
         /* NAVBAR */
         .navbar { background: linear-gradient(135deg, var(--violet), #4a1a6b); padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -25,60 +24,39 @@
         .nav-menu { display: flex; align-items: center; gap: 5px; }
         .nav-menu a { color: white; text-decoration: none; padding: 8px 15px; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 0.95rem; }
         .nav-menu a:hover, .nav-menu a.active { color: var(--gold-light); background: rgba(255,255,255,0.1); }
-        .user-info { color: var(--gold-light); margin: 0 15px; font-weight: bold; }
 
         /* GESTION DES PAGES */
-        .page { display: none; width: 100%; min-height: calc(100vh - 102px); background: var(--gray-light); }
+        .page { display: none; width: 100%; min-height: 90vh; }
         .page.active { display: block !important; }
-        #page-accueil { background: var(--violet); }
+        .container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
 
-        /* HERO ACCUEIL */
-        .hero { background: linear-gradient(135deg, var(--violet), #4a1a6b); color: white; padding: 60px 4%; display: flex; align-items: center; }
-        .hero-content { display: grid; grid-template-columns: 350px 1fr 500px; gap: 40px; max-width: 1700px; margin: 0 auto; align-items: center; width: 100%; }
-        .hero-logo { width: 100%; max-width: 340px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
-        .hero-text { text-align: center; }
-        .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 15px; font-weight: 900; }
-        .hero .subtitle { color: var(--gold-light); font-size: 1.8rem; margin-bottom: 35px; font-weight: 600; }
-        .hero-btns { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
-        .hero-team-img { width: 100%; max-width: 500px; border: 6px solid var(--gold); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 20px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
-        .venue-card:hover { background: var(--gold); color: var(--violet); transform: translateY(-3px); }
-
-        /* CALENDRIER INTERACTIF */
-        .calendar-nav { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--gray); gap: 1px; border: 1px solid var(--gray); border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .calendar-day-head { background: var(--violet); color: white; padding: 12px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; }
-        .calendar-day { background: white; min-height: 120px; padding: 10px; position: relative; transition: 0.2s; cursor: pointer; }
-        .calendar-day:hover { background: #fdfaf2; }
-        .calendar-day.not-current { background: #f9f9f9; color: #ccc; cursor: default; }
-        .calendar-day.today { background: #fff8e1; border: 2px solid var(--gold); }
-        .calendar-date-num { font-weight: 800; font-size: 1rem; margin-bottom: 5px; display: block; }
+        /* CHAMPIONNAT PAGE */
+        .comp-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; }
+        .section-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
-        /* ÉVÉNEMENTS COULEURS */
-        .event-item { font-size: 0.7rem; padding: 4px 6px; border-radius: 4px; margin-bottom: 3px; font-weight: bold; color: white; border: none; width: 100%; text-align: left; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        .event-match { background: var(--violet); border-left: 3px solid var(--gold); }
-        .event-entrainement { background: var(--info); border-left: 3px solid #2980b9; }
-        .event-anniversaire { background: #e91e63; border-left: 3px solid #ad1457; }
-        .event-repas { background: #27ae60; border-left: 3px solid #1e8449; }
-        .event-animation { background: #f39c12; border-left: 3px solid #d35400; }
+        /* MATCHS JOURNÉE */
+        .journee-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--violet); color: white; padding: 10px 20px; border-radius: 12px; }
+        .match-row { display: grid; grid-template-columns: 1fr 40px 20px 40px 1fr; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--gray-light); text-align: center; font-size: 0.95rem; }
+        .match-row span { font-weight: bold; color: var(--violet); }
+        .score-box { background: #eee; padding: 5px; border-radius: 5px; font-weight: 900; width: 35px; }
+        .score-box.win { background: var(--gold); color: var(--violet); }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 40px; }
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .page-header h2 { color: var(--violet); font-size: 2.2rem; border-bottom: 4px solid var(--gold); padding-bottom: 5px; }
+        /* TABLEAU CLASSEMENT */
+        .ranking-table { width: 100%; border-collapse: collapse; }
+        .ranking-table th { font-size: 0.75rem; color: var(--gray-dark); text-transform: uppercase; padding: 10px; border-bottom: 2px solid var(--gray-light); text-align: left; }
+        .ranking-table td { padding: 12px 10px; border-bottom: 1px solid var(--gray-light); font-size: 0.9rem; }
+        .row-me { background: #fdf6ec !important; font-weight: 800; border-left: 4px solid var(--gold); }
 
         /* MODALES */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
         .modal-overlay.active { display: flex; }
-        .modal { background: white; border-radius: 24px; padding: 40px; max-width: 600px; width: 100%; position: relative; animation: modalPop 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
-        @keyframes modalPop { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #eee; cursor: pointer; font-size: 20px; font-weight: bold; color: var(--violet); }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
-        .form-group label { font-weight: bold; color: var(--violet); font-size: 0.85rem; display: block; margin-bottom: 5px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid var(--gray); border-radius: 10px; font-size: 1rem; }
+        .modal { background: white; border-radius: 24px; padding: 35px; max-width: 500px; width: 100%; position: relative; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--violet); }
+        .form-group input { width: 100%; padding: 10px; border: 2px solid var(--gray); border-radius: 10px; }
 
-        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; text-decoration: none; display: inline-block; font-size: 0.9rem; }
+        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; text-transform: uppercase; }
         .btn-gold { background: var(--gold); color: var(--violet); }
-        .btn-gold:hover { background: #ffbb33; transform: translateY(-2px); }
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: inline-flex !important; }
     </style>
@@ -92,104 +70,95 @@
         </a>
         <div class="nav-menu">
             <a onclick="showPage('accueil')" id="nav-accueil">Accueil</a>
-            <a onclick="showPage('calendrier')" id="nav-calendrier">Calendrier</a>
-            <a onclick="showPage('resultats')" id="nav-resultats">Résultats</a>
-            <a onclick="showPage('classement')" id="nav-classement">Classement</a>
+            <a onclick="showPage('calendrier')" id="nav-calendrier">Mon Calendrier</a>
+            <a onclick="showPage('championnat')" id="nav-championnat">Championnat</a>
             <a onclick="showPage('effectif')" id="nav-effectif">Effectif</a>
             <a onclick="showPage('stats')" id="nav-stats">Stats</a>
             <a onclick="showPage('galerie')" id="nav-galerie">Galerie</a>
-            <a onclick="showPage('infos')" id="nav-infos">Infos</a>
-            <a onclick="showPage('messagerie')" id="nav-messagerie">Messagerie</a>
-            <span class="user-info" id="userInfo" style="display:none"></span>
-            <a class="btn btn-gold" style="padding:8px 15px; font-size:0.8rem;" onclick="showPage('login')" id="btnLogin">Connexion</a>
-            <a class="btn" style="padding:8px 15px; font-size:0.8rem; background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Déconnexion</a>
+            <a onclick="showPage('messagerie')" id="nav-messagerie">Messages</a>
+            <a class="btn btn-gold" style="padding:8px 15px; font-size:0.7rem;" onclick="showPage('login')" id="btnLogin">Connexion</a>
+            <a class="btn" style="padding:8px 15px; font-size:0.7rem; background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Sortir</a>
         </div>
     </nav>
 
-    <!-- PAGE : ACCUEIL -->
-    <div id="page-accueil" class="page active">
-        <section class="hero">
-            <div class="hero-content">
-                <img src="logo-alcf.png" class="hero-logo">
-                <div class="hero-text">
-                    <h1>BIENVENUE CHEZ<br>LES VIOLETS</h1>
-                    <p class="subtitle">Espace officiel ALCF Basket - PNM</p>
-                    <div class="hero-btns">
-                        <button onclick="showPage('effectif')" class="btn btn-gold" style="background:transparent; border:2px solid var(--gold); color:white;">L'Effectif</button>
-                        <button onclick="showPage('calendrier')" class="btn btn-gold">Calendrier</button>
-                    </div>
-                    <div class="next-match-box">🔴 Prochain match : <span id="nextMatchText">Chargement...</span></div>
-                    <div style="margin-top:20px;">
-                        <a href="https://www.google.com/maps/search/?api=1&query=1+rue+des+noyers+42700+Firminy" target="_blank" class="venue-card">
-                            <span style="font-size:1.8rem;">📍</span>
-                            <div style="text-align:left;"><strong style="display:block;">Salle GM4 Firminy</strong><small>1 Rue des Noyers, 42700 Firminy</small></div>
-                        </a>
-                    </div>
-                </div>
-                <img src="equipe-2025-2026.png" class="hero-team-img">
-            </div>
-        </section>
-    </div>
-
-    <!-- PAGE : CALENDRIER -->
-    <div id="page-calendrier" class="page">
+    <!-- PAGE CHAMPIONNAT (RESULTATS POULE + CLASSEMENT) -->
+    <div id="page-championnat" class="page">
         <div class="container">
             <div class="page-header">
-                <h2>📅 Calendrier interactif</h2>
-                <p class="admin-only" style="font-size:0.9rem; color:var(--violet); font-weight:bold;">💡 Admin : Cliquez sur un jour pour ajouter un événement</p>
+                <h2>🏆 Championnat PNM - Poule A</h2>
+                <a href="https://competitions.ffbb.com/ligues/ara/competitions/pnm?phase=200000002872829&poule=200000003018577" target="_blank" class="btn btn-gold" style="font-size:0.7rem;">Site Officiel FFBB ↗</a>
             </div>
-            <div class="calendar-nav">
-                <button class="btn btn-icon" style="background:var(--violet); padding:10px;" onclick="changeMonth(-1)">◀</button>
-                <h3 id="calendarMonthTitle" style="min-width:220px; text-align:center; color:var(--violet); font-size:1.6rem; text-transform: capitalize;">-</h3>
-                <button class="btn btn-icon" style="background:var(--violet); padding:10px;" onclick="changeMonth(1)">▶</button>
+
+            <div class="comp-grid">
+                <!-- Résultats de la journée -->
+                <div class="section-card">
+                    <div class="journee-nav">
+                        <button style="background:none; border:none; color:white; cursor:pointer;" onclick="changeJournee(-1)">◀</button>
+                        <span id="journeeTitle" style="font-weight:bold; font-size:1.1rem;">Journée 1</span>
+                        <button style="background:none; border:none; color:white; cursor:pointer;" onclick="changeJournee(1)">▶</button>
+                    </div>
+                    <div class="admin-only" style="margin-bottom:15px; width:100%">
+                        <button class="btn btn-gold" style="width:100%;" onclick="openModal('match-championnat')">+ Ajouter un match à la journée</button>
+                    </div>
+                    <div id="matchsJourneeList">
+                        <!-- Liste des matchs de la poule -->
+                    </div>
+                </div>
+
+                <!-- Classement -->
+                <div class="section-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3 style="color:var(--violet)">Classement Officiel</h3>
+                        <button class="btn btn-gold admin-only" style="padding:5px 12px; font-size:0.7rem;" onclick="openModal('classement')">Editer</button>
+                    </div>
+                    <table class="ranking-table">
+                        <thead><tr><th>Pos</th><th>Équipe</th><th>V</th><th>D</th><th>Pts</th></tr></thead>
+                        <tbody id="rankingBody"></tbody>
+                    </table>
+                </div>
             </div>
-            <div class="calendar-grid" id="calendarGrid"></div>
         </div>
     </div>
 
-    <!-- MODALE EVENEMENT (DYNAMIQUE) -->
-    <div class="modal-overlay" id="modal-match">
+    <!-- MODALE CLASSEMENT -->
+    <div class="modal-overlay" id="modal-classement">
         <div class="modal">
-            <button class="modal-close" onclick="closeModal('match')">×</button>
-            <h3 id="modalMatchTitle">Nouvel événement</h3>
-            <div class="form-grid" style="margin-top:20px;">
-                <div class="form-group full-width">
-                    <label>Type d'événement</label>
-                    <select id="matchType" onchange="toggleEventFields()">
-                        <option value="Match">🏀 Match</option>
-                        <option value="Entraînement">⏱ Entraînement</option>
-                        <option value="Anniversaire">🎂 Anniversaire</option>
-                        <option value="Repas">🍴 Repas Club</option>
-                        <option value="Animation">🎭 Animation / Soirée</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Date</label><input type="date" id="matchDate"></div>
-                
-                <!-- CHAMPS À CACHER POUR ANNIVERSAIRE -->
-                <div class="form-group event-extra"><label>Heure</label><input type="time" id="matchHeure" value="20:00"></div>
-                
-                <div class="form-group full-width">
-                    <label id="labelTitre">Titre / Adversaire</label>
-                    <input type="text" id="matchAdv" placeholder="Ex: Match vs Saint-Priest ou Joyeux Anniversaire...">
-                </div>
-
-                <div class="form-group event-extra"><label>Lieu</label><select id="matchLieu"><option>Domicile</option><option>Extérieur</option></select></div>
-                <div class="form-group event-extra"><label>Salle / Lieu</label><input type="text" id="matchSalle" value="Salle GM4 Firminy"></div>
+            <button class="modal-close" onclick="closeModal('classement')">×</button>
+            <h3>Mettre à jour le classement</h3>
+            <div class="form-group"><label>Nom de l'équipe</label><input type="text" id="rankEquipe" placeholder="Ex: MANTAILLE"></div>
+            <div class="form-group"><label>Position</label><input type="number" id="rankPos"></div>
+            <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-group"><label>Victoires</label><input type="number" id="rankV"></div>
+                <div class="form-group"><label>Défaites</label><input type="number" id="rankD"></div>
             </div>
-            <button class="btn btn-gold" style="margin-top:20px; width:100%" onclick="saveMatch()">Enregistrer</button>
-            <button class="btn" id="btnDelMatch" style="margin-top:10px; width:100%; background:var(--danger); color:white; display:none;" onclick="deleteCurrentMatch()">Supprimer</button>
+            <div class="form-group"><label>Points</label><input type="number" id="rankPts"></div>
+            <button class="btn btn-gold" style="width:100%" onclick="saveRanking()">Enregistrer l'équipe</button>
         </div>
     </div>
 
-    <!-- LE RESTE DES PAGES -->
-    <div id="page-effectif" class="page"><div class="container"><div class="page-header"><h2>👥 Effectif</h2><button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Joueur</button></div><div class="players-grid" id="effectifGrid"></div></div></div>
-    <div id="page-galerie" class="page"><div class="container"><h2>📸 Galerie</h2><div id="galleryGrid"></div></div></div>
-    <div id="page-resultats" class="page"><div class="container"><h2>📊 Résultats</h2></div></div>
-    <div id="page-classement" class="page"><div class="container"><h2>🥇 Classement</h2></div></div>
-    <div id="page-stats" class="page"><div class="container"><h2>📈 Stats</h2></div></div>
-    <div id="page-infos" class="page"><div class="container"><h2>📌 Infos</h2></div></div>
-    <div id="page-messagerie" class="page"><div class="container"><h2>💬 Messagerie</h2></div></div>
-    <div id="page-login" class="page"><div class="container"><div style="max-width:400px;margin:auto;text-align:center;"><h2>Connexion</h2><input type="email" id="loginEmail" placeholder="Email" style="width:100%;padding:10px;margin:10px 0;"><input type="password" id="loginPassword" placeholder="Pass" style="width:100%;padding:10px;margin:10px 0;"><button class="btn btn-gold" onclick="doLogin()">OK</button></div></div></div>
+    <!-- MODALE MATCH CHAMPIONNAT -->
+    <div class="modal-overlay" id="modal-match-championnat">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('match-championnat')">×</button>
+            <h3>Match de la poule</h3>
+            <div class="form-group"><label>Journée</label><input type="number" id="matchJ" value="1"></div>
+            <div class="form-group"><label>Équipe Domicile</label><input type="text" id="matchDom"></div>
+            <div class="form-group"><label>Équipe Extérieur</label><input type="text" id="matchExt"></div>
+            <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-group"><label>Score Dom</label><input type="number" id="scoreDom"></div>
+                <div class="form-group"><label>Score Ext</label><input type="number" id="scoreExt"></div>
+            </div>
+            <button class="btn btn-gold" style="width:100%" onclick="saveMatchChampionnat()">Enregistrer</button>
+        </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="page-login" class="page"><div class="container" style="max-width:400px;margin:auto;"><div class="section-card"><h2>Connexion Admin</h2><input type="email" id="loginEmail" placeholder="Email" style="width:100%;padding:12px;margin:10px 0;"><input type="password" id="loginPassword" placeholder="Pass" style="width:100%;padding:12px;margin:10px 0;"><button class="btn btn-gold" style="width:100%" onclick="doLogin()">OK</button></div></div></div>
+
+    <!-- PAGES VIDES POUR LE MOMENT -->
+    <div id="page-accueil" class="page active"></div>
+    <div id="page-calendrier" class="page"><div class="container"><h2>Mon Calendrier</h2><div id="calendarGrid"></div></div></div>
+    <div id="page-effectif" class="page"></div><div id="page-stats" class="page"></div><div id="page-galerie" class="page"></div><div id="page-messagerie" class="page"></div>
 
     <script>
         const firebaseConfig = {
@@ -203,111 +172,69 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(), auth = firebase.auth();
         const ADMIN = "polocezar@gmail.com";
-        let isAdmin = false, eventsData = [], currentViewDate = new Date(), currentEditId = null;
+        let isAdmin = false, currentJ = 1;
 
         auth.onAuthStateChanged(u => {
             isAdmin = u && u.email === ADMIN;
             document.body.classList.toggle('is-admin', isAdmin);
             if(u) {
-                document.getElementById('userInfo').style.display='inline';
-                document.getElementById('userInfo').textContent = '👤 ' + u.email.split('@')[0];
                 document.getElementById('btnLogin').style.display='none';
                 document.getElementById('btnLogout').style.display='inline-flex';
                 if(document.getElementById('page-login').classList.contains('active')) showPage('accueil');
             }
         });
 
+        async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch { alert('Erreur'); } }
+        function doLogout() { auth.signOut(); location.reload(); }
+
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-menu a').forEach(a => a.classList.remove('active'));
-            const target = document.getElementById('page-'+id);
-            if (target) target.classList.add('active');
-            if (document.getElementById('nav-'+id)) document.getElementById('nav-'+id).classList.add('active');
-            if(id==='calendrier') loadCalendar();
-            window.scrollTo(0,0);
+            document.getElementById('page-'+id).classList.add('active');
+            if(id === 'championnat') { loadRanking(); loadJournee(); }
         }
 
-        // GESTION DYNAMIQUE DES CHAMPS MODALE
-        function toggleEventFields() {
-            const type = document.getElementById('matchType').value;
-            const extras = document.querySelectorAll('.event-extra');
-            const labelTitre = document.getElementById('labelTitre');
-            
-            if (type === 'Anniversaire') {
-                extras.forEach(el => el.style.display = 'none');
-                labelTitre.textContent = "Message d'anniversaire";
-                document.getElementById('matchAdv').placeholder = "Ex: Joyeux anniversaire Romario ! 🎂";
-            } else {
-                extras.forEach(el => el.style.display = 'block');
-                labelTitre.textContent = "Titre / Adversaire";
-                document.getElementById('matchAdv').placeholder = "Ex: Match vs Saint-Priest";
-            }
-        }
-
-        function loadCalendar() {
-            db.collection('matchs').onSnapshot(snap => {
-                eventsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderCalendar();
+        /* LOGIQUE CHAMPIONNAT */
+        function loadRanking() {
+            db.collection('pouleClassement').orderBy('pos','asc').onSnapshot(snap => {
+                document.getElementById('rankingBody').innerHTML = snap.docs.map(doc => {
+                    const d = doc.data();
+                    const isMe = d.nom.includes('FIRMINY') || d.nom.includes('ALCF');
+                    return `<tr class="${isMe?'row-me':''}"><td>${d.pos}</td><td>${d.nom}</td><td>${d.v}</td><td>${d.d}</td><td>${d.pts}</td></tr>`;
+                }).join('');
             });
         }
 
-        function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            grid.innerHTML = '';
-            const m = currentViewDate.getMonth(), y = currentViewDate.getFullYear();
-            document.getElementById('calendarMonthTitle').textContent = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(currentViewDate);
-            ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].forEach(d => grid.innerHTML += `<div class="calendar-day-head">${d}</div>`);
-            const firstDay = new Date(y, m, 1).getDay();
-            const offset = firstDay === 0 ? 6 : firstDay - 1;
-            const daysInMonth = new Date(y, m + 1, 0).getDate();
-            for (let i = 0; i < offset; i++) grid.innerHTML += `<div class="calendar-day not-current"></div>`;
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-                const isToday = new Date().toISOString().split('T')[0] === dateStr;
-                let evHtml = '';
-                eventsData.filter(e => e.date === dateStr).forEach(e => {
-                    const typeClass = 'event-' + (e.type || 'match').toLowerCase().replace('é','e');
-                    const text = e.type === 'Anniversaire' ? e.matchAdv : `${e.heure} ${e.matchAdv || e.adversaire || ''}`;
-                    evHtml += `<button class="event-item ${typeClass}" onclick="event.stopPropagation(); editMatch('${e.id}')">${text}</button>`;
-                });
-                grid.innerHTML += `<div class="calendar-day ${isToday?'today':''}" onclick="addNewEvent('${dateStr}')"><span class="calendar-date-num">${day}</span>${evHtml}</div>`;
-            }
+        function loadJournee() {
+            document.getElementById('journeeTitle').textContent = `Journée ${currentJ}`;
+            db.collection('pouleMatchs').where('j','==',currentJ).onSnapshot(snap => {
+                if(snap.empty) { document.getElementById('matchsJourneeList').innerHTML = '<p style="text-align:center; padding:20px;">Aucun match saisi pour cette journée.</p>'; return; }
+                document.getElementById('matchsJourneeList').innerHTML = snap.docs.map(doc => {
+                    const m = doc.data();
+                    return `<div class="match-row">
+                        <div style="text-align:right">${m.dom}</div>
+                        <div class="score-box ${m.sDom > m.sExt ? 'win' : ''}">${m.sDom || 0}</div>
+                        <div>-</div>
+                        <div class="score-box ${m.sExt > m.sDom ? 'win' : ''}">${m.sExt || 0}</div>
+                        <div style="text-align:left">${m.ext}</div>
+                    </div>`;
+                }).join('');
+            });
         }
 
-        function changeMonth(v) { currentViewDate.setMonth(currentViewDate.getMonth() + v); renderCalendar(); }
-        function addNewEvent(date) { if(!isAdmin) return; currentEditId = null; document.getElementById('matchDate').value = date; document.getElementById('matchType').value = 'Match'; toggleEventFields(); document.getElementById('matchAdv').value = ''; document.getElementById('btnDelMatch').style.display = 'none'; openModal('match'); }
-        
-        async function editMatch(id) { 
-            if(!isAdmin) return; 
-            const d = eventsData.find(e => e.id === id); 
-            currentEditId = id; 
-            document.getElementById('matchType').value = d.type || 'Match'; 
-            toggleEventFields();
-            document.getElementById('matchDate').value = d.date; 
-            document.getElementById('matchHeure').value = d.heure || '20:00'; 
-            document.getElementById('matchAdv').value = d.matchAdv || d.adversaire || ''; 
-            document.getElementById('btnDelMatch').style.display = 'block'; 
-            openModal('match'); 
+        function changeJournee(v) { currentJ += v; if(currentJ < 1) currentJ = 1; loadJournee(); }
+
+        async function saveRanking() {
+            const data = { nom: document.getElementById('rankEquipe').value.toUpperCase(), pos: parseInt(document.getElementById('rankPos').value), v: parseInt(document.getElementById('rankV').value), d: parseInt(document.getElementById('rankD').value), pts: parseInt(document.getElementById('rankPts').value) };
+            await db.collection('pouleClassement').add(data); closeModal('classement');
         }
 
-        async function saveMatch() { 
-            const data = { 
-                type: document.getElementById('matchType').value, 
-                date: document.getElementById('matchDate').value, 
-                heure: document.getElementById('matchHeure').value, 
-                matchAdv: document.getElementById('matchAdv').value, 
-                lieu: document.getElementById('matchLieu').value, 
-                salle: document.getElementById('matchSalle').value 
-            }; 
-            if(currentEditId) await db.collection('matchs').doc(currentEditId).update(data); else await db.collection('matchs').add(data); 
-            closeModal('match'); 
+        async function saveMatchChampionnat() {
+            const data = { j: parseInt(document.getElementById('matchJ').value), dom: document.getElementById('matchDom').value, ext: document.getElementById('matchExt').value, sDom: parseInt(document.getElementById('scoreDom').value), sExt: parseInt(document.getElementById('scoreExt').value) };
+            await db.collection('pouleMatchs').add(data); closeModal('match-championnat');
         }
 
-        async function deleteCurrentMatch() { if(confirm('Supprimer?')) { await db.collection('matchs').doc(currentEditId).delete(); closeModal('match'); } }
         function openModal(id) { document.getElementById('modal-'+id).classList.add('active'); }
         function closeModal(id) { document.getElementById('modal-'+id).classList.remove('active'); }
-        async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch { alert('Erreur'); } }
-        function doLogout() { auth.signOut(); location.reload(); }
 
         showPage('accueil');
     </script>
