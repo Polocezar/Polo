@@ -17,7 +17,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; overflow-x: hidden; }
 
         .navbar {
             background: linear-gradient(135deg, var(--violet), #4a1a6b);
@@ -30,138 +30,128 @@
             z-index: 1000;
         }
 
-        .nav-logo img { height: 75px; }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .nav-logo img { height: 60px; }
 
         .nav-logo span {
-            font-size: 1.9rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: #ffd700;
             margin-left: 10px;
         }
 
-              /* ==================== HERO - VERSION OPTIMISÉE ==================== */
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: var(--gold);
+        }
+
+        /* HERO - NOUVELLE STRUCTURE ULTRA-STABLE */
         .hero {
             background: linear-gradient(135deg, var(--violet), #4a1a6b);
             color: white;
-            min-height: 92vh;
+            min-height: 90vh;
             display: flex;
             align-items: center;
-            padding: 30px 5%;
+            padding: 40px 4%;
+            overflow: hidden; /* Empêche tout bug d'agrandissement du logo */
         }
 
         .hero-content {
             display: grid;
-            grid-template-columns: 520px 1fr 420px;   /* Logo plus large */
-            gap: 40px;
-            max-width: 1750px;
+            grid-template-columns: 450px 1fr 450px; /* Colonnes bien définies */
+            gap: 20px;
+            max-width: 1800px;
+            width: 100%;
             margin: 0 auto;
             align-items: center;
         }
 
-        /* === LOGO === */
-        .logo-container {
+        /* LOGO - EFFET DE FORCE BRUTE */
+        .logo-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Suppression du cadre jaune de debug */
+            width: 100%;
         }
 
         .logo {
             width: 100%;
-            max-width: 580px;           /* ← Augmenté significativement */
+            max-width: 420px;
             height: auto;
-            filter: drop-shadow(0 25px 40px rgba(0, 0, 0, 0.6));
-            transition: transform 0.4s ease;
+            display: block;
+            /* Le transform scale(1.5) force le logo à zoomer à travers son espace transparent */
+            transform: scale(1.5); 
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.7));
+            transition: transform 0.3s ease;
         }
 
         .logo:hover {
-            transform: scale(1.03);
+            transform: scale(1.55);
         }
 
-        /* === TEXTE CENTRAL === */
+        /* TEXTE CENTRAL */
         .main-content { 
-            text-align: center; 
+            text-align: center;
+            z-index: 2;
         }
-
-        .badge {
-            display: inline-block;
-            background: rgba(245, 166, 35, 0.25);
-            color: var(--gold);
-            padding: 10px 28px;
-            border-radius: 50px;
-            border: 2px solid var(--gold);
-            font-weight: bold;
-            margin-bottom: 25px;
-            font-size: 1.1rem;
-        }
-
-        .hero h1 {
-            font-size: 4.8rem;
-            line-height: 1.05;
-            margin-bottom: 12px;
-        }
-
-        .subtitle {
-            color: #ffd700;
-            font-size: 2rem;
-            margin-bottom: 35px;
-        }
-
-        /* === PHOTO D'ÉQUIPE === */
-        .team-photo img {
-            width: 100%;
-            max-width: 420px;
-            border: 8px solid var(--gold);
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        }
-
-        /* ==================== RESPONSIVE ==================== */
-        @media (max-width: 1280px) {
-            .hero-content {
-                grid-template-columns: 1fr;
-                gap: 50px;
-            }
-            .logo {
-                max-width: 380px;
-            }
-            .hero h1 {
-                font-size: 3.8rem;
-            }
-        }
-
-        .main-content { text-align: center; }
 
         .badge {
             display: inline-block;
             background: rgba(245, 166, 35, 0.2);
             color: var(--gold);
-            padding: 12px 32px;
+            padding: 10px 25px;
             border-radius: 50px;
             border: 2px solid var(--gold);
             font-weight: bold;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
         }
 
         .hero h1 {
-            font-size: 4.5rem;
-            line-height: 1.05;
+            font-size: 4rem;
+            line-height: 1.1;
             margin-bottom: 15px;
+            font-weight: 800;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .subtitle {
             color: #ffd700;
-            font-size: 1.9rem;
-            margin-bottom: 40px;
+            font-size: 1.8rem;
+            margin-bottom: 35px;
+            font-weight: 600;
+        }
+
+        /* BOUTONS CORRIGÉS (Pas de chevauchement possible) */
+        .hero-buttons {
+            margin-bottom: 15px;
         }
 
         .btn {
-            padding: 16px 36px;
+            display: inline-block; /* <-- FIX CRUCIAL : force le bouton à respecter ses marges et sa taille */
+            padding: 14px 30px;
             border-radius: 50px;
-            font-weight: 600;
+            font-weight: bold;
             text-decoration: none;
             margin: 8px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
         }
 
         .btn-outline {
@@ -170,32 +160,77 @@
             border: 2px solid var(--gold);
         }
 
+        .btn-outline:hover {
+            background: var(--gold);
+            color: var(--violet);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(245, 166, 35, 0.3);
+        }
+
         .btn-gold {
             background: var(--gold);
-            color: #2d1048;
+            color: var(--violet);
+            border: 2px solid var(--gold);
+        }
+
+        .btn-gold:hover {
+            background: #ffbb33;
+            border-color: #ffbb33;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(245, 166, 35, 0.4);
         }
 
         .next-match {
             background: linear-gradient(90deg, var(--gold), #ffbb33);
             color: #2d1048;
-            padding: 20px 40px;
-            border-radius: 12px;
+            padding: 18px 35px;
+            border-radius: 50px;
             font-weight: bold;
-            margin-top: 25px;
+            margin-top: 30px;
             display: inline-block;
+            box-shadow: 0 10px 25px rgba(245, 166, 35, 0.3);
         }
 
-        .team-photo img {
+        /* PHOTO D'ÉQUIPE */
+        .team-photo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .team-photo {
             width: 100%;
-            max-width: 400px;
-            border: 8px solid var(--gold);
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            max-width: 430px;
+            border: 6px solid var(--gold);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            transition: transform 0.3s;
         }
 
-        @media (max-width: 1200px) {
-            .hero-content { grid-template-columns: 1fr; }
-            .logo { transform: scale(1.0); }
+        .team-photo:hover {
+            transform: scale(1.02);
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 1350px) {
+            .hero-content {
+                grid-template-columns: 1fr; /* Passage sur une seule colonne */
+                gap: 50px;
+                max-width: 700px;
+            }
+
+            .logo {
+                max-width: 250px;
+                transform: scale(1.2); /* Zoom plus doux sur mobile */
+            }
+
+            .logo:hover {
+                transform: scale(1.25);
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
         }
     </style>
 </head>
@@ -220,11 +255,16 @@
 
     <section class="hero" id="hero">
         <div class="hero-content">
-           <img src="logo-alcf.png" alt="Logo AL Chazeau Fayol Basket" class="logo">
+            
+            <!-- LOGO COLONNE GAUCHE -->
+            <div class="logo-wrapper">
+                <img src="logo-alcf.png" alt="Logo AL Chazeau Fayol Basket" class="logo">
+            </div>
 
+            <!-- CONTENU CENTRAL -->
             <div class="main-content">
                 <div class="badge">ÉQUIPE PNM 🏆 LIGUE AUVERGNE RHÔNE-ALPES</div>
-                <h1>BIENVENUE SUR<br>L'ESPACE PNM ALFC BASKET</h1>
+                <h1>BIENVENUE SUR<br>L'ESPACE PNM ALCF BASKET</h1>
                 <p class="subtitle">Site officiel de l'équipe</p>
 
                 <div class="hero-buttons">
@@ -237,20 +277,23 @@
                     <a href="#calendrier" class="btn btn-gold">Calendrier</a>
                 </div>
 
-                <div class="next-match">
-                    🔴 Prochain match : Pas de prochain match programmé
+                <div>
+                    <div class="next-match">
+                        🔴 Prochain match : Pas de prochain match programmé
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <img src="equipe-2025-2026.png" alt="Équipe" class="team-photo">
-                <p style="text-align:center; margin-top:15px; opacity:0.9;">Équipe PNM – AL Chazeau Fayol Basket</p>
+            <!-- PHOTO COLONNE DROITE -->
+            <div class="team-photo-container">
+                <img src="equipe-2025-2026.png" alt="Équipe AL Chazeau Fayol" class="team-photo">
+                <p style="text-align:center; margin-top:15px; opacity:0.8; font-style: italic; font-size: 0.95rem;">
+                    Équipe PNM – AL Chazeau Fayol Basket
+                </p>
             </div>
+
         </div>
     </section>
 
-    <script>
-        console.log("%c🔴 VERSION TEST - Regarde le cadre jaune autour du logo", "color:yellow; font-size:18px; font-weight:bold");
-    </script>
 </body>
 </html>
