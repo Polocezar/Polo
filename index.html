@@ -26,70 +26,54 @@
         .nav-menu a:hover, .nav-menu a.active { color: var(--gold-light); background: rgba(255,255,255,0.1); }
         .user-info { color: var(--gold-light); margin: 0 15px; font-weight: bold; }
 
-        /* GESTION DES PAGES */
+        /* PAGES */
         .page { display: none; width: 100%; min-height: 90vh; }
         .page.active { display: block !important; }
-        #page-accueil { background: var(--violet); }
 
-        /* DESIGN EFFECTIF (FOND TERRAIN) */
+        /* ACCUEIL */
+        .hero { background: linear-gradient(135deg, var(--violet), #4a1a6b); color: white; padding: 60px 4%; min-height: 85vh; display: flex; align-items: center; }
+        .hero-content { display: grid; grid-template-columns: 350px 1fr 500px; gap: 40px; max-width: 1700px; margin: 0 auto; align-items: center; width: 100%; }
+        .hero-logo { width: 100%; max-width: 320px; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6)); }
+        .hero-text { text-align: center; }
+        .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
+        .hero-btns { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
+        .hero-team-img { width: 100%; max-width: 500px; border: 6px solid var(--gold); border-radius: 20px; }
+
+        /* EFFECTIF FOND TERRAIN */
         #page-effectif { 
-            background-image: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url('https://www.transparenttextures.com/patterns/wood-pattern.png'); 
-            background-color: #d2b48c; /* Couleur bois parquet */
+            background: #d2b48c url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+            background-attachment: fixed;
         }
 
-        /* CARTE STYLE PANINI */
+        /* CARTE PANINI */
         .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; padding: 20px; }
         .player-card { 
-            background: white; 
-            border: 8px solid white; 
-            border-radius: 15px; 
-            padding: 0; 
-            text-align: center; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
-            position: relative; 
-            cursor: pointer; 
-            transition: 0.4s; 
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            background: white; border: 6px solid white; border-radius: 12px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); position: relative; cursor: pointer; 
+            transition: 0.3s; overflow: hidden; border-bottom: 25px solid white;
         }
-        .player-card::before {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            border: 2px solid var(--gold); border-radius: 10px; pointer-events: none; z-index: 2;
-        }
-        .player-card:hover { transform: scale(1.05) rotate(1deg); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
-        
-        .player-img-container { width: 100%; height: 280px; overflow: hidden; background: #eee; position: relative; }
-        .player-img { width: 100%; height: 100%; object-fit: cover; object-position: center 10%; transition: 0.5s; }
-        
-        .player-info-banner { 
-            background: var(--violet); color: white; padding: 15px 10px; 
-            border-top: 4px solid var(--gold); position: relative; z-index: 3;
-        }
-        .player-card h4 { font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; color: var(--gold-light); }
-        .player-card .poste-label { font-size: 0.8rem; font-weight: bold; opacity: 0.9; }
+        .player-card:hover { transform: scale(1.03); z-index: 10; }
+        .player-img-container { width: 100%; height: 300px; overflow: hidden; border: 2px solid var(--gold); border-radius: 6px; }
+        .player-img { width: 100%; height: 100%; object-fit: cover; object-position: center 10%; }
+        .player-num-panini { position: absolute; top: 12px; left: 12px; background: var(--gold); color: var(--violet); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid white; z-index: 5; }
+        .player-info-banner { background: var(--violet); color: var(--gold-light); padding: 10px; margin-top: -2px; }
+        .player-info-banner h4 { font-size: 1.1rem; text-transform: uppercase; margin: 0; }
+        .player-info-banner p { color: white; font-size: 0.8rem; font-weight: bold; margin: 0; }
 
-        .player-num-panini { 
-            position: absolute; top: 10px; left: 10px; background: var(--gold); 
-            color: var(--violet); width: 45px; height: 45px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 1.2rem; border: 3px solid white; z-index: 5;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
+        /* ADMIN ACTIONS SUR CARTES */
+        .admin-card-actions { position: absolute; bottom: 45px; right: 10px; display: flex; gap: 5px; z-index: 20; }
+        .btn-mini { padding: 5px 8px; border-radius: 5px; border: none; cursor: pointer; color: white; font-size: 0.8rem; }
 
-        /* CHAMPIONNAT & CALENDRIER */
-        .container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
-        .iframe-container-wrapper { position: relative; width: 100%; height: 800px; border-radius: 15px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        #ffbbIframe { position: absolute; top: -260px; left: -10px; width: 120%; height: 1200px; border: none; }
-        
         /* MODALES */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
         .modal-overlay.active { display: flex; }
-        .modal { background: white; border-radius: 24px; padding: 40px; max-width: 600px; width: 100%; position: relative; animation: modalPop 0.3s ease-out; }
-        @keyframes modalPop { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #eee; cursor: pointer; font-size: 20px; font-weight: bold; color: var(--violet); }
+        .modal { background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 100%; position: relative; }
+        .modal-close { position: absolute; top: 15px; right: 15px; border: none; background: #eee; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-weight: bold; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--violet); }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
 
-        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; text-decoration: none; display: inline-block; }
+        .btn { padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; text-transform: uppercase; }
         .btn-gold { background: var(--gold); color: var(--violet); }
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: inline-flex !important; }
@@ -107,75 +91,77 @@
             <a onclick="showPage('calendrier')" id="nav-calendrier">Calendrier</a>
             <a onclick="showPage('championnat')" id="nav-championnat">Championnat</a>
             <a onclick="showPage('effectif')" id="nav-effectif">Effectif</a>
-            <a onclick="showPage('stats')" id="nav-stats">Stats</a>
-            <a onclick="showPage('galerie')" id="nav-galerie">Galerie</a>
-            <a onclick="showPage('infos')" id="nav-infos">Infos</a>
             <span class="user-info" id="userInfo" style="display:none"></span>
-            <a class="btn btn-gold" style="padding:8px 15px; font-size:0.8rem;" onclick="showPage('login')" id="btnLogin">Connexion</a>
-            <a class="btn" style="padding:8px 15px; font-size:0.8rem; background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Sortir</a>
+            <a class="btn btn-gold" style="padding:8px 15px; font-size:0.7rem;" onclick="showPage('login')" id="btnLogin">Connexion</a>
+            <a class="btn" style="padding:8px 15px; font-size:0.7rem; background:var(--danger); color:white; display:none;" onclick="doLogout()" id="btnLogout">Sortir</a>
         </div>
     </nav>
 
     <!-- ACCUEIL -->
     <div id="page-accueil" class="page active">
-        <div style="background: var(--violet); color: white; padding: 80px 5%; display: flex; align-items: center; justify-content: center; min-height: 85vh;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px; max-width: 1200px; align-items: center;">
-                <div style="text-align: center;">
-                    <img src="logo-alcf.png" style="width: 100%; max-width: 320px; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));">
-                    <h1 style="font-size: 3.5rem; margin-top: 20px;">LES VIOLETS</h1>
-                    <div style="margin-top:30px;">
-                        <button onclick="showPage('effectif')" class="btn" style="border:2px solid var(--gold); color:white; background:transparent; margin-right:10px;">L'EFFECTIF</button>
+        <section class="hero">
+            <div class="hero-content">
+                <img src="logo-alcf.png" class="hero-logo">
+                <div class="hero-text">
+                    <h1>BIENVENUE CHEZ<br>LES VIOLETS</h1>
+                    <div class="hero-btns">
+                        <button onclick="showPage('effectif')" class="btn" style="background:transparent; border:2px solid var(--gold); color:white;">L'EFFECTIF</button>
                         <button onclick="showPage('championnat')" class="btn btn-gold">CHAMPIONNAT</button>
                     </div>
                 </div>
-                <img src="equipe-2025-2026.png" style="width: 100%; border: 6px solid var(--gold); border-radius: 20px;">
+                <img src="equipe-2025-2026.png" class="hero-team-img">
             </div>
-        </div>
+        </section>
     </div>
 
     <!-- EFFECTIF -->
     <div id="page-effectif" class="page">
         <div class="container">
-            <div class="page-header" style="background: rgba(255,255,255,0.9); padding: 20px; border-radius: 15px;">
-                <h2 style="margin:0;">👥 L'Effectif PNM 2025/2026</h2>
-                <button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Ajouter un joueur</button>
+            <div class="page-header" style="background:rgba(255,255,255,0.9); padding:20px; border-radius:15px;">
+                <h2>👥 Effectif PNM</h2>
+                <button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Joueur</button>
             </div>
-            <div class="players-grid" id="effectifGrid">
-                <!-- Les cartes Panini seront générées ici -->
-            </div>
+            <div class="players-grid" id="effectifGrid"></div>
         </div>
     </div>
 
     <!-- CHAMPIONNAT -->
     <div id="page-championnat" class="page">
-        <div class="container" style="max-width: 100%;">
-            <iframe id="ffbbIframe" style="width:100%; height:900px; border:none; border-radius:20px;" src="https://competitions.ffbb.com/ligues/ara/competitions/pnm?phase=200000002872829&poule=200000003018577&journee=1"></iframe>
+        <div class="container" style="max-width:100%">
+            <iframe style="width:100%; height:800px; border:none; border-radius:15px;" src="https://competitions.ffbb.com/ligues/ara/competitions/pnm?phase=200000002872829&poule=200000003018577&journee=1"></iframe>
         </div>
     </div>
 
-    <!-- CALENDRIER -->
-    <div id="page-calendrier" class="page">
-        <div class="container"><h2>📅 Calendrier de l'équipe</h2><div id="calendarGrid" style="background:white; padding:20px; border-radius:20px;">Chargement...</div></div>
+    <!-- CALENDRIER / LOGIN (Stubs) -->
+    <div id="page-calendrier" class="page"><div class="container"><h2>Calendrier</h2></div></div>
+    <div id="page-login" class="page"><div class="container" style="max-width:400px;margin:auto;"><div style="background:white;padding:40px;border-radius:20px;text-align:center;"><h2>Connexion</h2><input type="email" id="loginEmail" style="width:100%;margin:10px 0;padding:10px;"><input type="password" id="loginPassword" style="width:100%;margin:10px 0;padding:10px;"><button class="btn btn-gold" onclick="doLogin()">OK</button></div></div></div>
+
+    <!-- MODALE JOUEUR -->
+    <div class="modal-overlay" id="modal-joueur">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('joueur')">×</button>
+            <h3>Fiche Joueur</h3>
+            <input type="hidden" id="joueurId">
+            <div class="form-group"><label>Prénom</label><input type="text" id="joueurPrenom"></div>
+            <div class="form-group"><label>Nom</label><input type="text" id="joueurNom"></div>
+            <div class="form-group"><label>N° Maillot</label><input type="number" id="joueurNumero"></div>
+            <div class="form-group"><label>Poste</label><select id="joueurPoste"><option value="Meneur">Meneur</option><option value="Arrière">Arrière</option><option value="Ailier">Ailier</option><option value="Ailier Fort">Ailier Fort</option><option value="Pivot">Pivot</option></select></div>
+            <div class="form-group"><label>Photo URL</label><input type="text" id="joueurPhoto"></div>
+            <button class="btn btn-gold" style="width:100%" onclick="saveJoueur()">Enregistrer</button>
+        </div>
     </div>
 
-    <!-- LOGIN -->
-    <div id="page-login" class="page">
-        <div class="container" style="max-width:400px; margin:auto;"><div style="background:white; padding:40px; border-radius:20px; text-align:center;"><h2>Connexion</h2><input type="email" id="loginEmail" style="width:100%; padding:10px; margin:10px 0;"><input type="password" id="loginPassword" style="width:100%; padding:10px; margin:10px 0;"><button class="btn btn-gold" onclick="doLogin()">OK</button></div></div>
-    </div>
-
-    <!-- MODALE DETAILS JOUEUR -->
+    <!-- MODALE DETAILS -->
     <div class="modal-overlay" id="modal-player-details">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('player-details')">×</button>
-            <div style="display:flex; align-items:center; gap:20px; margin-bottom:20px;">
-                <img id="detPhoto" class="player-img" style="margin:0; width:120px; height:120px; border-radius:50%; border:4px solid var(--gold); object-fit:cover;">
-                <div style="text-align:left;">
-                    <h3 id="detName" style="color:var(--violet); font-size:1.8rem; text-transform:uppercase;">-</h3>
+            <div style="display:flex; align-items:center; gap:20px;">
+                <img id="detPhoto" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--gold);">
+                <div style="text-align:left">
+                    <h3 id="detName" style="margin:0"></h3>
                     <p id="detPoste" style="color:var(--gold); font-weight:bold;"></p>
-                    <p id="detNum" style="font-weight:bold; color:var(--violet-light)"></p>
                 </div>
             </div>
-            <div id="tabInfos" style="background:var(--gray-light); padding:20px; border-radius:15px; text-align:left;"></div>
         </div>
     </div>
 
@@ -207,55 +193,59 @@
 
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const target = document.getElementById('page-'+id);
-            if (target) target.classList.add('active');
+            document.getElementById('page-'+id).classList.add('active');
             if(id==='effectif') loadEff();
-            window.scrollTo(0,0);
         }
 
-        // CHARGEMENT EFFECTIF STYLE PANINI
         function loadEff() {
             db.collection('joueurs').orderBy('numero').onSnapshot(snap => {
                 document.getElementById('effectifGrid').innerHTML = snap.docs.map(doc => {
                     const j = doc.data();
                     return `
-                    <div class="player-card" onclick="openPlayerDetails('${doc.id}')">
+                    <div class="player-card" onclick="openPlayer('${doc.id}')">
                         <div class="player-num-panini">${j.numero || '0'}</div>
-                        <div class="player-img-container">
-                            <img src="${j.photo || 'logo-alcf.png'}" class="player-img">
-                        </div>
+                        <div class="player-img-container"><img src="${j.photo || 'logo-alcf.png'}" class="player-img"></div>
                         <div class="player-info-banner">
                             <h4>${j.prenom} ${j.nom}</h4>
-                            <span class="poste-label">${j.poste}</span>
+                            <p>${j.poste}</p>
+                        </div>
+                        <div class="admin-card-actions admin-only">
+                            <button class="btn-mini" style="background:var(--gold)" onclick="event.stopPropagation(); editJoueur('${doc.id}')">✏️</button>
+                            <button class="btn-mini" style="background:var(--danger)" onclick="event.stopPropagation(); deleteDoc('joueurs','${doc.id}')">🗑️</button>
                         </div>
                     </div>`;
                 }).join('');
             });
         }
 
-        async function openPlayerDetails(id) {
-            const doc = await db.collection('joueurs').doc(id).get();
-            const j = doc.data();
-            
-            document.getElementById('detPhoto').src = j.photo || 'logo-alcf.png';
-            document.getElementById('detName').textContent = j.prenom + ' ' + j.nom;
-            document.getElementById('detPoste').textContent = j.poste;
-            document.getElementById('detNum').textContent = 'Maillot n° ' + (j.numero || '0');
-            
-            document.getElementById('tabInfos').innerHTML = `
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                    <div><small>TAILLE</small><p><strong>${j.taille || '-'} cm</strong></p></div>
-                    <div><small>NAISSANCE</small><p><strong>${j.dateNaissance || '-'}</strong></p></div>
-                    <div style="grid-column: span 2; border-top:1px solid var(--gray); padding-top:10px; margin-top:5px;">
-                        <small>LICENCE</small><p><strong>${isAdmin ? (j.licence || '-') : '••••••'}</strong></p>
-                    </div>
-                </div>`;
-            
+        async function openPlayer(id) {
+            const d = (await db.collection('joueurs').doc(id).get()).data();
+            document.getElementById('detPhoto').src = d.photo || 'logo-alcf.png';
+            document.getElementById('detName').textContent = d.prenom + ' ' + d.nom;
+            document.getElementById('detPoste').textContent = d.poste;
             openModal('player-details');
         }
 
+        async function editJoueur(id) {
+            const d = (await db.collection('joueurs').doc(id).get()).data();
+            document.getElementById('joueurId').value = id;
+            document.getElementById('joueurPrenom').value = d.prenom;
+            document.getElementById('joueurNom').value = d.nom;
+            document.getElementById('joueurNumero').value = d.numero;
+            document.getElementById('joueurPoste').value = d.poste;
+            document.getElementById('joueurPhoto').value = d.photo;
+            openModal('joueur');
+        }
+
+        async function saveJoueur() {
+            const id = document.getElementById('joueurId').value, data = { prenom: document.getElementById('joueurPrenom').value, nom: document.getElementById('joueurNom').value, numero: parseInt(document.getElementById('joueurNumero').value)||0, poste: document.getElementById('joueurPoste').value, photo: document.getElementById('joueurPhoto').value };
+            if(id) await db.collection('joueurs').doc(id).update(data); else await db.collection('joueurs').add(data);
+            closeModal('joueur');
+        }
+
         function openModal(id) { document.getElementById('modal-'+id).classList.add('active'); }
-        function closeModal(id) { document.getElementById('modal-'+id).classList.remove('active'); }
+        function closeModal(id) { document.getElementById('modal-'+id).classList.remove('active'); if(id==='joueur') document.getElementById('joueurId').value=''; }
+        async function deleteDoc(c,i) { if(confirm('Supprimer?')) await db.collection(c).doc(i).delete(); }
         async function doLogin() { try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } catch { alert('Erreur'); } }
         function doLogout() { auth.signOut(); location.reload(); }
 
