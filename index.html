@@ -1,5 +1,3 @@
-Salut Polo ! C'est ma faute, dans la version précédente, j'avais laissé les "balises" des pages Stats et Infos vides pour gagner de la place, ce qui créait ces pages blanches.
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -45,12 +43,26 @@ Salut Polo ! C'est ma faute, dans la version précédente, j'avais laissé les "
         .venue-card { display: inline-flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 20px; text-decoration: none; color: white; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
         .venue-card:hover { background: var(--gold); color: var(--violet); transform: translateY(-3px); }
 
-        /* CHAMPIONNAT */
-        .iframe-wrapper { position: relative; width: 100%; height: 900px; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .iframe-container { width: 100%; height: 100%; border: none; background: white; }
-        .iframe-mask { position: absolute; top: 0; left: 0; width: 100%; height: 160px; z-index: 10; background: transparent; }
+        /* CHAMPIONNAT (RECADRAGE PRO) */
+        .iframe-container-wrapper { 
+            position: relative; 
+            width: 100%; 
+            height: 750px; /* Hauteur visible finale */
+            border-radius: 15px; 
+            overflow: hidden; 
+            background: white; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
+        #ffbbIframe { 
+            position: absolute;
+            top: -260px; /* ON REMONTE L'IFRAME POUR CACHER LE MENU FFBB */
+            left: 0;
+            width: 100%; 
+            height: 1100px; /* On augmente la hauteur totale pour compenser le décalage */
+            border: none; 
+        }
         .journee-selector { background: var(--violet); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; justify-content: center; }
-        .journee-selector select { padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; color: var(--violet); }
+        .journee-selector select { padding: 8px 15px; border-radius: 8px; border: none; font-weight: bold; color: var(--violet); cursor: pointer; }
 
         /* GRID & TABLES */
         .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
@@ -61,8 +73,8 @@ Salut Polo ! C'est ma faute, dans la version précédente, j'avais laissé les "
         .data-table th { background: var(--violet); color: var(--gold-light); padding: 15px; text-align: left; }
         .data-table td { padding: 15px; border-bottom: 1px solid var(--gray); }
         .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; cursor: pointer; transition: 0.3s; }
-        .player-card:hover { transform: translateY(-8px); border: 1px solid var(--gold); }
+        .player-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.06); position: relative; transition: 0.3s; cursor: pointer; border: 1px solid transparent; }
+        .player-card:hover { transform: translateY(-8px); border-color: var(--gold); }
         .player-img { width: 155px; height: 155px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; object-position: center 10%; margin: 0 auto 15px; display: block; }
         
         /* CALENDAR */
@@ -125,42 +137,38 @@ Salut Polo ! C'est ma faute, dans la version précédente, j'avais laissé les "
         </section>
     </div>
 
-    <!-- CHAMPIONNAT -->
+    <!-- CHAMPIONNAT (OPTIMISÉ SANS MENU FFBB) -->
     <div id="page-championnat" class="page">
         <div class="container" style="max-width: 100%;">
-            <div class="journee-selector"><label>📅 Journée :</label><select id="selectJournee" onchange="updateIframeJournee()"></select></div>
-            <div class="iframe-wrapper"><div class="iframe-mask"></div><iframe id="ffbbIframe" class="iframe-container" src="https://competitions.ffbb.com/ligues/ara/competitions/pnm?phase=200000002872829&poule=200000003018577&journee=1"></iframe></div>
+            <div class="journee-selector"><label>📅 Sélectionner la journée :</label><select id="selectJournee" onchange="updateIframeJournee()"></select></div>
+            <div class="iframe-container-wrapper">
+                <iframe id="ffbbIframe" src="https://competitions.ffbb.com/ligues/ara/competitions/pnm?phase=200000002872829&poule=200000003018577&journee=1"></iframe>
+            </div>
         </div>
     </div>
 
-    <!-- CALENDRIER -->
+    <!-- CALENDRIER INTERACTIF -->
     <div id="page-calendrier" class="page">
         <div class="container">
-            <div class="page-header"><h2>📅 Calendrier interactif</h2><p class="admin-only" style="font-size:0.9rem; color:var(--violet); font-weight:bold;">💡 Admin : Cliquez sur un jour</p></div>
+            <div class="page-header"><h2>📅 Calendrier de l'équipe</h2><p class="admin-only" style="font-size:0.9rem; color:var(--violet); font-weight:bold;">💡 Admin : Cliquez sur un jour</p></div>
             <div class="calendar-nav"><button class="btn btn-icon" style="background:var(--violet); padding:10px;" onclick="changeMonth(-1)">◀</button><h3 id="calendarMonthTitle" style="min-width:220px; text-align:center; color:var(--violet); font-size:1.6rem; text-transform: capitalize;">-</h3><button class="btn btn-icon" style="background:var(--violet); padding:10px;" onclick="changeMonth(1)">▶</button></div>
             <div class="calendar-grid" id="calendarGrid"></div>
         </div>
     </div>
 
-    <!-- STATS (RÉPARÉ) -->
-    <div id="page-stats" class="page">
-        <div class="container">
-            <div class="page-header"><h2>📈 Statistiques PNM</h2><button class="btn btn-gold admin-only" onclick="openModal('statsIndiv')">+ Stats Joueur</button></div>
-            <div class="table-responsive"><table class="data-table"><thead><tr><th>Joueur</th><th>🎯 3pt</th><th>✌️ 2pt</th><th>☝️ LF</th><th>📊 Total</th><th>Matchs</th><th class="admin-only">Actions</th></tr></thead><tbody id="statsIndivBody"></tbody></table></div>
-        </div>
-    </div>
-
-    <!-- INFOS (RÉPARÉ) -->
-    <div id="page-infos" class="page">
-        <div class="container">
-            <div class="page-header"><h2>📌 Informations Club</h2><button class="btn btn-gold admin-only" onclick="openModal('info')">+ Ajouter Info</button></div>
-            <div id="infosGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;"></div>
-        </div>
-    </div>
-
-    <!-- EFFECTIF & GALERIE -->
+    <!-- EFFECTIF -->
     <div id="page-effectif" class="page"><div class="container"><div class="page-header"><h2>👥 Effectif</h2><button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Joueur</button></div><div class="players-grid" id="effectifGrid"></div></div></div>
+    
+    <!-- STATS -->
+    <div id="page-stats" class="page"><div class="container"><div class="page-header"><h2>📈 Statistiques PNM</h2><button class="btn btn-gold admin-only" onclick="openModal('statsIndiv')">+ Stats Joueur</button></div><div class="table-responsive"><table class="data-table"><thead><tr><th>Joueur</th><th>🎯 3pt</th><th>✌️ 2pt</th><th>☝️ LF</th><th>📊 Total</th><th>Matchs</th><th class="admin-only">Actions</th></tr></thead><tbody id="statsIndivBody"></tbody></table></div></div></div>
+
+    <!-- INFOS -->
+    <div id="page-infos" class="page"><div class="container"><div class="page-header"><h2>📌 Informations Club</h2><button class="btn btn-gold admin-only" onclick="openModal('info')">+ Ajouter Info</button></div><div id="infosGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;"></div></div></div>
+
+    <!-- GALERIE -->
     <div id="page-galerie" class="page"><div class="container"><div class="page-header"><h2>📸 Galerie</h2><button class="btn btn-gold admin-only" onclick="openModal('galerie')">+ Photo</button></div><div class="gallery-grid" id="galleryGrid"></div></div></div>
+
+    <!-- LOGIN -->
     <div id="page-login" class="page"><div class="container" style="max-width:400px;margin:auto;text-align:center;"><h2>Connexion</h2><input type="email" id="loginEmail" style="width:100%;padding:10px;margin:10px 0;"><input type="password" id="loginPassword" style="width:100%;padding:10px;margin:10px 0;"><button class="btn btn-gold" onclick="doLogin()">OK</button></div></div>
 
     <!-- MODALES ADMIN -->
@@ -209,7 +217,7 @@ Salut Polo ! C'est ma faute, dans la version précédente, j'avais laissé les "
             window.scrollTo(0,0);
         }
 
-        /* LOGIQUE CHAMPIONNAT */
+        /* CHAMPIONNAT */
         function initChampionnat() {
             const s = document.getElementById('selectJournee');
             if(s.options.length===0) for(let i=1; i<=26; i++) { let o = document.createElement('option'); o.value=i; o.innerHTML="Journée "+i; s.appendChild(o); }
@@ -223,11 +231,11 @@ Salut Polo ! C'est ma faute, dans la version précédente, j'avais laissé les "
             const m = currentViewDate.getMonth(), y = currentViewDate.getFullYear();
             document.getElementById('calendarMonthTitle').textContent = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(currentViewDate);
             ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].forEach(d => grid.innerHTML += `<div class="calendar-day-head">${d}</div>`);
-            const first = new Date(y, m, 1).getDay();
-            const offset = first === 0 ? 6 : first - 1;
-            const days = new Date(y, m + 1, 0).getDate();
+            const firstDay = new Date(y, m, 1).getDay();
+            const offset = firstDay === 0 ? 6 : firstDay - 1;
+            const daysInMonth = new Date(y, m + 1, 0).getDate();
             for (let i = 0; i < offset; i++) grid.innerHTML += `<div class="calendar-day" style="background:#f9f9f9"></div>`;
-            for (let day = 1; day <= days; day++) {
+            for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
                 let evHtml = eventsData.filter(e => e.date === dateStr).map(e => `<button class="event-item event-${(e.type||'match').toLowerCase().replace('é','e')}" onclick="event.stopPropagation(); editMatch('${e.id}')">${e.heure||''} ${e.matchAdv||''}</button>`).join('');
                 grid.innerHTML += `<div class="calendar-day" onclick="addEv('${dateStr}')"><span style="font-weight:bold">${day}</span>${evHtml}</div>`;
@@ -241,14 +249,14 @@ Salut Polo ! C'est ma faute, dans la version précédente, j'avais laissé les "
         function loadEff() { db.collection('joueurs').orderBy('numero').onSnapshot(snap => { document.getElementById('effectifGrid').innerHTML = snap.docs.map(doc => `<div class="player-card"><img src="${doc.data().photo || 'logo-alcf.png'}" class="player-img"><h4>${doc.data().prenom} ${doc.data().nom}</h4><p>${doc.data().poste}</p></div>`).join(''); }); }
         async function saveJoueur() { await db.collection('joueurs').add({prenom:document.getElementById('joueurPrenom').value, nom:document.getElementById('joueurNom').value, numero:parseInt(document.getElementById('joueurNumero').value)||0, poste:document.getElementById('joueurPoste').value, photo:document.getElementById('joueurPhoto').value}); closeModal('joueur'); }
 
-        /* STATS (FIXED) */
+        /* STATS */
         function loadStats() {
             db.collection('statsIndiv').orderBy('totalPts','desc').onSnapshot(s => { document.getElementById('statsIndivBody').innerHTML = s.docs.map(doc => { const st = doc.data(); return `<tr><td><strong>${st.joueurNom}</strong></td><td>${st.pts3}</td><td>${st.pts2}</td><td>${st.pts1}</td><td><strong>${st.totalPts}</strong></td><td>${st.matchs}</td><td class="admin-only"><button onclick="deleteDoc('statsIndiv','${doc.id}')">🗑️</button></td></tr>`; }).join(''); });
             db.collection('joueurs').get().then(s => { document.getElementById('stJoueur').innerHTML = s.docs.map(d => `<option value="${d.data().prenom} ${d.data().nom}">${d.data().prenom} ${d.data().nom}</option>`).join(''); });
         }
         async function saveStatsIndiv() { const p3=parseInt(document.getElementById('st3').value)||0, p2=parseInt(document.getElementById('st2').value)||0, p1=parseInt(document.getElementById('st1').value)||0; await db.collection('statsIndiv').add({joueurNom:document.getElementById('stJoueur').value, pts3:p3, pts2:p2, pts1:p1, totalPts:(p3*3)+(p2*2)+p1, matchs:parseInt(document.getElementById('stMJ').value)||1}); closeModal('statsIndiv'); }
 
-        /* INFOS (FIXED) */
+        /* INFOS */
         function loadInf() { db.collection('infos').orderBy('createdAt','desc').onSnapshot(s => { document.getElementById('infosGrid').innerHTML = s.docs.map(doc => `<div class="player-card" style="text-align:left;"><h4>${doc.data().titre}</h4><p>${doc.data().texte}</p><button class="admin-only" style="margin-top:10px;color:red;border:none;background:none;cursor:pointer;" onclick="deleteDoc('infos','${doc.id}')">🗑️ Supprimer</button></div>`).join(''); }); }
         async function saveInfo() { await db.collection('infos').add({titre:document.getElementById('infoTitre').value, texte:document.getElementById('infoContenu').value, createdAt:firebase.firestore.FieldValue.serverTimestamp()}); closeModal('info'); }
 
@@ -263,3 +271,4 @@ Salut Polo ! C'est ma faute, dans la version précédente, j'avais laissé les "
     </script>
 </body>
 </html>
+```
