@@ -199,15 +199,29 @@
         .calendar-nav button:hover { background: var(--violet-light); }
         .calendar-nav h3 { min-width: 220px; text-align: center; font-size: 1.3rem; color: var(--violet-deep); }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--line); gap: 1px; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
-        .calendar-day { background: var(--paper); min-height: 108px; padding: 10px; transition: background 0.15s; }
+        .calendar-day { background: var(--paper); min-height: 108px; padding: 10px; transition: background 0.15s, box-shadow 0.15s; }
+        .calendar-day:not(.empty) { cursor: pointer; }
+        .calendar-day:not(.empty):hover { background: #faf6ec; box-shadow: inset 0 0 0 2px rgba(232,161,60,0.4); }
         .calendar-day.empty { background: #f2ede2; }
         .calendar-day.today { background: #fff6e6; box-shadow: inset 0 0 0 2px var(--gold); }
         .calendar-day strong { font-size: 0.85rem; color: var(--ink-soft); font-weight: 600; }
         .calendar-day.today strong { color: var(--gold); }
         .calendar-day-head { background: var(--violet-deep); color: white; padding: 12px; text-align: center; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
-        .event-item { font-size: 0.68rem; padding: 4px 6px; border-radius: 6px; margin-top: 4px; color: white; font-weight: 600; }
+        .event-item { font-size: 0.68rem; padding: 4px 6px; border-radius: 6px; margin-top: 4px; color: white; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .event-match { background: var(--violet); border-left: 3px solid var(--gold); }
         .event-entrainement { background: #2f7fb8; border-left: 3px solid #1d5f8f; }
+        .event-anniversaire { background: #c2478a; border-left: 3px solid #8f3266; }
+        .event-repas { background: #d97a2e; border-left: 3px solid #a55a20; }
+        .event-autre { background: #6b6478; border-left: 3px solid #4d4759; }
+
+        /* Détails du jour */
+        .day-event-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: var(--radius-sm); background: #faf7f0; margin-bottom: 10px; }
+        .day-event-badge { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: white; }
+        .day-event-info { flex: 1; text-align: left; }
+        .day-event-info .ev-heure { font-size: 0.75rem; color: var(--ink-soft); font-weight: 600; }
+        .day-event-info .ev-text { font-size: 0.92rem; margin-top: 2px; }
+        .day-event-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .day-event-actions button { background: rgba(0,0,0,0.06); border: none; border-radius: 6px; width: 28px; height: 28px; font-size: 0.8rem; }
 
         /* ===== CONTAINERS ===== */
         .container { max-width: 1300px; margin: 0 auto; padding: 48px 24px; }
@@ -373,7 +387,7 @@
     <!-- CALENDRIER -->
     <div id="page-calendrier" class="page">
         <div class="container">
-            <div class="page-header"><h2>Calendrier</h2><button class="btn btn-gold admin-only" onclick="openModal('match')">+ Ajouter un événement</button></div>
+            <div class="page-header"><h2>Calendrier</h2><button class="btn btn-gold admin-only" onclick="newMatchModal()">+ Ajouter un événement</button></div>
             <div class="calendar-nav">
                 <button onclick="changeMonth(-1)" aria-label="Mois précédent">‹</button>
                 <h3 id="calMonthLabel"></h3>
@@ -417,12 +431,21 @@
         <div class="field-block full-width"><label for="joueurPhoto">Photo (URL)</label><input type="text" id="joueurPhoto" placeholder="https://..."></div>
     </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveJoueur()">Enregistrer</button></div></div>
 
-    <div class="modal-overlay" id="modal-match"><div class="modal"><button class="modal-close" onclick="closeModal('match')">×</button><h3>Match / Entraînement</h3><div class="form-grid">
+    <div class="modal-overlay" id="modal-match"><div class="modal"><button class="modal-close" onclick="closeModal('match')">×</button><h3 id="matchModalTitle">Nouvel événement</h3><input type="hidden" id="matchId"><div class="form-grid">
         <div class="field-block"><label for="matchDate">Date</label><input type="date" id="matchDate"></div>
-        <div class="field-block"><label for="matchHeure">Heure</label><input type="time" id="matchHeure"></div>
-        <div class="field-block"><label for="matchType">Type</label><select id="matchType"><option value="match">Match</option><option value="entrainement">Entraînement</option></select></div>
-        <div class="field-block full-width"><label for="matchAdv">Titre / Adversaire</label><input type="text" id="matchAdv" placeholder="Ex : vs Saint-Étienne"></div>
+        <div class="field-block"><label for="matchHeure">Heure (facultatif)</label><input type="time" id="matchHeure"></div>
+        <div class="field-block full-width"><label for="matchType">Type</label><select id="matchType" onchange="toggleMatchFields()">
+            <option value="match">Match</option>
+            <option value="entrainement">Entraînement</option>
+            <option value="anniversaire">Anniversaire</option>
+            <option value="repas">Repas</option>
+            <option value="autre">Autre</option>
+        </select></div>
+        <div class="field-block full-width" id="matchAdvField"><label for="matchAdv">Titre / Adversaire</label><input type="text" id="matchAdv" placeholder="Ex : vs Saint-Étienne"></div>
+        <div class="field-block full-width" id="matchCommentField" style="display:none;"><label for="matchCommentaire">Commentaire</label><textarea id="matchCommentaire" placeholder="Ex : Anniversaire de Léo, repas de fin de saison..."></textarea></div>
     </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveMatch()">Enregistrer</button></div></div>
+
+    <div class="modal-overlay" id="modal-day-details"><div class="modal"><button class="modal-close" onclick="closeModal('day-details')">×</button><h3 id="dayDetailsTitle">Jour</h3><div id="dayDetailsList" style="margin-top:18px;"></div><button class="btn btn-gold admin-only" style="width:100%; margin-top:12px; justify-content:center;" onclick="openMatchModalForDate(currentDayDate)">+ Ajouter un événement ce jour</button></div></div>
 
     <div class="modal-overlay" id="modal-statsIndiv"><div class="modal"><button class="modal-close" onclick="closeModal('statsIndiv')">×</button><h3>Statistiques</h3><div class="field-block" style="margin-top:14px;"><label for="stJoueur">Joueur</label><select id="stJoueur"></select></div><div class="form-grid">
         <div class="field-block"><label for="st3">Paniers à 3pts</label><input type="number" id="st3" placeholder="0"></div>
@@ -466,6 +489,17 @@
         // Etat du calendrier
         let calYear = new Date().getFullYear();
         let calMonth = new Date().getMonth();
+        let currentDayDate = null;
+
+        const EVENT_TYPES = {
+            match:         { label: 'Match',         icon: '🏀', color: 'var(--violet)' },
+            entrainement:  { label: 'Entraînement',  icon: '💪', color: '#2f7fb8' },
+            anniversaire:  { label: 'Anniversaire',  icon: '🎂', color: '#c2478a' },
+            repas:         { label: 'Repas',         icon: '🍽️', color: '#d97a2e' },
+            autre:         { label: 'Autre',         icon: '📌', color: '#6b6478' }
+        };
+        function isMatchLikeType(type) { return type === 'match' || type === 'entrainement'; }
+        function eventText(m) { return isMatchLikeType(m.type) ? (m.matchAdv || '') : (m.commentaire || ''); }
 
         // Stocke les listeners actifs pour pouvoir les couper en changeant de page
         const activeListeners = {};
@@ -563,8 +597,11 @@
         let allMatchsCache = [];
         function loadCal() {
             watch('calendrier', 'matchs', snap => {
-                allMatchsCache = snap.docs.map(d => d.data());
+                allMatchsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderCalendar();
+                if (document.getElementById('modal-day-details').classList.contains('active') && currentDayDate) {
+                    renderDayDetails(currentDayDate);
+                }
             });
         }
 
@@ -599,12 +636,104 @@
                 const evs = allMatchsCache
                     .filter(m => m.date === fullDatePrefix)
                     .map(m => {
-                        const cls = m.type === 'entrainement' ? 'event-entrainement' : 'event-match';
-                        return `<div class="event-item ${cls}">${m.heure || ''} ${m.matchAdv || ''}</div>`;
+                        const cls = 'event-' + (EVENT_TYPES[m.type] ? m.type : 'match');
+                        const icon = (EVENT_TYPES[m.type] || EVENT_TYPES.match).icon;
+                        return `<div class="event-item ${cls}">${icon} ${m.heure || ''} ${eventText(m)}</div>`;
                     })
                     .join('');
                 const isToday = isCurrentMonth && today.getDate() === i;
-                grid.innerHTML += `<div class="calendar-day${isToday ? ' today' : ''}"><strong>${i}</strong>${evs}</div>`;
+                grid.innerHTML += `<div class="calendar-day${isToday ? ' today' : ''}" onclick="openDayDetails('${fullDatePrefix}')"><strong>${i}</strong>${evs}</div>`;
+            }
+        }
+
+        function openDayDetails(dateStr) {
+            currentDayDate = dateStr;
+            renderDayDetails(dateStr);
+            openModal('day-details');
+        }
+
+        function renderDayDetails(dateStr) {
+            const [y, m, d] = dateStr.split('-');
+            const dateObj = new Date(y, m - 1, d);
+            document.getElementById('dayDetailsTitle').textContent = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+            const evs = allMatchsCache.filter(ev => ev.date === dateStr);
+            const list = document.getElementById('dayDetailsList');
+
+            if (evs.length === 0) {
+                list.innerHTML = '<p class="empty-msg" style="padding:20px 0;">Aucun événement ce jour.</p>';
+                return;
+            }
+
+            list.innerHTML = evs.map(ev => {
+                const t = EVENT_TYPES[ev.type] || EVENT_TYPES.match;
+                return `<div class="day-event-row">
+                    <div class="day-event-badge" style="background:${t.color};">${t.icon}</div>
+                    <div class="day-event-info">
+                        <div class="ev-heure">${t.label}${ev.heure ? ' · ' + ev.heure : ''}</div>
+                        <div class="ev-text">${eventText(ev) || '<em>Sans détail</em>'}</div>
+                    </div>
+                    <div class="day-event-actions admin-only">
+                        <button onclick="editMatch('${ev.id}')" aria-label="Modifier">✏️</button>
+                        <button onclick="deleteMatchFromDay('${ev.id}')" aria-label="Supprimer">🗑️</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleMatchFields() {
+            const type = document.getElementById('matchType').value;
+            const isMatch = isMatchLikeType(type);
+            document.getElementById('matchAdvField').style.display = isMatch ? 'block' : 'none';
+            document.getElementById('matchCommentField').style.display = isMatch ? 'none' : 'block';
+        }
+
+        function newMatchModal() {
+            document.getElementById('matchId').value = '';
+            document.getElementById('matchModalTitle').textContent = 'Nouvel événement';
+            document.getElementById('matchDate').value = '';
+            document.getElementById('matchHeure').value = '';
+            document.getElementById('matchType').value = 'match';
+            document.getElementById('matchAdv').value = '';
+            document.getElementById('matchCommentaire').value = '';
+            toggleMatchFields();
+            openModal('match');
+        }
+
+        function openMatchModalForDate(dateStr) {
+            newMatchModal();
+            document.getElementById('matchDate').value = dateStr;
+            closeModal('day-details');
+            openModal('match');
+        }
+
+        async function editMatch(id) {
+            const doc = await db.collection('matchs').doc(id).get();
+            if (!doc.exists) return;
+            const d = doc.data();
+            document.getElementById('matchId').value = id;
+            document.getElementById('matchModalTitle').textContent = 'Modifier l\'événement';
+            document.getElementById('matchDate').value = d.date || '';
+            document.getElementById('matchHeure').value = d.heure || '';
+            document.getElementById('matchType').value = d.type || 'match';
+            document.getElementById('matchAdv').value = d.matchAdv || '';
+            document.getElementById('matchCommentaire').value = d.commentaire || '';
+            toggleMatchFields();
+            closeModal('day-details');
+            openModal('match');
+        }
+
+        async function deleteMatchFromDay(id) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (!confirm('Supprimer cet événement ?')) return;
+            try {
+                await db.collection('matchs').doc(id).delete();
+                allMatchsCache = allMatchsCache.filter(m => m.id !== id);
+                renderDayDetails(currentDayDate);
+                renderCalendar();
+                toast('Événement supprimé', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
             }
         }
 
@@ -675,18 +804,30 @@
 
         async function saveMatch() {
             if (!isAdmin) return toast('Accès refusé', 'error');
+            const id = document.getElementById('matchId').value;
             const date = document.getElementById('matchDate').value;
+            const type = document.getElementById('matchType').value;
+            const isMatch = isMatchLikeType(type);
             const titre = document.getElementById('matchAdv').value.trim();
-            if (!date || !titre) return toast('Date et titre sont obligatoires', 'error');
+            const commentaire = document.getElementById('matchCommentaire').value.trim();
+
+            if (!date) return toast('La date est obligatoire', 'error');
+            if (isMatch && !titre) return toast('Le titre est obligatoire', 'error');
+            if (!isMatch && !commentaire) return toast('Le commentaire est obligatoire', 'error');
+
+            const data = {
+                date: date,
+                heure: document.getElementById('matchHeure').value,
+                type: type,
+                matchAdv: isMatch ? titre : '',
+                commentaire: isMatch ? '' : commentaire
+            };
+
             try {
-                await db.collection('matchs').add({
-                    date: date,
-                    heure: document.getElementById('matchHeure').value,
-                    matchAdv: titre,
-                    type: document.getElementById('matchType').value
-                });
+                if (id) await db.collection('matchs').doc(id).update(data);
+                else await db.collection('matchs').add(data);
                 closeModal('match');
-                toast('Événement ajouté', 'success');
+                toast(id ? 'Événement modifié' : 'Événement ajouté', 'success');
             } catch (e) {
                 toast('Erreur : ' + e.message, 'error');
             }
@@ -775,10 +916,14 @@
                 document.getElementById('joueurPhoto').value = '';
             }
             if (id === 'match') {
+                document.getElementById('matchId').value = '';
+                document.getElementById('matchModalTitle').textContent = 'Nouvel événement';
                 document.getElementById('matchDate').value = '';
                 document.getElementById('matchHeure').value = '';
                 document.getElementById('matchAdv').value = '';
+                document.getElementById('matchCommentaire').value = '';
                 document.getElementById('matchType').value = 'match';
+                toggleMatchFields();
             }
             if (id === 'statsIndiv') {
                 document.getElementById('st3').value = '';
