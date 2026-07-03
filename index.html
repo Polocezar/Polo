@@ -365,6 +365,9 @@
                         <button onclick="showPage('effectif')" class="btn btn-outline">Voir l'effectif</button>
                         <button onclick="showPage('championnat')" class="btn btn-gold">Classement</button>
                     </div>
+                    <div style="margin-top:16px;">
+                        <button onclick="openModal('coordonnees')" class="btn btn-outline">📍 Coordonnées</button>
+                    </div>
                 </div>
                 <img src="equipe-2025-2026.png" class="hero-team-img" alt="Photo d'équipe" onerror="this.onerror=null; this.src='https://placehold.co/460x320/34195a/f8c667?text=Photo+equipe';">
             </div>
@@ -459,6 +462,23 @@
     <div class="modal-overlay" id="modal-galerie"><div class="modal"><button class="modal-close" onclick="closeModal('galerie')">×</button><h3>Ajouter une photo</h3><div class="field-block" style="margin-top:14px;"><label for="galUrl">URL de la photo</label><input type="text" id="galUrl" placeholder="https://..."></div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="savePhoto()">Ajouter</button></div></div>
 
     <div class="modal-overlay" id="modal-player-details"><div class="modal"><button class="modal-close" onclick="closeModal('player-details')">×</button><div id="detContent"></div></div></div>
+
+    <div class="modal-overlay" id="modal-coordonnees"><div class="modal"><button class="modal-close" onclick="closeModal('coordonnees')">×</button><h3>Coordonnées</h3>
+        <div style="margin-top:20px; text-align:left; display:flex; flex-direction:column; gap:18px;">
+            <div>
+                <div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.75rem; font-weight:700; letter-spacing:0.04em;">Adresse du club</div>
+                <div style="font-size:1rem; margin-top:4px; color:var(--ink);">Rue Sainte Poulette, Chazeau, 42700 Firminy</div>
+            </div>
+            <div>
+                <div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.75rem; font-weight:700; letter-spacing:0.04em;">Responsable de l'équipe</div>
+                <a href="tel:0000000000" style="font-size:1rem; margin-top:4px; color:var(--violet-deep); font-weight:700; text-decoration:underline; display:inline-block;">00 00 00 00 00</a>
+            </div>
+            <div>
+                <div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.75rem; font-weight:700; letter-spacing:0.04em;">Salle de sport</div>
+                <a href="https://www.google.com/maps/search/?api=1&query=3+rue+des+Noyers+42700+Firminy" target="_blank" rel="noopener" style="font-size:1rem; margin-top:4px; color:var(--violet-deep); font-weight:700; text-decoration:underline; display:inline-block;">3 rue des Noyers, 42700 Firminy</a>
+            </div>
+        </div>
+    </div></div>
 
     <script>
         const firebaseConfig = {
