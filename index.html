@@ -156,8 +156,8 @@
         .hero-team-img { width: 100%; max-width: 460px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 3px solid rgba(232, 161, 60, 0.4); }
 
         /* ===== CHAMPIONNAT ===== */
-        .iframe-wrapper { position: relative; width: 100%; height: 400px; border-radius: var(--radius-md); overflow: hidden; background: white; box-shadow: var(--shadow-md); }
-        #ffbbIframe { position: absolute; top: -550px; left: -10px; width: 120%; height: 3000px; border: none; }
+        .iframe-wrapper { position: relative; width: 100%; max-width: 1050px; margin: 0 auto; height: 900px; border-radius: var(--radius-md); overflow: hidden; background: white; box-shadow: var(--shadow-md); }
+        #ffbbIframe { position: absolute; top: -550px; left: -10px; width: 1500px; height: 3000px; border: none; pointer-events: none; }
 
         /* ===== EFFECTIF ===== */
         #page-effectif { background: var(--parquet); }
@@ -429,7 +429,15 @@
     <div class="modal-overlay" id="modal-joueur"><div class="modal"><button class="modal-close" onclick="closeModal('joueur')">×</button><h3>Joueur</h3><input type="hidden" id="joueurId"><div class="form-grid">
         <div class="field-block"><label for="joueurPrenom">Prénom</label><input type="text" id="joueurPrenom" placeholder="Prénom"></div>
         <div class="field-block"><label for="joueurNom">Nom</label><input type="text" id="joueurNom" placeholder="Nom"></div>
+        <div class="field-block"><label for="joueurNaissance">Date de naissance</label><input type="date" id="joueurNaissance"></div>
+        <div class="field-block"><label for="joueurTaille">Taille (cm)</label><input type="number" id="joueurTaille" placeholder="Ex : 188"></div>
+        <div class="field-block full-width" style="margin-top:4px; font-size:0.75rem; color:var(--ink-soft); font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Adresse</div>
+        <div class="field-block"><label for="joueurRue">Rue</label><input type="text" id="joueurRue" placeholder="Ex : Rue des Noyers"></div>
+        <div class="field-block"><label for="joueurAdresseNum">N°</label><input type="text" id="joueurAdresseNum" placeholder="Ex : 3"></div>
+        <div class="field-block"><label for="joueurCodePostal">Code postal</label><input type="text" id="joueurCodePostal" placeholder="Ex : 42700"></div>
+        <div class="field-block"><label for="joueurVille">Ville</label><input type="text" id="joueurVille" placeholder="Ex : Firminy"></div>
         <div class="field-block"><label for="joueurNumero">N° Maillot</label><input type="number" id="joueurNumero" placeholder="N° Maillot"></div>
+        <div class="field-block"><label for="joueurLicence">N° de licence</label><input type="text" id="joueurLicence" placeholder="N° de licence"></div>
         <div class="field-block"><label for="joueurPoste">Poste</label><select id="joueurPoste"><option value="Meneur">Meneur</option><option value="Arrière">Arrière</option><option value="Ailier">Ailier</option><option value="Ailier Fort">Ailier Fort</option><option value="Pivot">Pivot</option></select></div>
         <div class="field-block full-width"><label for="joueurPhoto">Photo (URL)</label><input type="text" id="joueurPhoto" placeholder="https://..."></div>
     </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveJoueur()">Enregistrer</button></div></div>
@@ -596,10 +604,21 @@
             });
         }
 
+        function formatDateFr(dateStr) {
+            if (!dateStr) return '';
+            const [y, m, d] = dateStr.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
         async function openPlayer(id) {
             const doc = await db.collection('joueurs').doc(id).get();
             if (!doc.exists) return;
             const d = doc.data();
+            const adresse = [
+                [d.rue, d.adresseNum].filter(Boolean).join(' n°'),
+                [d.codePostal, d.ville].filter(Boolean).join(' ')
+            ].filter(Boolean).join(', ');
+
             document.getElementById('detContent').innerHTML = `
                 <div style="display:flex; align-items:center; gap:20px;">
                     <img src="${d.photo || 'logo-alcf.png'}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--gold);" onerror="this.src='logo-alcf.png'; this.onerror=null;">
@@ -607,7 +626,14 @@
                         <h3 style="margin:0; color:var(--violet-deep);">${d.prenom} ${d.nom}</h3>
                         <p style="color:var(--gold); font-weight:600; margin-top:6px;">${d.poste} · Maillot n° ${d.numero}</p>
                     </div>
-                </div>`;
+                </div>
+                <div style="text-align:left; margin-top:22px; display:flex; flex-direction:column; gap:14px;">
+                    ${d.dateNaissance ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Date de naissance</div><div style="margin-top:2px;">${formatDateFr(d.dateNaissance)}</div></div>` : ''}
+                    ${d.taille ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Taille</div><div style="margin-top:2px;">${d.taille} cm</div></div>` : ''}
+                    ${adresse ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Adresse</div><div style="margin-top:2px;">${adresse}</div></div>` : ''}
+                    ${d.licence ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">N° de licence</div><div style="margin-top:2px;">${d.licence}</div></div>` : ''}
+                </div>
+                <button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="closeModal('player-details'); showPage('stats');">📊 Voir ses statistiques</button>`;
             openModal('player-details');
         }
 
@@ -811,7 +837,14 @@
             const data = {
                 prenom: document.getElementById('joueurPrenom').value.trim(),
                 nom: document.getElementById('joueurNom').value.trim(),
+                dateNaissance: document.getElementById('joueurNaissance').value,
+                taille: parseInt(document.getElementById('joueurTaille').value) || 0,
+                rue: document.getElementById('joueurRue').value.trim(),
+                adresseNum: document.getElementById('joueurAdresseNum').value.trim(),
+                codePostal: document.getElementById('joueurCodePostal').value.trim(),
+                ville: document.getElementById('joueurVille').value.trim(),
                 numero: parseInt(document.getElementById('joueurNumero').value) || 0,
+                licence: document.getElementById('joueurLicence').value.trim(),
                 poste: document.getElementById('joueurPoste').value,
                 photo: document.getElementById('joueurPhoto').value.trim()
             };
@@ -908,7 +941,14 @@
             document.getElementById('joueurId').value = id;
             document.getElementById('joueurPrenom').value = d.prenom || '';
             document.getElementById('joueurNom').value = d.nom || '';
+            document.getElementById('joueurNaissance').value = d.dateNaissance || '';
+            document.getElementById('joueurTaille').value = d.taille || '';
+            document.getElementById('joueurRue').value = d.rue || '';
+            document.getElementById('joueurAdresseNum').value = d.adresseNum || '';
+            document.getElementById('joueurCodePostal').value = d.codePostal || '';
+            document.getElementById('joueurVille').value = d.ville || '';
             document.getElementById('joueurNumero').value = d.numero || '';
+            document.getElementById('joueurLicence').value = d.licence || '';
             document.getElementById('joueurPoste').value = d.poste || 'Meneur';
             document.getElementById('joueurPhoto').value = d.photo || '';
             openModal('joueur');
@@ -934,7 +974,14 @@
                 document.getElementById('joueurId').value = '';
                 document.getElementById('joueurPrenom').value = '';
                 document.getElementById('joueurNom').value = '';
+                document.getElementById('joueurNaissance').value = '';
+                document.getElementById('joueurTaille').value = '';
+                document.getElementById('joueurRue').value = '';
+                document.getElementById('joueurAdresseNum').value = '';
+                document.getElementById('joueurCodePostal').value = '';
+                document.getElementById('joueurVille').value = '';
                 document.getElementById('joueurNumero').value = '';
+                document.getElementById('joueurLicence').value = '';
                 document.getElementById('joueurPoste').value = 'Meneur';
                 document.getElementById('joueurPhoto').value = '';
             }
@@ -976,3 +1023,4 @@
     </script>
 </body>
 </html>
+oups j'ai oublier la capture
