@@ -1,0 +1,9 @@
+{
+  "name": "alcf-ffbb-sync",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Synchronisation automatique des données FFBB (classement, rencontres) vers Firestore pour le site ALCF Basket",
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}
