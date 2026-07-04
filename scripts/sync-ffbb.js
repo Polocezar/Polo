@@ -1,1 +1,120 @@
 
+/**
+ * Synchronisation FFBB -> Firestore
+ * ---------------------------------
+ * Récupère le classement et les rencontres de la poule ALCF Basket
+ * directement depuis les serveurs FFBB, et les enregistre dans Firestore
+ * pour affichage sur le site (sans iframe, sans publicité).
+ *
+ * Exécuté automatiquement par GitHub Actions toutes les ~20 minutes.
+ */
+
+const admin = require('firebase-admin');
+
+// ID de la poule FFBB (visible dans l'URL de l'iframe : ...&poule=XXXXXXX)
+// A modifier chaque saison si le club change de poule.
+const POULE_ID = '200000003018577';
+
+const FFBB_BASE = 'https://api.ffbb.app/';
+const HEADERS_BASE = { 'user-agent': 'okhttp/4.12.0' };
+
+async function getApiToken() {
+  const res = await fetch(`${FFBB_BASE}items/configuration`, { headers: HEADERS_BASE });
+  if (!res.ok) throw new Error(`Erreur configuration FFBB : HTTP ${res.status}`);
+  const json = await res.json();
+  const token = json?.data?.api_bearer_token;
+  if (!token) throw new Error('Jeton API FFBB introuvable dans la réponse');
+  return token;
+}
+
+async function getClassement(headers) {
+  const fields = [
+    'id', 'nom', 'id_competition',
+    'classements.position', 'classements.points', 'classements.matchJoues',
+    'classements.gagnes', 'classements.perdus',
+    'classements.paniersMarques', 'classements.paniersEncaisses',
+    'classements.difference', 'classements.organisme_nom'
+  ].join(',');
+
+  const url = `${FFBB_BASE}items/ffbbserver_poules/${POULE_ID}` +
+    `?fields=${encodeURIComponent(fields)}&deep[classements][_limit]=100`;
+
+  const res = await fetch(url, { headers });
+  if (!res.ok) throw new Error(`Erreur classement FFBB : HTTP ${res.status}`);
+  const json = await res.json();
+  const data = json.data || {};
+
+  const classement = (data.classements || [])
+    .map(c => ({
+      position: c.position ?? null,
+      equipe: c.organisme_nom || '',
+      points: c.points ?? 0,
+      joues: c.matchJoues ?? 0,
+      gagnes: c.gagnes ?? 0,
+      perdus: c.perdus ?? 0,
+      paniersMarques: c.paniersMarques ?? 0,
+      paniersEncaisses: c.paniersEncaisses ?? 0,
+      difference: c.difference ?? 0
+    }))
+    .sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
+
+  return { nom: data.nom || '', classement };
+}
+
+async function getRencontres(headers) {
+  const fields = [
+    'id', 'date_rencontre', 'horaire', 'numeroJournee',
+    'nomEquipe1', 'nomEquipe2', 'resultatEquipe1', 'resultatEquipe2', 'joue'
+  ].join(',');
+
+  const filter = encodeURIComponent(JSON.stringify({ idPoule: { _eq: Number(POULE_ID) } }));
+  const url = `${FFBB_BASE}items/ffbbserver_rencontres` +
+    `?fields=${encodeURIComponent(fields)}&filter=${filter}&sort=date_rencontre&limit=300`;
+
+  const res = await fetch(url, { headers });
+  if (!res.ok) throw new Error(`Erreur rencontres FFBB : HTTP ${res.status}`);
+  const json = await res.json();
+
+  return (json.data || []).map(m => ({
+    id: m.id,
+    date: m.date_rencontre || null,
+    heure: m.horaire || '',
+    journee: m.numeroJournee ?? null,
+    equipe1: m.nomEquipe1 || '',
+    equipe2: m.nomEquipe2 || '',
+    score1: m.resultatEquipe1 ?? null,
+    score2: m.resultatEquipe2 ?? null,
+    joue: !!m.joue
+  }));
+}
+
+async function main() {
+  if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+    throw new Error('Variable FIREBASE_SERVICE_ACCOUNT manquante');
+  }
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+  const db = admin.firestore();
+
+  console.log('Récupération du jeton FFBB...');
+  const apiToken = await getApiToken();
+  const headers = { ...HEADERS_BASE, Authorization: `Bearer ${apiToken}` };
+
+  console.log('Récupération du classement...');
+  const { nom, classement } = await getClassement(headers);
+
+  console.log('Récupération des rencontres...');
+  const matchs = await getRencontres(headers);
+
+  const updatedAt = admin.firestore.FieldValue.serverTimestamp();
+
+  await db.collection('ffbb').doc('poule').set({ nom, classement, updatedAt });
+  await db.collection('ffbb').doc('rencontres').set({ matchs, updatedAt });
+
+  console.log(`OK — ${classement.length} équipes au classement, ${matchs.length} rencontres synchronisées.`);
+}
+
+main().catch(err => {
+  console.error('Échec de la synchronisation FFBB :', err);
+  process.exit(1);
+});
