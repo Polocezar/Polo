@@ -1,13 +1,26 @@
-{
-  "type": "service_account",
-  "project_id": "alcf-basket",
-  "private_key_id": "8cecfe49e32fc2176d74b340487f2ec3b5843888",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCXJRejNqGJNisd\nSaEshvZJz3a4KMC81qjgN6KCF/Cy+Zm/DDZbZO9k4wyxtlm0raev0E/YzOe7XjNH\nyrj1zvVI6omtpgSPXb/5+FWrAekk36hZxTQHvwlyIgc/nn/S1A/bzEVGMnAvSYyP\noenYiMaRJ+R4nEo2Zv6toinvCSe8iW06fvPts6GREi0g3N60xz+d6D3VgJUubiSL\nDmSRgAycz3K/tQilpX6sMFY4iJtfIgdbyznICtpPuOVahX3WbSGNYFvRbqrsSLLw\nHo472woCPzyU6JwXP3WqpxvEcmxyK1HyRFCN17jtIgj7vE6Ypt9HlfQkLyfMm/JF\nYusm1qGZAgMBAAECggEAFEDmL/rMHqThliUdsefL7Qwd7oOXgDaLnrAV2LT4jiMg\nVRd/2TNnWO+L7exvjOSQSeDyMi0TCGqRGJezvUykVccH9/r9NXDsnsSGRkoVQdmu\np4jjdf5Fd8PTkNTecBP2pA91YPi1S8DhUwXxXhDF+wGLfhYDY9LdYcsPL3bcmkjj\nXKzts/cARibC7TIVM9cjC/hZNr3P/TRakFXNlUuNnZX1h0sNw9jGEZPhuJkzAuQI\nta85syMwP0S2DEbnYagVnIBv05evw82Riw5AZqZ3xiPFSgbfA5ZdbuY4HQ0ozrRO\n+jveHoCuGE6+Gh9Lxp9xtLO/lejyus4qp6qxEtvGeQKBgQDJU3xVz/alfkJekbte\nPRiHBQ3bjg4OaDSgrcOsyGMQLC8CEa7XY03dWmaq86sT2Vk0CW3IWPPHk0PGoHTb\n8UGzpbo5CQ3bh/huDsOURkkafdkgwzZ+ogRG427iGLvjTkS5loUS2NxGHzUB+in3\nmxEoaq/aV+RbtSqzwoiA2gmu0wKBgQDAMO1xfWPG7XgIR0ZHN9U7c2ITBCNVEnj0\nEusMWTNJ8nnBClsqHsNQj/ArDQtdiw803h1Ucp7f03Vfh1+j6115FOOiSUvIPFak\nl6s26newEWJV84F2LcWtI1hvrcZW44D8VDOZhTXZRNXtnrXoC8ZT6/TXsc7UnFe5\nWzo9mKAiYwKBgQCjaYNTd+DghXJDppBqNrcQ6RZNbqmUIhsNjN12ApT+DI7/Y/EB\n3RXXpMgO3IexLctNBJY6d5EwHiV2NMmFuPa2Zb+ZCfNYjK4mTw+K693shdfW0v0J\nnmJQU8yt8puXLfF0nmtXV/S7ahsxhqfH1fMAVlB0rsCpe4y0qiL4S4JuhwKBgA1s\n3YlJ+whQWkwpvm0HJ2wJuVYeueEdczmJgMXSDVUjDQJBGPEuSPJ9u4cmWB7msd89\njMrzXsm/2bkcmb+3l0X4AZa6jAKmxF6nAZzKcCXqcPYUFn0M4XwgtfLHLs2vArmd\noCUfOw28Uz1QEuDswaPnHalbkFklurMF/mGDIdyFAoGBAMFj/0KuOrxqvDSOBZE6\npI398tHns07ai65LhHViCwiBkYoJ9XSoyfFltbtVXuXmZClpLeI4irO0nhJjHoqQ\nIUN1nSrKlCnKoI3k/8tXboKWRErXZ8PTS/dRaxsLDXx7ythE2NCjevXVZD75XRE9\nxrO4PtGBw7Dry8NbqHwPPGr1\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-fbsvc@alcf-basket.iam.gserviceaccount.com",
-  "client_id": "116880751808452606455",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40alcf-basket.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-}
+name: Synchronisation FFBB
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v4
+
+      - name: Installation de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installation des dépendances
+        run: npm install
+
+      - name: Synchronisation des données FFBB
+        run: node scripts/sync-ffbb.js
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
