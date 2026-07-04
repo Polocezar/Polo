@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALCF Basket - PNM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <style>
+        :root {
+            /* Palette — inspirée du parquet, du tableau d'affichage et des lignes de terrain */
+            --court-bg: #120a1f;
+            --violet-deep: #1c0f33;
+            --violet: #34195a;
+            --violet-light: #4a2680;
+            --gold: #e8a13c;
+            --gold-bright: #f8c667;
+            --parquet: #f7f2e9;
+            --paper: #fffdf8;
+            --ink: #1b1425;
+            --ink-soft: #6b6478;
+            --line: #e7e0d4;
+            --danger: #e0553f;
+            --success: #3fa66a;
+
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --shadow-sm: 0 2px 8px rgba(28, 15, 51, 0.08);
+            --shadow-md: 0 8px 24px rgba(28, 15, 51, 0.12);
+            --shadow-lg: 0 20px 50px rgba(28, 15, 51, 0.25);
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--parquet);
+            color: var(--ink);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        h1, h2, h3, h4, .scoreboard {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        button, input, select, textarea { font-family: inherit; }
+        button { cursor: pointer; }
+        img { max-width: 100%; display: block; }
+
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 3px solid var(--gold);
+            outline-offset: 2px;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: rgba(28, 15, 51, 0.92);
+            backdrop-filter: blur(10px);
+            padding: 12px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(232, 161, 60, 0.15);
+        }
+        .nav-logo { display: flex; align-items: center; background: none; border: none; gap: 12px; }
+        .nav-logo img { height: 46px; }
+        .nav-logo span { font-size: 1.4rem; font-weight: 600; color: var(--gold-bright); letter-spacing: 0.03em; }
+        .nav-menu { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        .nav-menu button.nav-link {
+            position: relative;
+            color: rgba(255,255,255,0.75);
+            background: none; border: none;
+            padding: 10px 14px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            transition: color 0.2s var(--ease);
+        }
+        .nav-menu button.nav-link::after {
+            content: '';
+            position: absolute; left: 14px; right: 14px; bottom: 2px;
+            height: 2px; background: var(--gold);
+            transform: scaleX(0); transform-origin: left;
+            transition: transform 0.25s var(--ease);
+        }
+        .nav-menu button.nav-link:hover { color: white; }
+        .nav-menu button.nav-link.active { color: var(--gold-bright); }
+        .nav-menu button.nav-link.active::after { transform: scaleX(1); }
+
+        /* ===== BOUTONS ===== */
+        .btn {
+            padding: 11px 24px;
+            border-radius: 999px;
+            font-weight: 600;
+            border: none;
+            transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s var(--ease);
+            text-transform: uppercase;
+            font-size: 0.82rem;
+            letter-spacing: 0.04em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-gold { background: linear-gradient(135deg, var(--gold-bright), var(--gold)); color: var(--violet-deep); }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(232, 161, 60, 0.35); }
+        .btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.5); color: white; }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(224, 85, 63, 0.35); }
+        .btn-ghost { background: rgba(28,15,51,0.06); color: var(--ink); padding: 8px 14px; font-size: 0.75rem; border-radius: var(--radius-sm); }
+        .btn-ghost:hover { background: rgba(28,15,51,0.12); }
+        .admin-only { display: none !important; }
+        body.is-admin .admin-only { display: inline-flex !important; }
+
+        /* ===== PAGES ===== */
+        .page { display: none; width: 100%; min-height: 92vh; }
+        .page.active { display: block !important; animation: fadeIn 0.4s var(--ease); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        #page-accueil { background: radial-gradient(ellipse at top, var(--violet) 0%, var(--court-bg) 70%); }
+
+        /* ===== HERO ===== */
+        .hero { color: white; padding: 70px 4%; display: flex; align-items: center; min-height: 88vh; position: relative; }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 78px, rgba(255,255,255,0.025) 78px, rgba(255,255,255,0.025) 79px);
+            pointer-events: none;
+        }
+        .hero-content { display: grid; grid-template-columns: 320px 1fr 460px; gap: 50px; max-width: 1700px; margin: 0 auto; align-items: center; width: 100%; position: relative; }
+        .hero-logo { width: 100%; max-width: 300px; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5)); animation: floatIn 0.8s var(--ease); }
+        @keyframes floatIn { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+        .hero-text { text-align: center; }
+        .hero-eyebrow { color: var(--gold-bright); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 14px; display: block; }
+        .hero h1 { font-size: 3.6rem; line-height: 1; margin-bottom: 22px; font-weight: 600; }
+        .hero h1 span { color: var(--gold-bright); }
+        .hero-btns { display: flex; justify-content: center; gap: 14px; margin-top: 30px; flex-wrap: wrap; }
+        .hero-team-img { width: 100%; max-width: 460px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 3px solid rgba(232, 161, 60, 0.4); }
+
+        /* ===== CHAMPIONNAT ===== */
+        .iframe-wrapper { position: relative; width: 100%; max-width: 1500px; margin: 0 auto; height: 900px; border-radius: var(--radius-md); overflow: hidden; background: white; box-shadow: var(--shadow-md); }
+        #ffbbIframe { position: absolute; top: -550px; left: -10px; width: 1500px; height: 3000px; border: none; pointer-events: none; }
+
+        /* ===== EFFECTIF ===== */
+        #page-effectif { background: var(--parquet); }
+        .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px; padding: 30px 0; }
+        .player-card {
+            background: var(--paper);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+            overflow: hidden;
+        }
+        .player-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+        .player-img-container { width: 100%; height: 250px; overflow: hidden; position: relative; background: var(--violet-deep); }
+        .player-img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; transition: transform 0.4s var(--ease); }
+        .player-card:hover .player-img { transform: scale(1.06); }
+        .player-num-panini {
+            position: absolute; top: 10px; left: 10px;
+            background: var(--gold-bright); color: var(--violet-deep);
+            width: 38px; height: 38px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.1rem;
+            box-shadow: var(--shadow-sm); z-index: 5;
+        }
+        .player-info-banner { padding: 14px; text-align: center; }
+        .player-info-banner h4 { font-size: 1.05rem; font-weight: 600; }
+        .player-info-banner p { color: var(--gold); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+        .player-card .admin-only.card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; z-index: 20; }
+        .player-card .card-actions button { background: rgba(255,255,255,0.9); border: none; border-radius: 8px; width: 30px; height: 30px; font-size: 0.85rem; }
+
+        /* ===== CALENDRIER ===== */
+        .calendar-nav { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 24px; }
+        .calendar-nav button {
+            background: var(--violet); color: white; border: none;
+            border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem;
+            transition: background 0.15s;
+        }
+        .calendar-nav button:hover { background: var(--violet-light); }
+        .calendar-nav h3 { min-width: 220px; text-align: center; font-size: 1.3rem; color: var(--violet-deep); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--line); gap: 1px; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+        .calendar-day { background: var(--paper); min-height: 128px; padding: 10px; transition: background 0.15s, box-shadow 0.15s; }
+        .calendar-day:not(.empty) { cursor: pointer; }
+        .calendar-day:not(.empty):hover { background: #faf6ec; box-shadow: inset 0 0 0 2px rgba(232,161,60,0.4); }
+        .calendar-day.empty { background: #f2ede2; }
+        .calendar-day.today { background: #fff6e6; box-shadow: inset 0 0 0 2px var(--gold); }
+        .calendar-day strong { font-size: 0.9rem; color: var(--ink-soft); font-weight: 600; }
+        .calendar-day.today strong { color: var(--gold); }
+        .calendar-day-head { background: var(--violet-deep); color: white; padding: 12px; text-align: center; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+        .event-item { font-size: 0.82rem; padding: 6px 8px; border-radius: 6px; margin-top: 5px; color: white; font-weight: 700; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .event-match { background: var(--violet); border-left: 3px solid var(--gold); }
+        .event-entrainement { background: #2f7fb8; border-left: 3px solid #1d5f8f; }
+        .event-anniversaire { background: #c2478a; border-left: 3px solid #8f3266; }
+        .event-repas { background: #d97a2e; border-left: 3px solid #a55a20; }
+        .event-autre { background: #6b6478; border-left: 3px solid #4d4759; }
+
+        /* Détails du jour */
+        .day-event-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: var(--radius-sm); background: #faf7f0; margin-bottom: 10px; }
+        .day-event-badge { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: white; }
+        .day-event-info { flex: 1; text-align: left; }
+        .day-event-info .ev-heure { font-size: 0.75rem; color: var(--ink-soft); font-weight: 600; }
+        .day-event-info .ev-text { font-size: 0.92rem; margin-top: 2px; }
+        .day-event-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .day-event-actions button { background: rgba(0,0,0,0.06); border: none; border-radius: 6px; width: 28px; height: 28px; font-size: 0.8rem; }
+
+        /* ===== CONTAINERS ===== */
+        .container { max-width: 1300px; margin: 0 auto; padding: 48px 24px; }
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+            margin-bottom: 28px; background: var(--paper); padding: 22px 26px;
+            border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+        }
+        .page-header h2 { font-size: 1.5rem; color: var(--violet-deep); font-weight: 600; }
+
+        .table-responsive { width: 100%; overflow-x: auto; background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+        .data-table { width: 100%; min-width: 700px; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 14px; border-bottom: 1px solid var(--line); text-align: center; }
+        .data-table th { background: var(--violet-deep); color: white; font-weight: 500; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.04em; }
+        .data-table tbody tr { transition: background 0.15s; }
+        .data-table tbody tr:hover { background: #faf6ec; }
+        .data-table td:first-child { font-weight: 600; text-align: left; }
+
+        .empty-msg { text-align: center; color: var(--ink-soft); padding: 50px 20px; grid-column: 1 / -1; font-size: 0.95rem; }
+
+        /* ===== MODALES ===== */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(18, 10, 31, 0.72); backdrop-filter: blur(4px);
+            z-index: 2000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; animation: overlayIn 0.2s var(--ease); }
+        @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: var(--paper); border-radius: var(--radius-lg); padding: 32px;
+            max-width: 550px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto;
+            animation: modalIn 0.3s var(--ease);
+        }
+        @keyframes modalIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal h3 { color: var(--violet-deep); font-size: 1.3rem; margin-bottom: 6px; }
+        .modal-close {
+            position: absolute; top: 20px; right: 20px; border: none;
+            background: #f0ece2; border-radius: 50%; width: 34px; height: 34px;
+            font-weight: bold; color: var(--ink-soft); transition: background 0.15s;
+        }
+        .modal-close:hover { background: #e5dfd0; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; text-align: left; margin-top: 18px; }
+        .field-block { display: flex; flex-direction: column; }
+        .full-width { grid-column: 1 / -1; }
+        .modal label { font-size: 0.75rem; color: var(--ink-soft); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+        .modal input, .modal select, .modal textarea {
+            width: 100%; padding: 12px 14px; border: 1.5px solid var(--line);
+            border-radius: var(--radius-sm); font-size: 0.95rem; transition: border-color 0.15s;
+            background: var(--paper); color: var(--ink);
+        }
+        .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--gold); outline: none; }
+        .modal textarea { resize: vertical; min-height: 100px; }
+
+        /* ===== LOGIN ===== */
+        .login-box { background: var(--paper); padding: 44px 36px; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-md); }
+        .login-box h3 { color: var(--violet-deep); margin-bottom: 20px; font-size: 1.3rem; }
+        .login-box input { width: 100%; margin: 8px 0; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 0.95rem; }
+        .login-box input:focus { border-color: var(--gold); outline: none; }
+
+        /* ===== SKELETON LOADING ===== */
+        .skeleton-card { background: var(--paper); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+        .skeleton-block { background: linear-gradient(90deg, #ece6d9 25%, #f5f1e6 50%, #ece6d9 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .skeleton-card .skeleton-block.img { height: 250px; }
+        .skeleton-card .skeleton-block.line { height: 14px; margin: 14px auto; width: 60%; border-radius: 4px; }
+
+        /* ===== TOASTS ===== */
+        #toastContainer { position: fixed; bottom: 24px; right: 24px; z-index: 5000; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: var(--violet-deep); color: white; padding: 14px 20px;
+            border-radius: var(--radius-sm); box-shadow: var(--shadow-md);
+            font-size: 0.88rem; font-weight: 500; max-width: 320px;
+            animation: toastIn 0.3s var(--ease);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .toast.hide { animation: toastOut 0.25s var(--ease) forwards; }
+        @keyframes toastOut { to { opacity: 0; transform: translateX(30px); } }
+
+        /* ===== GALERIE ===== */
+        .gallery-card { padding: 10px; }
+        .gallery-card .player-img-container { height: 220px; border-radius: var(--radius-sm); }
+        .gallery-card .card-footer { padding: 10px; text-align: center; }
+
+        /* ===== INFOS ===== */
+        .info-card { text-align: left; padding: 22px; }
+        .info-card h4 { color: var(--violet-deep); margin-bottom: 8px; font-size: 1.1rem; }
+        .info-card p { color: var(--ink-soft); font-size: 0.9rem; line-height: 1.6; }
+
+        /* ===== AUTH GATE ===== */
+        #authGate {
+            position: fixed; inset: 0; z-index: 9000;
+            background: radial-gradient(ellipse at top, var(--violet) 0%, var(--court-bg) 70%);
+            display: flex; align-items: center; justify-content: center; padding: 24px;
+            overflow-y: auto;
+        }
+        .gate-card { background: var(--paper); border-radius: var(--radius-lg); padding: 40px 36px; max-width: 400px; width: 100%; box-shadow: var(--shadow-lg); text-align: center; }
+        .gate-card h2 { color: var(--violet-deep); font-size: 1.4rem; margin-bottom: 6px; }
+        .gate-card p.gate-sub { color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 20px; }
+        .gate-tabs { display: flex; gap: 6px; background: #f0ece2; border-radius: 999px; padding: 4px; margin-bottom: 24px; }
+        .gate-tabs button { flex: 1; border: none; background: none; padding: 9px; border-radius: 999px; font-weight: 600; font-size: 0.82rem; color: var(--ink-soft); transition: all 0.2s var(--ease); }
+        .gate-tabs button.active { background: var(--violet-deep); color: white; }
+        .gate-form input, .gate-form select { width: 100%; margin: 6px 0; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 0.92rem; }
+        .gate-form input:focus { border-color: var(--gold); outline: none; }
+        .gate-icon { font-size: 2.6rem; margin-bottom: 10px; }
+        #gatePending, #gateRevoked { display: none; }
+
+        /* ===== MEMBRES (admin) ===== */
+        .member-row { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 12px; flex-wrap: wrap; }
+        .member-info { flex: 1; min-width: 180px; text-align: left; }
+        .member-info strong { color: var(--violet-deep); }
+        .member-info div.member-email { color: var(--ink-soft); font-size: 0.82rem; }
+        .status-badge { padding: 5px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+        .status-pending { background: #fdeecb; color: #a5680c; }
+        .status-approved { background: #d9f2e3; color: var(--success); }
+        .status-revoked { background: #fbe0dc; color: var(--danger); }
+        .member-actions { display: flex; gap: 8px; }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 990px) {
+            .hero-content { grid-template-columns: 1fr; text-align: center; }
+            .hero-logo { width: 170px; margin: 0 auto; }
+            .hero h1 { font-size: 2.3rem; }
+            .navbar { padding: 10px 16px; }
+            .nav-menu button.nav-link { padding: 8px 10px; font-size: 0.75rem; }
+            .nav-logo span { font-size: 1.1rem; }
+            .nav-logo img { height: 36px; }
+            .players-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+            .calendar-day { min-height: 82px; font-size: 0.7rem; padding: 6px; }
+            .calendar-nav h3 { min-width: 150px; font-size: 1.05rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .container { padding: 28px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toastContainer"></div>
+
+    <div id="authGate">
+        <div class="gate-card">
+            <div id="gateAuthForms">
+                <div class="gate-icon">🏀</div>
+                <h2>ALCF Basket</h2>
+                <p class="gate-sub">Ce site est réservé aux membres approuvés du club.</p>
+                <div class="gate-tabs">
+                    <button id="gateTabLogin" class="active" onclick="switchGateTab('login')">Connexion</button>
+                    <button id="gateTabRegister" onclick="switchGateTab('register')">Inscription</button>
+                </div>
+                <div id="gateLoginForm" class="gate-form">
+                    <input type="email" id="loginEmail" placeholder="Adresse email">
+                    <input type="password" id="loginPassword" placeholder="Mot de passe">
+                    <button class="btn btn-gold" style="width:100%; margin-top:14px; justify-content:center;" onclick="doLogin()">Se connecter</button>
+                </div>
+                <div id="gateRegisterForm" class="gate-form" style="display:none;">
+                    <input type="text" id="regPrenom" placeholder="Prénom">
+                    <input type="text" id="regNom" placeholder="Nom">
+                    <input type="email" id="regEmail" placeholder="Adresse email">
+                    <input type="password" id="regPassword" placeholder="Mot de passe (6 caractères min.)">
+                    <input type="password" id="regPassword2" placeholder="Confirmer le mot de passe">
+                    <button class="btn btn-gold" style="width:100%; margin-top:14px; justify-content:center;" onclick="doRegister()">Créer mon compte</button>
+                </div>
+            </div>
+            <div id="gatePending">
+                <div class="gate-icon">⏳</div>
+                <h2>En attente de validation</h2>
+                <p class="gate-sub">Ton inscription a bien été reçue. L'administrateur du club doit valider ton compte avant que tu puisses accéder au site.</p>
+                <button class="btn btn-outline" style="width:100%; justify-content:center; color:var(--violet-deep); border-color:var(--violet-deep);" onclick="doLogout()">Se déconnecter</button>
+            </div>
+            <div id="gateRevoked">
+                <div class="gate-icon">🚫</div>
+                <h2>Accès non autorisé</h2>
+                <p class="gate-sub">Ton accès à ce site a été révoqué. Contacte l'administrateur du club si tu penses qu'il s'agit d'une erreur.</p>
+                <button class="btn btn-outline" style="width:100%; justify-content:center; color:var(--violet-deep); border-color:var(--violet-deep);" onclick="doLogout()">Se déconnecter</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="siteContent" style="display:none;">
+    <nav class="navbar">
+        <button class="nav-logo" onclick="showPage('accueil')">
+            <img src="logo-alcf.png" alt="Logo ALCF Basket">
+            <span>ALCF Basket</span>
+        </button>
+        <div class="nav-menu" id="navLinks">
+            <button class="nav-link" onclick="showPage('accueil')" id="nav-accueil">Accueil</button>
+            <button class="nav-link" onclick="showPage('calendrier')" id="nav-calendrier">Calendrier</button>
+            <button class="nav-link" onclick="showPage('championnat')" id="nav-championnat">Championnat</button>
+            <button class="nav-link" onclick="showPage('effectif')" id="nav-effectif">Équipe</button>
+            <button class="nav-link" onclick="showPage('stats')" id="nav-stats">Stats</button>
+            <button class="nav-link" onclick="showPage('galerie')" id="nav-galerie">Galerie</button>
+            <button class="nav-link" onclick="showPage('infos')" id="nav-infos">Infos</button>
+            <button class="nav-link" onclick="showPage('messagerie')" id="nav-messagerie">Messages</button>
+            <button class="nav-link admin-only" onclick="showPage('membres')" id="nav-membres">Membres</button>
+            <button class="btn btn-danger" style="padding:8px 16px; font-size:0.72rem; margin-left:8px;" onclick="doLogout()" id="btnLogout">Déconnexion</button>
+        </div>
+    </nav>
+
+    <!-- ACCUEIL -->
+    <div id="page-accueil" class="page active">
+        <section class="hero">
+            <div class="hero-content">
+                <img src="logo-alcf.png" class="hero-logo" alt="Logo du club" onerror="this.onerror=null; this.src='https://placehold.co/300x300/1c0f33/e8a13c?text=ALCF';">
+                <div class="hero-text">
+                    <span class="hero-eyebrow">Poule A · Saison 2025-2026</span>
+                    <h1>ALCF <span>PNM</span><br>Basket-Ball</h1>
+                    <div class="hero-btns">
+                        <button onclick="showPage('effectif')" class="btn btn-outline">Voir l'effectif</button>
+                        <button onclick="showPage('championnat')" class="btn btn-gold">Classement</button>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <button onclick="openModal('coordonnees')" class="btn btn-outline">📍 Coordonnées</button>
+                    </div>
+                </div>
+                <img src="equipe-2025-2026.png" class="hero-team-img" alt="Photo d'équipe" onerror="this.onerror=null; this.src='https://placehold.co/460x320/34195a/f8c667?text=Photo+equipe';">
+            </div>
+        </section>
+    </div>
+
+    <!-- CHAMPIONNAT -->
+    <div id="page-championnat" class="page">
+        <div class="container" style="max-width:100%"><div class="iframe-wrapper"><iframe id="ffbbIframe" src="https://competitions.ffbb.com/ligues/ara/competitions/pnm/classement?phase=200000002872829&poule=200000003018577" title="Classement championnat FFBB"></iframe></div></div>
+    </div>
+
+    <!-- EFFECTIF -->
+    <div id="page-effectif" class="page">
+        <div class="container">
+            <div class="page-header"><h2>Effectif PNM</h2><button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Ajouter un joueur</button></div>
+            <div class="players-grid" id="effectifGrid"></div>
+        </div>
+    </div>
+
+    <!-- CALENDRIER -->
+    <div id="page-calendrier" class="page">
+        <div class="container">
+            <div class="page-header"><h2>Calendrier</h2><button class="btn btn-gold admin-only" onclick="newMatchModal()">+ Ajouter un événement</button></div>
+            <div class="calendar-nav">
+                <button onclick="changeMonth(-1)" aria-label="Mois précédent">‹</button>
+                <h3 id="calMonthLabel"></h3>
+                <button onclick="changeMonth(1)" aria-label="Mois suivant">›</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div id="page-stats" class="page">
+        <div class="container">
+            <div class="page-header"><h2>Statistiques</h2><button class="btn btn-gold admin-only" onclick="openModal('statsIndiv')">+ Ajouter des stats</button></div>
+            <div class="table-responsive"><table class="data-table"><thead><tr><th>Joueur</th><th>3pts</th><th>2pts</th><th>LF</th><th>Total</th><th class="admin-only"></th></tr></thead><tbody id="statsBody"></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- GALERIE -->
+    <div id="page-galerie" class="page"><div class="container"><div class="page-header"><h2>Galerie</h2><button class="btn btn-gold admin-only" onclick="openModal('galerie')">+ Ajouter une photo</button></div><div class="players-grid" id="galleryGrid"></div></div></div>
+
+    <!-- INFOS -->
+    <div id="page-infos" class="page"><div class="container"><div class="page-header"><h2>Infos du club</h2><button class="btn btn-gold admin-only" onclick="openModal('info')">+ Publier une info</button></div><div id="infosGrid" class="players-grid"></div></div></div>
+
+    <!-- MESSAGERIE -->
+    <div id="page-messagerie" class="page"><div class="container"><h2 style="margin-bottom:20px; color:var(--violet-deep);">Messagerie</h2><div id="messagesContainer"></div></div></div>
+
+    <!-- MEMBRES (admin) -->
+    <div id="page-membres" class="page"><div class="container">
+        <div class="page-header"><h2>Membres inscrits</h2></div>
+        <p style="color:var(--ink-soft); margin-bottom:20px;">Approuve les nouvelles inscriptions pour leur donner accès au site, ou révoque l'accès d'un membre à tout moment.</p>
+        <div id="membresList"></div>
+    </div></div>
+    </div><!-- /siteContent -->
+
+    <!-- MODALES ADMIN -->
+    <div class="modal-overlay" id="modal-joueur"><div class="modal"><button class="modal-close" onclick="closeModal('joueur')">×</button><h3>Joueur</h3><input type="hidden" id="joueurId"><div class="form-grid">
+        <div class="field-block"><label for="joueurPrenom">Prénom</label><input type="text" id="joueurPrenom" placeholder="Prénom"></div>
+        <div class="field-block"><label for="joueurNom">Nom</label><input type="text" id="joueurNom" placeholder="Nom"></div>
+        <div class="field-block"><label for="joueurNaissance">Date de naissance</label><input type="date" id="joueurNaissance"></div>
+        <div class="field-block"><label for="joueurTaille">Taille (cm)</label><input type="number" id="joueurTaille" placeholder="Ex : 188"></div>
+        <div class="field-block full-width" style="margin-top:4px; font-size:0.75rem; color:var(--ink-soft); font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Adresse</div>
+        <div class="field-block"><label for="joueurRue">Rue</label><input type="text" id="joueurRue" placeholder="Ex : Rue des Noyers"></div>
+        <div class="field-block"><label for="joueurAdresseNum">N°</label><input type="text" id="joueurAdresseNum" placeholder="Ex : 3"></div>
+        <div class="field-block"><label for="joueurCodePostal">Code postal</label><input type="text" id="joueurCodePostal" placeholder="Ex : 42700"></div>
+        <div class="field-block"><label for="joueurVille">Ville</label><input type="text" id="joueurVille" placeholder="Ex : Firminy"></div>
+        <div class="field-block"><label for="joueurNumero">N° Maillot</label><input type="number" id="joueurNumero" placeholder="N° Maillot"></div>
+        <div class="field-block"><label for="joueurLicence">N° de licence</label><input type="text" id="joueurLicence" placeholder="N° de licence"></div>
+        <div class="field-block"><label for="joueurTelephone">Téléphone</label><input type="tel" id="joueurTelephone" placeholder="Ex : 06 12 34 56 78"></div>
+        <div class="field-block"><label for="joueurEmail">Email</label><input type="email" id="joueurEmail" placeholder="Ex : prenom.nom@mail.com"></div>
+        <div class="field-block"><label for="joueurPoste">Poste</label><select id="joueurPoste"><option value="Meneur">Meneur</option><option value="Arrière">Arrière</option><option value="Ailier">Ailier</option><option value="Ailier Fort">Ailier Fort</option><option value="Pivot">Pivot</option></select></div>
+        <div class="field-block full-width"><label for="joueurPhoto">Photo (URL)</label><input type="text" id="joueurPhoto" placeholder="https://..."></div>
+    </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveJoueur()">Enregistrer</button></div></div>
+
+    <div class="modal-overlay" id="modal-match"><div class="modal"><button class="modal-close" onclick="closeModal('match')">×</button><h3 id="matchModalTitle">Nouvel événement</h3><input type="hidden" id="matchId"><div class="form-grid">
+        <div class="field-block"><label for="matchDate">Date</label><input type="date" id="matchDate"></div>
+        <div class="field-block"><label for="matchHeure">Heure (facultatif)</label><input type="time" id="matchHeure"></div>
+        <div class="field-block full-width"><label for="matchType">Type</label><select id="matchType" onchange="toggleMatchFields()">
+            <option value="match">Match</option>
+            <option value="entrainement">Entraînement</option>
+            <option value="anniversaire">Anniversaire</option>
+            <option value="repas">Repas</option>
+            <option value="autre">Autre</option>
+        </select></div>
+        <div class="field-block full-width" id="matchAdvField"><label for="matchAdv">Adversaire</label><input type="text" id="matchAdv" placeholder="Ex : Clermont"></div>
+        <div class="field-block full-width" id="matchCommentField" style="display:none;"><label for="matchCommentaire">Commentaire</label><textarea id="matchCommentaire" placeholder="Ex : Anniversaire de Léo, repas de fin de saison..."></textarea></div>
+        <p class="full-width" id="matchNoFieldNote" style="display:none; color:var(--ink-soft); font-size:0.85rem; margin:0;">Il suffit d'indiquer la date et l'heure ci-dessus, aucune autre information n'est nécessaire.</p>
+    </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveMatch()">Enregistrer</button></div></div>
+
+    <div class="modal-overlay" id="modal-day-details"><div class="modal"><button class="modal-close" onclick="closeModal('day-details')">×</button><h3 id="dayDetailsTitle">Jour</h3><div id="dayDetailsList" style="margin-top:18px;"></div><button class="btn btn-gold admin-only" style="width:100%; margin-top:12px; justify-content:center;" onclick="openMatchModalForDate(currentDayDate)">+ Ajouter un événement ce jour</button></div></div>
+
+    <div class="modal-overlay" id="modal-statsIndiv"><div class="modal"><button class="modal-close" onclick="closeModal('statsIndiv')">×</button><h3>Statistiques</h3><div class="field-block" style="margin-top:14px;"><label for="stJoueur">Joueur</label><select id="stJoueur"></select></div><div class="form-grid">
+        <div class="field-block"><label for="st3">Paniers à 3pts</label><input type="number" id="st3" placeholder="0"></div>
+        <div class="field-block"><label for="st2">Paniers à 2pts</label><input type="number" id="st2" placeholder="0"></div>
+        <div class="field-block"><label for="st1">Lancers francs</label><input type="number" id="st1" placeholder="0"></div>
+    </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveStats()">Enregistrer</button></div></div>
+
+    <div class="modal-overlay" id="modal-info"><div class="modal"><button class="modal-close" onclick="closeModal('info')">×</button><h3>Nouvelle info</h3><div class="field-block" style="margin-top:14px;"><label for="infoTitre">Titre</label><input type="text" id="infoTitre"></div><div class="field-block" style="margin-top:14px;"><label for="infoTexte">Contenu</label><textarea id="infoTexte"></textarea></div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveInfo()">Publier</button></div></div>
+
+    <div class="modal-overlay" id="modal-galerie"><div class="modal"><button class="modal-close" onclick="closeModal('galerie')">×</button><h3>Ajouter une photo</h3><div class="field-block" style="margin-top:14px;"><label for="galUrl">URL de la photo</label><input type="text" id="galUrl" placeholder="https://..."></div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="savePhoto()">Ajouter</button></div></div>
+
+    <div class="modal-overlay" id="modal-player-details"><div class="modal"><button class="modal-close" onclick="closeModal('player-details')">×</button><div id="detContent"></div></div></div>
+
+    <div class="modal-overlay" id="modal-coordonnees"><div class="modal"><button class="modal-close" onclick="closeModal('coordonnees')">×</button><h3>Coordonnées</h3>
+        <div style="margin-top:20px; text-align:left; display:flex; flex-direction:column; gap:18px;">
+            <div>
+                <div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.75rem; font-weight:700; letter-spacing:0.04em;">Adresse du club</div>
+                <div style="font-size:1rem; margin-top:4px; color:var(--ink);">Rue Sainte Poulette, Chazeau, 42700 Firminy</div>
+            </div>
+            <div>
+                <div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.75rem; font-weight:700; letter-spacing:0.04em;">Responsable de l'équipe</div>
+                <a href="tel:0000000000" style="font-size:1rem; margin-top:4px; color:var(--violet-deep); font-weight:700; text-decoration:underline; display:inline-block;">00 00 00 00 00</a>
+            </div>
+            <div>
+                <div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.75rem; font-weight:700; letter-spacing:0.04em;">Salle de sport</div>
+                <a href="https://www.google.com/maps/search/?api=1&query=3+rue+des+Noyers+42700+Firminy" target="_blank" rel="noopener" style="font-size:1rem; margin-top:4px; color:var(--violet-deep); font-weight:700; text-decoration:underline; display:inline-block;">3 rue des Noyers, 42700 Firminy</a>
+            </div>
+        </div>
+    </div></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYZuhh6iKsUMM-MBA3fANDGgCQOhANfVU",
+            authDomain: "alcf-basket.firebaseapp.com",
+            projectId: "alcf-basket",
+            storageBucket: "alcf-basket.firebasestorage.app",
+            messagingSenderId: "1082312491425",
+            appId: "1:1082312491425:web:646f4c5158d2707b0d8be0"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(), auth = firebase.auth();
+        const ADMIN = "polocezar@gmail.com";
+        let isAdmin = false;
+
+        // ---- Toasts (remplace les alert() natifs, plus agréables) ----
+        function toast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.textContent = message;
+            container.appendChild(el);
+            setTimeout(() => {
+                el.classList.add('hide');
+                setTimeout(() => el.remove(), 300);
+            }, 3200);
+        }
+
+        // Etat du calendrier
+        let calYear = new Date().getFullYear();
+        let calMonth = new Date().getMonth();
+        let currentDayDate = null;
+
+        const EVENT_TYPES = {
+            match:         { label: 'Match',         icon: '🏀', color: 'var(--violet)' },
+            entrainement:  { label: 'Entraînement',  icon: '💪', color: '#2f7fb8' },
+            anniversaire:  { label: 'Anniversaire',  icon: '🎂', color: '#c2478a' },
+            repas:         { label: 'Repas',         icon: '🍽️', color: '#d97a2e' },
+            autre:         { label: 'Autre',         icon: '📌', color: '#6b6478' }
+        };
+        function eventText(m) {
+            if (m.type === 'match') return 'Match' + (m.matchAdv ? ' vs ' + m.matchAdv : '');
+            if (m.type === 'entrainement') return 'Entraînement';
+            return m.commentaire || '';
+        }
+
+        // Stocke les listeners actifs pour pouvoir les couper en changeant de page
+        const activeListeners = {};
+        function watch(page, collectionName, callback) {
+            if (activeListeners[page]) activeListeners[page]();
+            activeListeners[page] = db.collection(collectionName).onSnapshot(callback, err => {
+                console.error('Erreur Firestore sur', collectionName, err);
+                toast('Impossible de charger les données. Vérifiez votre connexion.', 'error');
+            });
+        }
+
+        function skeletonCards(n, imgHeight) {
+            let html = '';
+            for (let i = 0; i < n; i++) {
+                html += `<div class="skeleton-card"><div class="skeleton-block img" style="height:${imgHeight}px;"></div><div class="skeleton-block line"></div></div>`;
+            }
+            return html;
+        }
+
+        let userStatusUnsub = null;
+
+        function showGateMode(mode) {
+            document.getElementById('gateAuthForms').style.display = (mode === 'auth') ? 'block' : 'none';
+            document.getElementById('gatePending').style.display = (mode === 'pending') ? 'block' : 'none';
+            document.getElementById('gateRevoked').style.display = (mode === 'revoked') ? 'block' : 'none';
+            document.getElementById('authGate').style.display = 'flex';
+            document.getElementById('siteContent').style.display = 'none';
+        }
+
+        function enterSite() {
+            document.getElementById('authGate').style.display = 'none';
+            document.getElementById('siteContent').style.display = 'block';
+        }
+
+        function switchGateTab(tab) {
+            document.getElementById('gateTabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('gateTabRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('gateLoginForm').style.display = (tab === 'login') ? 'block' : 'none';
+            document.getElementById('gateRegisterForm').style.display = (tab === 'register') ? 'block' : 'none';
+        }
+
+        auth.onAuthStateChanged(u => {
+            if (userStatusUnsub) { userStatusUnsub(); userStatusUnsub = null; }
+            isAdmin = !!u && u.email === ADMIN;
+            document.body.classList.toggle('is-admin', isAdmin);
+
+            if (!u) {
+                showGateMode('auth');
+                return;
+            }
+
+            if (isAdmin) {
+                enterSite();
+                return;
+            }
+
+            // Membre normal : on écoute son statut d'approbation en temps réel
+            const userDocRef = db.collection('users').doc(u.uid);
+            userStatusUnsub = userDocRef.onSnapshot(docSnap => {
+                const data = docSnap.data();
+                const status = data ? data.status : 'pending';
+                if (status === 'approved') {
+                    enterSite();
+                } else if (status === 'revoked') {
+                    showGateMode('revoked');
+                } else {
+                    showGateMode('pending');
+                }
+            }, err => {
+                console.error('Erreur de vérification du statut', err);
+                showGateMode('pending');
+            });
+        });
+
+        async function doRegister() {
+            const prenom = document.getElementById('regPrenom').value.trim();
+            const nom = document.getElementById('regNom').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const pass = document.getElementById('regPassword').value;
+            const pass2 = document.getElementById('regPassword2').value;
+
+            if (!prenom || !nom || !email || !pass) return toast('Tous les champs sont obligatoires', 'error');
+            if (pass.length < 6) return toast('Le mot de passe doit contenir au moins 6 caractères', 'error');
+            if (pass !== pass2) return toast('Les mots de passe ne correspondent pas', 'error');
+
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                await db.collection('users').doc(cred.user.uid).set({
+                    prenom, nom, email,
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                });
+                toast('Compte créé ! En attente de validation.', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        function loadMembres() {
+            watch('membres', 'users', snap => {
+                const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (docs.length === 0) {
+                    document.getElementById('membresList').innerHTML = '<p class="empty-msg">Aucune inscription pour le moment.</p>';
+                    return;
+                }
+                const statusInfo = {
+                    pending: { label: 'En attente', cls: 'status-pending' },
+                    approved: { label: 'Approuvé', cls: 'status-approved' },
+                    revoked: { label: 'Révoqué', cls: 'status-revoked' }
+                };
+                document.getElementById('membresList').innerHTML = docs.map(m => {
+                    const s = statusInfo[m.status] || statusInfo.pending;
+                    return `<div class="member-row">
+                        <div class="member-info">
+                            <strong>${m.prenom || ''} ${m.nom || ''}</strong>
+                            <div class="member-email">${m.email || ''}</div>
+                        </div>
+                        <span class="status-badge ${s.cls}">${s.label}</span>
+                        <div class="member-actions">
+                            ${m.status !== 'approved' ? `<button class="btn-ghost" onclick="setMemberStatus('${m.id}','approved')">Approuver</button>` : ''}
+                            ${m.status !== 'revoked' ? `<button class="btn-ghost" onclick="setMemberStatus('${m.id}','revoked')">Révoquer</button>` : ''}
+                            <button class="btn-ghost" onclick="deleteMember('${m.id}')">Supprimer</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        async function setMemberStatus(uid, status) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            try {
+                await db.collection('users').doc(uid).update({ status });
+                toast(status === 'approved' ? 'Membre approuvé' : 'Accès révoqué', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function deleteMember(uid) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (!confirm('Supprimer cette inscription ? Cela ne supprime pas son compte de connexion, seulement son accès au site.')) return;
+            try {
+                await db.collection('users').doc(uid).delete();
+                toast('Inscription supprimée', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-menu button.nav-link').forEach(a => a.classList.remove('active'));
+            document.getElementById('page-' + id).classList.add('active');
+            if (document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
+            if (id === 'effectif') loadEff();
+            if (id === 'calendrier') loadCal();
+            if (id === 'stats') loadStats();
+            if (id === 'infos') loadInf();
+            if (id === 'galerie') loadGallery();
+            if (id === 'membres') loadMembres();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadEff() {
+            document.getElementById('effectifGrid').innerHTML = skeletonCards(4, 250);
+            watch('effectif', 'joueurs', snap => {
+                const docs = snap.docs.sort((a, b) => (a.data().numero || 0) - (b.data().numero || 0));
+                if (docs.length === 0) {
+                    document.getElementById('effectifGrid').innerHTML = '<p class="empty-msg">Aucun joueur pour le moment.</p>';
+                    return;
+                }
+                document.getElementById('effectifGrid').innerHTML = docs.map(doc => {
+                    const j = doc.data();
+                    return `<div class="player-card" onclick="openPlayer('${doc.id}')">
+                        <div class="player-num-panini">${j.numero || '0'}</div>
+                        <div class="player-img-container"><img src="${j.photo || 'logo-alcf.png'}" class="player-img" alt="${j.prenom} ${j.nom}" onerror="this.src='logo-alcf.png'; this.onerror=null;"></div>
+                        <div class="player-info-banner"><h4>${j.prenom} ${j.nom}</h4><p>${j.poste}</p></div>
+                        <div class="admin-only card-actions">
+                            <button onclick="event.stopPropagation(); editJoueur('${doc.id}')" aria-label="Modifier">✏️</button>
+                            <button onclick="event.stopPropagation(); deleteDoc('joueurs','${doc.id}')" aria-label="Supprimer">🗑️</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        function formatDateFr(dateStr) {
+            if (!dateStr) return '';
+            const [y, m, d] = dateStr.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
+        async function openPlayer(id) {
+            const doc = await db.collection('joueurs').doc(id).get();
+            if (!doc.exists) return;
+            const d = doc.data();
+            const adresse = [
+                [d.rue, d.adresseNum].filter(Boolean).join(' n°'),
+                [d.codePostal, d.ville].filter(Boolean).join(' ')
+            ].filter(Boolean).join(', ');
+
+            document.getElementById('detContent').innerHTML = `
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <img src="${d.photo || 'logo-alcf.png'}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--gold);" onerror="this.src='logo-alcf.png'; this.onerror=null;">
+                    <div style="text-align:left">
+                        <h3 style="margin:0; color:var(--violet-deep);">${d.prenom} ${d.nom}</h3>
+                        <p style="color:var(--gold); font-weight:600; margin-top:6px;">${d.poste} · Maillot n° ${d.numero}</p>
+                    </div>
+                </div>
+                <div style="text-align:left; margin-top:22px; display:flex; flex-direction:column; gap:14px;">
+                    ${d.dateNaissance ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Date de naissance</div><div style="margin-top:2px;">${formatDateFr(d.dateNaissance)}</div></div>` : ''}
+                    ${d.taille ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Taille</div><div style="margin-top:2px;">${d.taille} cm</div></div>` : ''}
+                    ${adresse ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Adresse</div><div style="margin-top:2px;">${adresse}</div></div>` : ''}
+                    ${d.licence ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">N° de licence</div><div style="margin-top:2px;">${d.licence}</div></div>` : ''}
+                    ${d.telephone ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Téléphone</div><a href="tel:${d.telephone.replace(/\s+/g,'')}" style="margin-top:2px; display:inline-block; color:var(--violet-deep); font-weight:700; text-decoration:underline;">${d.telephone}</a></div>` : ''}
+                    ${d.email ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Email</div><a href="mailto:${d.email}" style="margin-top:2px; display:inline-block; color:var(--violet-deep); font-weight:700; text-decoration:underline;">${d.email}</a></div>` : ''}
+                </div>
+                <button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="closeModal('player-details'); showPage('stats');">📊 Voir ses statistiques</button>`;
+            openModal('player-details');
+        }
+
+        function changeMonth(delta) {
+            calMonth += delta;
+            if (calMonth < 0) { calMonth = 11; calYear--; }
+            if (calMonth > 11) { calMonth = 0; calYear++; }
+            renderCalendar();
+        }
+
+        let allMatchsCache = [];
+        function loadCal() {
+            watch('calendrier', 'matchs', snap => {
+                allMatchsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderCalendar();
+                if (document.getElementById('modal-day-details').classList.contains('active') && currentDayDate) {
+                    renderDayDetails(currentDayDate);
+                }
+            });
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const label = document.getElementById('calMonthLabel');
+            const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+            label.textContent = `${monthNames[calMonth]} ${calYear}`;
+
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === calYear && today.getMonth() === calMonth;
+
+            grid.innerHTML = '';
+            ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(d => {
+                grid.innerHTML += `<div class="calendar-day-head">${d}</div>`;
+            });
+
+            const firstOfMonth = new Date(calYear, calMonth, 1);
+            let startOffset = firstOfMonth.getDay() - 1;
+            if (startOffset < 0) startOffset = 6;
+
+            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+            const monthStr = String(calMonth + 1).padStart(2, '0');
+
+            for (let i = 0; i < startOffset; i++) {
+                grid.innerHTML += `<div class="calendar-day empty"></div>`;
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayStr = String(i).padStart(2, '0');
+                const fullDatePrefix = `${calYear}-${monthStr}-${dayStr}`;
+                const evs = allMatchsCache
+                    .filter(m => m.date === fullDatePrefix)
+                    .map(m => {
+                        const cls = 'event-' + (EVENT_TYPES[m.type] ? m.type : 'match');
+                        const icon = (EVENT_TYPES[m.type] || EVENT_TYPES.match).icon;
+                        return `<div class="event-item ${cls}">${icon} ${m.heure || ''} ${eventText(m)}</div>`;
+                    })
+                    .join('');
+                const isToday = isCurrentMonth && today.getDate() === i;
+                grid.innerHTML += `<div class="calendar-day${isToday ? ' today' : ''}" onclick="openDayDetails('${fullDatePrefix}')"><strong>${i}</strong>${evs}</div>`;
+            }
+        }
+
+        function openDayDetails(dateStr) {
+            currentDayDate = dateStr;
+            renderDayDetails(dateStr);
+            openModal('day-details');
+        }
+
+        function renderDayDetails(dateStr) {
+            const [y, m, d] = dateStr.split('-');
+            const dateObj = new Date(y, m - 1, d);
+            document.getElementById('dayDetailsTitle').textContent = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+            const evs = allMatchsCache.filter(ev => ev.date === dateStr);
+            const list = document.getElementById('dayDetailsList');
+
+            if (evs.length === 0) {
+                list.innerHTML = '<p class="empty-msg" style="padding:20px 0;">Aucun événement ce jour.</p>';
+                return;
+            }
+
+            list.innerHTML = evs.map(ev => {
+                const t = EVENT_TYPES[ev.type] || EVENT_TYPES.match;
+                return `<div class="day-event-row">
+                    <div class="day-event-badge" style="background:${t.color};">${t.icon}</div>
+                    <div class="day-event-info">
+                        <div class="ev-heure">${t.label}${ev.heure ? ' · ' + ev.heure : ''}</div>
+                        <div class="ev-text">${eventText(ev) || '<em>Sans détail</em>'}</div>
+                    </div>
+                    <div class="day-event-actions admin-only">
+                        <button onclick="editMatch('${ev.id}')" aria-label="Modifier">✏️</button>
+                        <button onclick="deleteMatchFromDay('${ev.id}')" aria-label="Supprimer">🗑️</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleMatchFields() {
+            const type = document.getElementById('matchType').value;
+            document.getElementById('matchAdvField').style.display = (type === 'match') ? 'block' : 'none';
+            document.getElementById('matchCommentField').style.display = (type === 'anniversaire' || type === 'repas' || type === 'autre') ? 'block' : 'none';
+            document.getElementById('matchNoFieldNote').style.display = (type === 'entrainement') ? 'block' : 'none';
+        }
+
+        function newMatchModal() {
+            document.getElementById('matchId').value = '';
+            document.getElementById('matchModalTitle').textContent = 'Nouvel événement';
+            document.getElementById('matchDate').value = '';
+            document.getElementById('matchHeure').value = '';
+            document.getElementById('matchType').value = 'match';
+            document.getElementById('matchAdv').value = '';
+            document.getElementById('matchCommentaire').value = '';
+            toggleMatchFields();
+            openModal('match');
+        }
+
+        function openMatchModalForDate(dateStr) {
+            newMatchModal();
+            document.getElementById('matchDate').value = dateStr;
+            closeModal('day-details');
+            openModal('match');
+        }
+
+        async function editMatch(id) {
+            const doc = await db.collection('matchs').doc(id).get();
+            if (!doc.exists) return;
+            const d = doc.data();
+            document.getElementById('matchId').value = id;
+            document.getElementById('matchModalTitle').textContent = 'Modifier l\'événement';
+            document.getElementById('matchDate').value = d.date || '';
+            document.getElementById('matchHeure').value = d.heure || '';
+            document.getElementById('matchType').value = d.type || 'match';
+            document.getElementById('matchAdv').value = d.matchAdv || '';
+            document.getElementById('matchCommentaire').value = d.commentaire || '';
+            toggleMatchFields();
+            closeModal('day-details');
+            openModal('match');
+        }
+
+        async function deleteMatchFromDay(id) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (!confirm('Supprimer cet événement ?')) return;
+            try {
+                await db.collection('matchs').doc(id).delete();
+                allMatchsCache = allMatchsCache.filter(m => m.id !== id);
+                renderDayDetails(currentDayDate);
+                renderCalendar();
+                toast('Événement supprimé', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        function loadStats() {
+            document.getElementById('statsBody').innerHTML = '<tr><td colspan="6" class="empty-msg">Chargement…</td></tr>';
+            watch('stats', 'statsIndiv', s => {
+                if (s.docs.length === 0) {
+                    document.getElementById('statsBody').innerHTML = '<tr><td colspan="6" class="empty-msg">Aucune statistique enregistrée.</td></tr>';
+                } else {
+                    document.getElementById('statsBody').innerHTML = s.docs.map(d => `<tr><td>${d.data().joueurNom}</td><td>${d.data().pts3}</td><td>${d.data().pts2}</td><td>${d.data().pts1}</td><td>${d.data().totalPts}</td><td class="admin-only"><button class="btn-ghost" onclick="deleteDoc('statsIndiv','${d.id}')">Supprimer</button></td></tr>`).join('');
+                }
+            });
+            db.collection('joueurs').get().then(s => {
+                document.getElementById('stJoueur').innerHTML = s.docs.map(d => `<option value="${d.data().prenom} ${d.data().nom}">${d.data().prenom} ${d.data().nom}</option>`).join('');
+            });
+        }
+
+        function loadInf() {
+            watch('infos', 'infos', s => {
+                if (s.docs.length === 0) {
+                    document.getElementById('infosGrid').innerHTML = '<p class="empty-msg">Aucune info publiée.</p>';
+                    return;
+                }
+                document.getElementById('infosGrid').innerHTML = s.docs.map(d => `<div class="player-card info-card"><h4>${d.data().titre}</h4><p>${d.data().texte}</p><button class="btn-ghost admin-only" style="margin-top:14px;" onclick="deleteDoc('infos','${d.id}')">Supprimer</button></div>`).join('');
+            });
+        }
+
+        function loadGallery() {
+            document.getElementById('galleryGrid').innerHTML = skeletonCards(4, 220);
+            watch('galerie', 'photos', s => {
+                if (s.docs.length === 0) {
+                    document.getElementById('galleryGrid').innerHTML = '<p class="empty-msg">Aucune photo pour le moment.</p>';
+                    return;
+                }
+                document.getElementById('galleryGrid').innerHTML = s.docs.map(d => `
+                    <div class="player-card gallery-card">
+                        <div class="player-img-container">
+                            <img src="${d.data().url || 'logo-alcf.png'}" class="player-img" alt="Photo galerie" onclick="window.open('${d.data().url || 'logo-alcf.png'}', '_blank')" onerror="this.src='logo-alcf.png'; this.onerror=null;">
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn-ghost admin-only" onclick="deleteDoc('photos','${d.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        async function saveJoueur() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const id = document.getElementById('joueurId').value;
+            const data = {
+                prenom: document.getElementById('joueurPrenom').value.trim(),
+                nom: document.getElementById('joueurNom').value.trim(),
+                dateNaissance: document.getElementById('joueurNaissance').value,
+                taille: parseInt(document.getElementById('joueurTaille').value) || 0,
+                rue: document.getElementById('joueurRue').value.trim(),
+                adresseNum: document.getElementById('joueurAdresseNum').value.trim(),
+                codePostal: document.getElementById('joueurCodePostal').value.trim(),
+                ville: document.getElementById('joueurVille').value.trim(),
+                numero: parseInt(document.getElementById('joueurNumero').value) || 0,
+                licence: document.getElementById('joueurLicence').value.trim(),
+                telephone: document.getElementById('joueurTelephone').value.trim(),
+                email: document.getElementById('joueurEmail').value.trim(),
+                poste: document.getElementById('joueurPoste').value,
+                photo: document.getElementById('joueurPhoto').value.trim()
+            };
+            if (!data.prenom || !data.nom) return toast('Prénom et nom sont obligatoires', 'error');
+            try {
+                if (id) await db.collection('joueurs').doc(id).update(data);
+                else await db.collection('joueurs').add(data);
+                closeModal('joueur');
+                toast('Joueur enregistré', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function saveMatch() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const id = document.getElementById('matchId').value;
+            const date = document.getElementById('matchDate').value;
+            const type = document.getElementById('matchType').value;
+            const titre = document.getElementById('matchAdv').value.trim();
+            const commentaire = document.getElementById('matchCommentaire').value.trim();
+
+            if (!date) return toast('La date est obligatoire', 'error');
+            if (type === 'match' && !titre) return toast('Le nom de l\'adversaire est obligatoire', 'error');
+            if ((type === 'anniversaire' || type === 'repas' || type === 'autre') && !commentaire) return toast('Le commentaire est obligatoire', 'error');
+
+            const data = {
+                date: date,
+                heure: document.getElementById('matchHeure').value,
+                type: type,
+                matchAdv: (type === 'match') ? titre : '',
+                commentaire: (type === 'anniversaire' || type === 'repas' || type === 'autre') ? commentaire : ''
+            };
+
+            try {
+                if (id) await db.collection('matchs').doc(id).update(data);
+                else await db.collection('matchs').add(data);
+                closeModal('match');
+                toast(id ? 'Événement modifié' : 'Événement ajouté', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function saveStats() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const p3 = parseInt(document.getElementById('st3').value) || 0;
+            const p2 = parseInt(document.getElementById('st2').value) || 0;
+            const p1 = parseInt(document.getElementById('st1').value) || 0;
+            try {
+                await db.collection('statsIndiv').add({
+                    joueurNom: document.getElementById('stJoueur').value,
+                    pts3: p3, pts2: p2, pts1: p1,
+                    totalPts: (p3 * 3) + (p2 * 2) + p1,
+                    matchs: 1
+                });
+                closeModal('statsIndiv');
+                toast('Statistiques enregistrées', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function saveInfo() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const titre = document.getElementById('infoTitre').value.trim();
+            if (!titre) return toast('Le titre est obligatoire', 'error');
+            try {
+                await db.collection('infos').add({ titre: titre, texte: document.getElementById('infoTexte').value.trim() });
+                closeModal('info');
+                toast('Info publiée', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function savePhoto() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const url = document.getElementById('galUrl').value.trim();
+            if (!url) return toast('URL obligatoire', 'error');
+            try {
+                await db.collection('photos').add({ url: url });
+                closeModal('galerie');
+                toast('Photo ajoutée', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function editJoueur(id) {
+            const doc = await db.collection('joueurs').doc(id).get();
+            if (!doc.exists) return;
+            const d = doc.data();
+            document.getElementById('joueurId').value = id;
+            document.getElementById('joueurPrenom').value = d.prenom || '';
+            document.getElementById('joueurNom').value = d.nom || '';
+            document.getElementById('joueurNaissance').value = d.dateNaissance || '';
+            document.getElementById('joueurTaille').value = d.taille || '';
+            document.getElementById('joueurRue').value = d.rue || '';
+            document.getElementById('joueurAdresseNum').value = d.adresseNum || '';
+            document.getElementById('joueurCodePostal').value = d.codePostal || '';
+            document.getElementById('joueurVille').value = d.ville || '';
+            document.getElementById('joueurNumero').value = d.numero || '';
+            document.getElementById('joueurLicence').value = d.licence || '';
+            document.getElementById('joueurTelephone').value = d.telephone || '';
+            document.getElementById('joueurEmail').value = d.email || '';
+            document.getElementById('joueurPoste').value = d.poste || 'Meneur';
+            document.getElementById('joueurPhoto').value = d.photo || '';
+            openModal('joueur');
+        }
+
+        async function deleteDoc(c, i) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (confirm('Supprimer ?')) {
+                try {
+                    await db.collection(c).doc(i).delete();
+                    toast('Supprimé', 'success');
+                } catch (e) {
+                    toast('Erreur : ' + e.message, 'error');
+                }
+            }
+        }
+
+        function openModal(id) { document.getElementById('modal-' + id).classList.add('active'); }
+
+        function closeModal(id) {
+            document.getElementById('modal-' + id).classList.remove('active');
+            if (id === 'joueur') {
+                document.getElementById('joueurId').value = '';
+                document.getElementById('joueurPrenom').value = '';
+                document.getElementById('joueurNom').value = '';
+                document.getElementById('joueurNaissance').value = '';
+                document.getElementById('joueurTaille').value = '';
+                document.getElementById('joueurRue').value = '';
+                document.getElementById('joueurAdresseNum').value = '';
+                document.getElementById('joueurCodePostal').value = '';
+                document.getElementById('joueurVille').value = '';
+                document.getElementById('joueurNumero').value = '';
+                document.getElementById('joueurLicence').value = '';
+                document.getElementById('joueurTelephone').value = '';
+                document.getElementById('joueurEmail').value = '';
+                document.getElementById('joueurPoste').value = 'Meneur';
+                document.getElementById('joueurPhoto').value = '';
+            }
+            if (id === 'match') {
+                document.getElementById('matchId').value = '';
+                document.getElementById('matchModalTitle').textContent = 'Nouvel événement';
+                document.getElementById('matchDate').value = '';
+                document.getElementById('matchHeure').value = '';
+                document.getElementById('matchAdv').value = '';
+                document.getElementById('matchCommentaire').value = '';
+                document.getElementById('matchType').value = 'match';
+                toggleMatchFields();
+            }
+            if (id === 'statsIndiv') {
+                document.getElementById('st3').value = '';
+                document.getElementById('st2').value = '';
+                document.getElementById('st1').value = '';
+            }
+            if (id === 'info') {
+                document.getElementById('infoTitre').value = '';
+                document.getElementById('infoTexte').value = '';
+            }
+            if (id === 'galerie') {
+                document.getElementById('galUrl').value = '';
+            }
+        }
+
+        async function doLogin() {
+            try {
+                await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+            } catch (e) {
+                toast('Erreur de connexion : ' + e.message, 'error');
+            }
+        }
+
+        function doLogout() { auth.signOut(); location.reload(); }
+
+        showPage('accueil');
+    </script>
+</body>
+</html>
+>>>>>>> 6e5ed3be1bc08996dc80265e60a4b559cd7211e1
