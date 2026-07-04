@@ -22,7 +22,7 @@ async function getApiToken() {
   const res = await fetch(`${FFBB_BASE}items/configuration`, { headers: HEADERS_BASE });
   if (!res.ok) throw new Error(`Erreur configuration FFBB : HTTP ${res.status}`);
   const json = await res.json();
-  const token = json?.data?.api_bearer_token;
+   const token = json?.data?.key_dh;
   if (!token) throw new Error('Jeton API FFBB introuvable dans la réponse');
   return token;
 }
