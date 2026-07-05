@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
     <style>
         :root {
             /* Palette — inspirée du parquet, du tableau d'affichage et des lignes de terrain */
@@ -460,6 +461,7 @@
             <button class="nav-link" onclick="showPage('infos')" id="nav-infos">Infos</button>
             <button class="nav-link" onclick="showPage('messagerie')" id="nav-messagerie">Messages</button>
             <button class="nav-link admin-only" onclick="showPage('membres')" id="nav-membres">Membres</button>
+            <button class="btn btn-outline" id="btnNotif" onclick="enableNotifications()" style="padding:8px 14px; font-size:0.72rem; margin-left:8px;">🔔 Activer les notifications</button>
             <button class="btn btn-danger" style="padding:8px 16px; font-size:0.72rem; margin-left:8px;" onclick="doLogout()" id="btnLogout">Déconnexion</button>
         </div>
     </nav>
@@ -663,6 +665,61 @@
         const ADMIN = "polocezar@gmail.com";
         let isAdmin = false;
 
+        // ---- Notifications push (Firebase Cloud Messaging) ----
+        const VAPID_KEY = "BAvYrLQvhFiKRnZnP4d5OOIK7IwivxCCbOLUOTacNsMlO-UKGFvZ6ZJPcoAh2JslsZ4k2wGhfKJJWHiFn6u-7qg";
+        let messaging = null;
+        try {
+            if (firebase.messaging.isSupported()) messaging = firebase.messaging();
+        } catch (e) {
+            console.warn('Firebase Messaging non disponible sur ce navigateur', e);
+        }
+
+        function updateNotifButtonState() {
+            const btn = document.getElementById('btnNotif');
+            if (!btn) return;
+            if (!messaging || typeof Notification === 'undefined') {
+                btn.style.display = 'none';
+                return;
+            }
+            if (Notification.permission === 'granted') {
+                btn.textContent = '🔔 Notifications activées';
+                btn.disabled = true;
+            } else if (Notification.permission === 'denied') {
+                btn.textContent = '🔕 Notifications bloquées';
+                btn.disabled = true;
+            } else {
+                btn.textContent = '🔔 Activer les notifications';
+                btn.disabled = false;
+            }
+        }
+
+        async function enableNotifications() {
+            if (!messaging) return toast('Les notifications ne sont pas supportées sur cet appareil.', 'error');
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') return toast('Notifications refusées.', 'error');
+                const registration = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+                const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
+                if (!token) return toast('Impossible de générer le jeton de notification.', 'error');
+                const uid = auth.currentUser.uid;
+                await db.collection('users').doc(uid).update({
+                    fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
+                });
+                toast('Notifications activées ! 🔔', 'success');
+                updateNotifButtonState();
+            } catch (e) {
+                console.error('Erreur activation notifications', e);
+                toast('Erreur lors de l\'activation des notifications : ' + e.message, 'error');
+            }
+        }
+
+        if (messaging) {
+            messaging.onMessage(payload => {
+                const body = (payload.notification && payload.notification.body) || 'Nouvelle notification';
+                toast(body, 'info');
+            });
+        }
+
         // ---- Toasts (remplace les alert() natifs, plus agréables) ----
         function toast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
@@ -725,6 +782,7 @@
         function enterSite() {
             document.getElementById('authGate').style.display = 'none';
             document.getElementById('siteContent').style.display = 'block';
+            updateNotifButtonState();
         }
 
         function switchGateTab(tab) {
