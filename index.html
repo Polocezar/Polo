@@ -159,15 +159,39 @@
         /* Championnat — classement et matchs FFBB, données propres via Firestore */
         .champ-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: start; }
         @media (max-width: 900px) { .champ-layout { grid-template-columns: 1fr; } }
-        .champ-block { background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 24px; }
-        .champ-block h3 { color: var(--violet-deep); font-size: 1.05rem; font-weight: 600; margin-bottom: 16px; }
-        .match-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+        .champ-block { background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 24px 24px 8px; }
+        .champ-block h3 { color: var(--violet-deep); font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+
+        /* Cartes de match */
+        .match-row { display: flex; align-items: center; gap: 14px; padding: 14px 4px; border-bottom: 1px solid var(--line); transition: background 0.15s; }
         .match-row:last-child { border-bottom: none; }
-        .match-date { font-size: 0.72rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; min-width: 90px; }
-        .match-teams { flex: 1; font-size: 0.88rem; text-align: center; }
+        .match-row:hover { background: #faf6ec; border-radius: var(--radius-sm); }
+        .match-date { font-size: 0.68rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; min-width: 76px; line-height: 1.35; }
+        .match-date strong { display: block; color: var(--ink); font-size: 0.78rem; letter-spacing: 0.02em; }
+        .match-teams { flex: 1; font-size: 0.86rem; line-height: 1.5; }
+        .match-teams .team-line { display: flex; justify-content: space-between; gap: 10px; }
         .match-teams .alcf { color: var(--violet-deep); font-weight: 700; }
-        .match-score { font-weight: 700; color: var(--violet-deep); min-width: 56px; text-align: right; white-space: nowrap; }
-        .data-table tr.row-alcf td { background: rgba(232, 161, 60, 0.16); font-weight: 700; }
+        .score-pill { min-width: 62px; text-align: center; font-weight: 700; font-size: 0.86rem; border-radius: 999px; padding: 5px 10px; white-space: nowrap; background: rgba(28,15,51,0.06); color: var(--ink); }
+        .score-pill.win { background: rgba(45, 148, 96, 0.15); color: #1f7a4d; }
+        .score-pill.loss { background: rgba(196, 68, 68, 0.14); color: #b8382f; }
+        .score-pill.upcoming { background: transparent; color: var(--ink-soft); font-weight: 600; font-size: 0.72rem; }
+
+        /* Classement */
+        .pos-badge { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--violet-deep); color: var(--gold-bright); font-weight: 700; font-size: 0.78rem; }
+        .row-alcf .pos-badge { background: var(--gold); color: var(--violet-deep); }
+        .data-table tr.row-alcf td { background: rgba(232, 161, 60, 0.14); }
+        .data-table td.col-equipe { font-weight: 700; }
+        .data-table th.col-hide, .data-table td.col-hide { display: table-cell; }
+        @media (max-width: 620px) {
+            .data-table th.col-hide, .data-table td.col-hide { display: none; }
+            .data-table th:first-child, .data-table td:first-child,
+            .data-table th.col-equipe, .data-table td.col-equipe { position: sticky; left: 0; background: var(--paper); z-index: 1; }
+            .data-table th:first-child, .data-table td:first-child { left: 0; }
+            .data-table th.col-equipe, .data-table td.col-equipe { left: 46px; }
+            .data-table th { background: var(--violet-deep); }
+        }
+        #champUpdatedAt { display: inline-flex; align-items: center; gap: 6px; }
+        #champUpdatedAt::before { content: '●'; color: #3fa96a; font-size: 0.6rem; }
 
         /* ===== EFFECTIF ===== */
         #page-effectif { background: var(--parquet); }
@@ -475,7 +499,7 @@
                     <h3>🏆 Classement officiel</h3>
                     <div class="table-responsive">
                         <table class="data-table">
-                            <thead><tr><th>Pos</th><th style="text-align:left;">Équipe</th><th>J</th><th>V</th><th>D</th><th>+/-</th><th>Pts</th></tr></thead>
+                            <thead><tr><th>Pos</th><th class="col-equipe" style="text-align:left;">Équipe</th><th class="col-hide">J</th><th class="col-hide">V</th><th class="col-hide">D</th><th class="col-hide">+/-</th><th>Pts</th></tr></thead>
                             <tbody id="champClassementBody"><tr><td colspan="7" class="empty-msg">Chargement…</td></tr></tbody>
                         </table>
                     </div>
@@ -841,13 +865,13 @@
 
             tbody.innerHTML = classement.map(c => `
                 <tr${isAlcf(c.equipe) ? ' class="row-alcf"' : ''}>
-                    <td>${c.position ?? ''}</td>
-                    <td style="text-align:left;">${c.equipe || ''}</td>
-                    <td>${c.joues ?? ''}</td>
-                    <td>${c.gagnes ?? ''}</td>
-                    <td>${c.perdus ?? ''}</td>
-                    <td>${c.difference ?? ''}</td>
-                    <td>${c.points ?? ''}</td>
+                    <td><span class="pos-badge">${c.position ?? ''}</span></td>
+                    <td class="col-equipe" style="text-align:left;">${c.equipe || ''}</td>
+                    <td class="col-hide">${c.joues ?? ''}</td>
+                    <td class="col-hide">${c.gagnes ?? ''}</td>
+                    <td class="col-hide">${c.perdus ?? ''}</td>
+                    <td class="col-hide">${c.difference ?? ''}</td>
+                    <td><strong>${c.points ?? ''}</strong></td>
                 </tr>`).join('');
 
             const updated = data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate() : null;
@@ -856,20 +880,41 @@
                 : '';
         }
 
+        function formatHeureChamp(heure) {
+            if (!heure) return '';
+            const digits = String(heure).replace(/\D/g, '');
+            if (digits.length === 3) return `${digits.slice(0, 1)}h${digits.slice(1)}`;
+            if (digits.length === 4) return `${digits.slice(0, 2)}h${digits.slice(2)}`;
+            return heure;
+        }
+
         function renderMatchsFFBB(data) {
             const matchs = (data && data.matchs) || [];
             const joues = matchs.filter(m => m.joue).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
             const aVenir = matchs.filter(m => !m.joue).sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 6);
 
-            const rowHtml = (m, showScore) => `
+            const rowHtml = (m, showScore) => {
+                let pillClass = 'upcoming', pillText = '';
+                if (showScore && m.score1 != null && m.score2 != null) {
+                    pillText = `${m.score1} - ${m.score2}`;
+                    if (isAlcf(m.equipe1) || isAlcf(m.equipe2)) {
+                        const alcfScore = isAlcf(m.equipe1) ? m.score1 : m.score2;
+                        const oppScore = isAlcf(m.equipe1) ? m.score2 : m.score1;
+                        pillClass = alcfScore > oppScore ? 'win' : (alcfScore < oppScore ? 'loss' : '');
+                    }
+                } else if (!showScore) {
+                    pillText = formatHeureChamp(m.heure) || 'à venir';
+                }
+                return `
                 <div class="match-row">
-                    <span class="match-date">${formatDateChamp(m.date)}${m.heure ? ' · ' + m.heure : ''}</span>
-                    <span class="match-teams">
-                        <span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span> vs
-                        <span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span>
-                    </span>
-                    <span class="match-score">${showScore && m.score1 != null && m.score2 != null ? m.score1 + ' - ' + m.score2 : ''}</span>
+                    <div class="match-date">${formatDateChamp(m.date)}${showScore ? '' : (m.heure ? `<strong>${formatHeureChamp(m.heure)}</strong>` : '')}</div>
+                    <div class="match-teams">
+                        <div class="team-line"><span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span></div>
+                        <div class="team-line"><span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span></div>
+                    </div>
+                    <span class="score-pill ${pillClass}">${pillText}</span>
                 </div>`;
+            };
 
             document.getElementById('champProchains').innerHTML = aVenir.length
                 ? aVenir.map(m => rowHtml(m, false)).join('')
