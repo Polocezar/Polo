@@ -27,8 +27,6 @@
             --danger: #e0553f;
             --success: #3fa66a;
 
-            
-
             --radius-sm: 10px;
             --radius-md: 16px;
             --radius-lg: 24px;
@@ -554,7 +552,17 @@
     <div id="page-infos" class="page"><div class="container"><div class="page-header"><h2>Infos du club</h2><button class="btn btn-gold admin-only" onclick="openModal('info')">+ Publier une info</button></div><div id="infosGrid" class="players-grid"></div></div></div>
 
     <!-- MESSAGERIE -->
-    <div id="page-messagerie" class="page"><div class="container"><h2 style="margin-bottom:20px; color:var(--violet-deep);">Messagerie</h2><div id="messagesContainer"></div></div></div>
+    <div id="page-messagerie" class="page"><div class="container">
+        <div class="page-header"><h2>Messagerie</h2><button class="btn btn-gold" onclick="openNewMessageModal()">+ Nouveau message</button></div>
+        <div class="gate-tabs" style="max-width:480px;">
+            <button id="msgTabInboxBtn" class="active" onclick="switchMsgTab('inbox')">Boîte de réception</button>
+            <button id="msgTabSentBtn" onclick="switchMsgTab('sent')">Envoyés</button>
+            <button id="msgTabAllBtn" class="admin-only" onclick="switchMsgTab('all')">Tous les messages</button>
+        </div>
+        <div id="msgInboxList"></div>
+        <div id="msgSentList" style="display:none;"></div>
+        <div id="msgAllList" style="display:none;"></div>
+    </div></div>
 
     <!-- MEMBRES (admin) -->
     <div id="page-membres" class="page"><div class="container">
@@ -599,6 +607,18 @@
     </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveMatch()">Enregistrer</button></div></div>
 
     <div class="modal-overlay" id="modal-day-details"><div class="modal"><button class="modal-close" onclick="closeModal('day-details')">×</button><h3 id="dayDetailsTitle">Jour</h3><div id="dayDetailsList" style="margin-top:18px;"></div><button class="btn btn-gold admin-only" style="width:100%; margin-top:12px; justify-content:center;" onclick="openMatchModalForDate(currentDayDate)">+ Ajouter un événement ce jour</button></div></div>
+
+    <div class="modal-overlay" id="modal-message"><div class="modal"><button class="modal-close" onclick="closeModal('message')">×</button><h3>Nouveau message</h3>
+        <div class="field-block full-width">
+            <label>Destinataire(s)</label>
+            <div id="msgRecipientsList" style="max-height:200px; overflow-y:auto; border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px; display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+        <div class="field-block full-width" style="margin-top:16px;">
+            <label for="msgTexte">Message</label>
+            <textarea id="msgTexte" placeholder="Écris ton message..." rows="5"></textarea>
+        </div>
+        <button class="btn btn-gold" style="width:100%; margin-top:20px; justify-content:center;" onclick="sendMessage()">Envoyer</button>
+    </div></div>
 
     <div class="modal-overlay" id="modal-statsIndiv"><div class="modal"><button class="modal-close" onclick="closeModal('statsIndiv')">×</button><h3>Statistiques</h3><div class="field-block" style="margin-top:14px;"><label for="stJoueur">Joueur</label><select id="stJoueur"></select></div><div class="form-grid">
         <div class="field-block"><label for="st3">Paniers à 3pts</label><input type="number" id="st3" placeholder="0"></div>
@@ -828,6 +848,7 @@
             document.getElementById('page-' + id).classList.add('active');
             if (document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
             if (id === 'championnat') loadChampionnat();
+            if (id === 'messagerie') loadMessagerie();
             if (id === 'effectif') loadEff();
             if (id === 'calendrier') loadCal();
             if (id === 'stats') loadStats();
@@ -946,6 +967,137 @@
             document.getElementById('champResultats').innerHTML = joues.length
                 ? joues.map(m => rowHtml(m, true)).join('')
                 : '<p class="empty-msg" style="padding:16px 0;">Aucun résultat disponible.</p>';
+        }
+
+        // ---- Messagerie : messages privés ciblés entre membres approuvés ----
+        let msgMembersCache = [];
+
+        function switchMsgTab(tab) {
+            document.getElementById('msgTabInboxBtn').classList.toggle('active', tab === 'inbox');
+            document.getElementById('msgTabSentBtn').classList.toggle('active', tab === 'sent');
+            document.getElementById('msgTabAllBtn').classList.toggle('active', tab === 'all');
+            document.getElementById('msgInboxList').style.display = tab === 'inbox' ? 'block' : 'none';
+            document.getElementById('msgSentList').style.display = tab === 'sent' ? 'block' : 'none';
+            document.getElementById('msgAllList').style.display = tab === 'all' ? 'block' : 'none';
+        }
+
+        function loadMessagerie() {
+            if (activeListeners['messagerie']) activeListeners['messagerie']();
+            const uid = auth.currentUser.uid;
+            const unsubs = [];
+
+            unsubs.push(db.collection('messages').where('to', 'array-contains', uid).onSnapshot(snap => {
+                const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                renderMsgList('msgInboxList', msgs, false);
+            }, err => { console.error('Erreur Firestore messages (reçus)', err); toast('Impossible de charger la boîte de réception.', 'error'); }));
+
+            unsubs.push(db.collection('messages').where('from', '==', uid).onSnapshot(snap => {
+                const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                renderMsgList('msgSentList', msgs, true);
+            }, err => { console.error('Erreur Firestore messages (envoyés)', err); toast('Impossible de charger les messages envoyés.', 'error'); }));
+
+            if (isAdmin) {
+                unsubs.push(db.collection('messages').onSnapshot(snap => {
+                    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                        .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                    renderMsgList('msgAllList', msgs, true, true);
+                }, err => { console.error('Erreur Firestore messages (modération)', err); toast('Impossible de charger tous les messages.', 'error'); }));
+            }
+
+            activeListeners['messagerie'] = () => unsubs.forEach(u => u());
+        }
+
+        function renderMsgList(containerId, msgs, isSent, isModeration) {
+            const el = document.getElementById(containerId);
+            if (msgs.length === 0) {
+                el.innerHTML = '<p class="empty-msg" style="padding:20px 0;">Aucun message.</p>';
+                return;
+            }
+            el.innerHTML = msgs.map(m => {
+                const date = m.createdAt && m.createdAt.toDate
+                    ? m.createdAt.toDate().toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                    : 'Envoi en cours…';
+                const noms = (m.toNoms || []).join(', ') || 'destinataire(s)';
+                const entete = isModeration
+                    ? `${m.fromNom || 'Un membre'} → ${noms}`
+                    : (isSent ? 'À : ' + noms : 'De : ' + (m.fromNom || 'Un membre'));
+                const canDelete = isSent || isAdmin;
+                return `<div class="champ-block" style="margin-bottom:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
+                        <strong style="color:var(--violet-deep);">${entete}</strong>
+                        <span style="font-size:0.75rem; color:var(--ink-soft); white-space:nowrap;">${date}</span>
+                    </div>
+                    <p style="white-space:pre-wrap; margin:0;">${m.texte || ''}</p>
+                    ${canDelete ? `<button class="btn-ghost" style="margin-top:10px;" onclick="deleteMessage('${m.id}')">Supprimer</button>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        async function openNewMessageModal() {
+            document.getElementById('msgTexte').value = '';
+            const uid = auth.currentUser.uid;
+            try {
+                const snap = await db.collection('users').where('status', '==', 'approved').get();
+                msgMembersCache = snap.docs.map(d => ({ uid: d.id, ...d.data() })).filter(u => u.uid !== uid);
+            } catch (e) {
+                console.error('Erreur chargement des membres', e);
+                msgMembersCache = [];
+            }
+            document.getElementById('msgRecipientsList').innerHTML = msgMembersCache.length
+                ? msgMembersCache.map(u => `<label style="display:flex; gap:8px; align-items:center; font-weight:400; cursor:pointer;">
+                        <input type="checkbox" value="${u.uid}" data-nom="${(u.prenom || '') + ' ' + (u.nom || '')}"> ${u.prenom || ''} ${u.nom || ''}
+                    </label>`).join('')
+                : '<p class="empty-msg">Aucun autre membre approuvé pour le moment.</p>';
+            openModal('message');
+        }
+
+        async function sendMessage() {
+            const texte = document.getElementById('msgTexte').value.trim();
+            const checked = Array.from(document.querySelectorAll('#msgRecipientsList input:checked'));
+
+            if (!texte) return toast('Écris un message avant d\'envoyer.', 'error');
+            if (checked.length === 0) return toast('Choisis au moins un destinataire.', 'error');
+
+            const to = checked.map(c => c.value);
+            const toNoms = checked.map(c => c.dataset.nom.trim());
+            const u = auth.currentUser;
+
+            let fromNom = 'Administrateur ALCF';
+            if (!isAdmin) {
+                try {
+                    const ownDoc = await db.collection('users').doc(u.uid).get();
+                    const od = ownDoc.exists ? ownDoc.data() : {};
+                    fromNom = `${od.prenom || ''} ${od.nom || ''}`.trim() || u.email;
+                } catch (e) { fromNom = u.email; }
+            }
+
+            try {
+                await db.collection('messages').add({
+                    from: u.uid,
+                    fromNom,
+                    to,
+                    toNoms,
+                    texte,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                closeModal('message');
+                toast('Message envoyé !', 'success');
+            } catch (e) {
+                console.error('Erreur envoi message', e);
+                toast('Erreur lors de l\'envoi du message.', 'error');
+            }
+        }
+
+        async function deleteMessage(id) {
+            if (!confirm('Supprimer ce message ?')) return;
+            try {
+                await db.collection('messages').doc(id).delete();
+            } catch (e) {
+                console.error('Erreur suppression message', e);
+                toast('Impossible de supprimer ce message.', 'error');
+            }
         }
 
         function loadEff() {
