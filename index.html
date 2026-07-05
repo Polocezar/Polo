@@ -171,6 +171,12 @@
         .match-teams { flex: 1; font-size: 0.86rem; line-height: 1.5; }
         .match-teams .team-line { display: flex; justify-content: space-between; gap: 10px; }
         .match-teams .alcf { color: var(--violet-deep); font-weight: 700; }
+        .match-teams-scored { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .match-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.86rem; }
+        .match-line .alcf { color: var(--violet-deep); font-weight: 700; }
+        .match-line .score { font-weight: 700; min-width: 32px; text-align: right; color: var(--ink); }
+        .match-line.win .score { color: #1f7a4d; }
+        .match-line.loss .score { color: #b8382f; }
         .score-pill { min-width: 62px; text-align: center; font-weight: 700; font-size: 0.86rem; border-radius: 999px; padding: 5px 10px; white-space: nowrap; background: rgba(28,15,51,0.06); color: var(--ink); }
         .score-pill.win { background: rgba(45, 148, 96, 0.15); color: #1f7a4d; }
         .score-pill.loss { background: rgba(196, 68, 68, 0.14); color: #b8382f; }
@@ -893,26 +899,38 @@
             const joues = matchs.filter(m => m.joue).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
             const aVenir = matchs.filter(m => !m.joue).sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 6);
 
+            const lineClass = (estAlcf, score, scoreAdv) => {
+                if (!estAlcf || score == null || scoreAdv == null) return '';
+                if (score > scoreAdv) return 'win';
+                if (score < scoreAdv) return 'loss';
+                return '';
+            };
+
             const rowHtml = (m, showScore) => {
-                let pillClass = 'upcoming', pillText = '';
                 if (showScore && m.score1 != null && m.score2 != null) {
-                    pillText = `${m.score1} - ${m.score2}`;
-                    if (isAlcf(m.equipe1) || isAlcf(m.equipe2)) {
-                        const alcfScore = isAlcf(m.equipe1) ? m.score1 : m.score2;
-                        const oppScore = isAlcf(m.equipe1) ? m.score2 : m.score1;
-                        pillClass = alcfScore > oppScore ? 'win' : (alcfScore < oppScore ? 'loss' : '');
-                    }
-                } else if (!showScore) {
-                    pillText = formatHeureChamp(m.heure) || 'à venir';
+                    return `
+                    <div class="match-row">
+                        <div class="match-date">${formatDateChamp(m.date)}</div>
+                        <div class="match-teams-scored">
+                            <div class="match-line ${lineClass(isAlcf(m.equipe1), m.score1, m.score2)}">
+                                <span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span>
+                                <span class="score">${m.score1}</span>
+                            </div>
+                            <div class="match-line ${lineClass(isAlcf(m.equipe2), m.score2, m.score1)}">
+                                <span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span>
+                                <span class="score">${m.score2}</span>
+                            </div>
+                        </div>
+                    </div>`;
                 }
                 return `
                 <div class="match-row">
-                    <div class="match-date">${formatDateChamp(m.date)}${showScore ? '' : (m.heure ? `<strong>${formatHeureChamp(m.heure)}</strong>` : '')}</div>
+                    <div class="match-date">${formatDateChamp(m.date)}${m.heure ? `<strong>${formatHeureChamp(m.heure)}</strong>` : ''}</div>
                     <div class="match-teams">
                         <div class="team-line"><span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span></div>
                         <div class="team-line"><span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span></div>
                     </div>
-                    <span class="score-pill ${pillClass}">${pillText}</span>
+                    <span class="score-pill upcoming">${formatHeureChamp(m.heure) || 'à venir'}</span>
                 </div>`;
             };
 
