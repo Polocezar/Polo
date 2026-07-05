@@ -1,4 +1,3 @@
-
 /**
  * Synchronisation FFBB -> Firestore
  * ---------------------------------
@@ -22,7 +21,7 @@ async function getApiToken() {
   const res = await fetch(`${FFBB_BASE}items/configuration`, { headers: HEADERS_BASE });
   if (!res.ok) throw new Error(`Erreur configuration FFBB : HTTP ${res.status}`);
   const json = await res.json();
-   const token = json?.data?.key_dh;
+  const token = json?.data?.key_dh;
   if (!token) throw new Error('Jeton API FFBB introuvable dans la réponse');
   return token;
 }
@@ -88,6 +87,45 @@ async function getRencontres(headers) {
   }));
 }
 
+function isAlcfName(nomEquipe) {
+  return (nomEquipe || '').toUpperCase().includes('CHAZEAU');
+}
+
+// Convertit un horaire FFBB brut ("2030") en format HH:MM ("20:30") attendu par le calendrier
+function formatHeureHHMM(heure) {
+  const digits = String(heure || '').replace(/\D/g, '');
+  if (digits.length === 3) return `0${digits[0]}:${digits.slice(1)}`;
+  if (digits.length === 4) return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+  return '';
+}
+
+// Insère/actualise dans le calendrier du site (collection "matchs") tous les matchs
+// impliquant l'ALCF, à leur date officielle FFBB. Un identifiant stable (ffbb-<id>)
+// évite tout doublon lors des synchronisations suivantes.
+async function syncCalendrierAlcf(db, rencontres) {
+  const matchsAlcf = rencontres.filter(m => isAlcfName(m.equipe1) || isAlcfName(m.equipe2));
+  let count = 0;
+
+  for (const m of matchsAlcf) {
+    if (!m.date) continue;
+    const dateOnly = String(m.date).slice(0, 10);
+    const adversaire = isAlcfName(m.equipe1) ? m.equipe2 : m.equipe1;
+
+    await db.collection('matchs').doc(`ffbb-${m.id}`).set({
+      date: dateOnly,
+      heure: formatHeureHHMM(m.heure),
+      type: 'match',
+      matchAdv: adversaire || '',
+      source: 'ffbb',
+      ffbbId: m.id
+    }, { merge: true });
+
+    count++;
+  }
+
+  return count;
+}
+
 async function main() {
   if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
     throw new Error('Variable FIREBASE_SERVICE_ACCOUNT manquante');
@@ -111,7 +149,10 @@ async function main() {
   await db.collection('ffbb').doc('poule').set({ nom, classement, updatedAt });
   await db.collection('ffbb').doc('rencontres').set({ matchs, updatedAt });
 
-  console.log(`OK — ${classement.length} équipes au classement, ${matchs.length} rencontres synchronisées.`);
+  console.log('Synchronisation des matchs ALCF dans le calendrier...');
+  const nbCalendrier = await syncCalendrierAlcf(db, matchs);
+
+  console.log(`OK — ${classement.length} équipes au classement, ${matchs.length} rencontres, ${nbCalendrier} match(s) ALCF ajoutés/mis à jour dans le calendrier.`);
 }
 
 main().catch(err => {
