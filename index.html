@@ -156,8 +156,18 @@
         .hero-team-img { width: 100%; max-width: 460px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 3px solid rgba(232, 161, 60, 0.4); }
 
         /* ===== CHAMPIONNAT ===== */
-        .iframe-wrapper { position: relative; width: 100%; max-width: 1500px; margin: 0 auto; height: 900px; border-radius: var(--radius-md); overflow: hidden; background: white; box-shadow: var(--shadow-md); }
-        #ffbbIframe { position: absolute; top: -550px; left: -10px; width: 1500px; height: 3000px; border: none; }
+        /* Championnat — classement et matchs FFBB, données propres via Firestore */
+        .champ-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+        @media (max-width: 900px) { .champ-layout { grid-template-columns: 1fr; } }
+        .champ-block { background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 24px; }
+        .champ-block h3 { color: var(--violet-deep); font-size: 1.05rem; font-weight: 600; margin-bottom: 16px; }
+        .match-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+        .match-row:last-child { border-bottom: none; }
+        .match-date { font-size: 0.72rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; min-width: 90px; }
+        .match-teams { flex: 1; font-size: 0.88rem; text-align: center; }
+        .match-teams .alcf { color: var(--violet-deep); font-weight: 700; }
+        .match-score { font-weight: 700; color: var(--violet-deep); min-width: 56px; text-align: right; white-space: nowrap; }
+        .data-table tr.row-alcf td { background: rgba(232, 161, 60, 0.16); font-weight: 700; }
 
         /* ===== EFFECTIF ===== */
         #page-effectif { background: var(--parquet); }
@@ -445,7 +455,33 @@
 
     <!-- CHAMPIONNAT -->
     <div id="page-championnat" class="page">
-        <div class="container" style="max-width:100%"><div class="iframe-wrapper"><iframe id="ffbbIframe" src="https://competitions.ffbb.com/ligues/ara/competitions/pnm/classement?phase=200000002872829&poule=200000003018577" title="Classement championnat FFBB" scrolling="no"></iframe></div></div>
+        <div class="container">
+            <div class="page-header">
+                <h2>Championnat — Poule A PNM</h2>
+                <span id="champUpdatedAt" style="color:var(--ink-soft); font-size:0.78rem;"></span>
+            </div>
+            <div class="champ-layout">
+                <div>
+                    <div class="champ-block">
+                        <h3>🏀 Prochains matchs</h3>
+                        <div id="champProchains"><p class="empty-msg" style="padding:16px 0;">Chargement…</p></div>
+                    </div>
+                    <div class="champ-block" style="margin-top:20px;">
+                        <h3>📋 Derniers résultats</h3>
+                        <div id="champResultats"><p class="empty-msg" style="padding:16px 0;">Chargement…</p></div>
+                    </div>
+                </div>
+                <div class="champ-block">
+                    <h3>🏆 Classement officiel</h3>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Pos</th><th style="text-align:left;">Équipe</th><th>J</th><th>V</th><th>D</th><th>+/-</th><th>Pts</th></tr></thead>
+                            <tbody id="champClassementBody"><tr><td colspan="7" class="empty-msg">Chargement…</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- EFFECTIF -->
@@ -757,6 +793,7 @@
             document.querySelectorAll('.nav-menu button.nav-link').forEach(a => a.classList.remove('active'));
             document.getElementById('page-' + id).classList.add('active');
             if (document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
+            if (id === 'championnat') loadChampionnat();
             if (id === 'effectif') loadEff();
             if (id === 'calendrier') loadCal();
             if (id === 'stats') loadStats();
@@ -764,6 +801,83 @@
             if (id === 'galerie') loadGallery();
             if (id === 'membres') loadMembres();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ---- Championnat : classement + matchs FFBB, lus en temps réel depuis Firestore ----
+        function isAlcf(nomEquipe) {
+            return (nomEquipe || '').toUpperCase().includes('CHAZEAU');
+        }
+
+        function formatDateChamp(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            if (isNaN(d)) return dateStr;
+            return d.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        }
+
+        function loadChampionnat() {
+            if (activeListeners['championnat']) activeListeners['championnat']();
+
+            const unsubPoule = db.collection('ffbb').doc('poule').onSnapshot(
+                doc => renderClassement(doc.exists ? doc.data() : null),
+                err => { console.error('Erreur Firestore ffbb/poule', err); toast('Impossible de charger le classement.', 'error'); }
+            );
+            const unsubRencontres = db.collection('ffbb').doc('rencontres').onSnapshot(
+                doc => renderMatchsFFBB(doc.exists ? doc.data() : null),
+                err => { console.error('Erreur Firestore ffbb/rencontres', err); toast('Impossible de charger les matchs.', 'error'); }
+            );
+
+            activeListeners['championnat'] = () => { unsubPoule(); unsubRencontres(); };
+        }
+
+        function renderClassement(data) {
+            const tbody = document.getElementById('champClassementBody');
+            const classement = (data && data.classement) || [];
+
+            if (classement.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Classement indisponible pour le moment.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = classement.map(c => `
+                <tr${isAlcf(c.equipe) ? ' class="row-alcf"' : ''}>
+                    <td>${c.position ?? ''}</td>
+                    <td style="text-align:left;">${c.equipe || ''}</td>
+                    <td>${c.joues ?? ''}</td>
+                    <td>${c.gagnes ?? ''}</td>
+                    <td>${c.perdus ?? ''}</td>
+                    <td>${c.difference ?? ''}</td>
+                    <td>${c.points ?? ''}</td>
+                </tr>`).join('');
+
+            const updated = data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate() : null;
+            document.getElementById('champUpdatedAt').textContent = updated
+                ? 'Mis à jour à ' + updated.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                : '';
+        }
+
+        function renderMatchsFFBB(data) {
+            const matchs = (data && data.matchs) || [];
+            const joues = matchs.filter(m => m.joue).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
+            const aVenir = matchs.filter(m => !m.joue).sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 6);
+
+            const rowHtml = (m, showScore) => `
+                <div class="match-row">
+                    <span class="match-date">${formatDateChamp(m.date)}${m.heure ? ' · ' + m.heure : ''}</span>
+                    <span class="match-teams">
+                        <span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span> vs
+                        <span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span>
+                    </span>
+                    <span class="match-score">${showScore && m.score1 != null && m.score2 != null ? m.score1 + ' - ' + m.score2 : ''}</span>
+                </div>`;
+
+            document.getElementById('champProchains').innerHTML = aVenir.length
+                ? aVenir.map(m => rowHtml(m, false)).join('')
+                : '<p class="empty-msg" style="padding:16px 0;">Aucun match à venir programmé.</p>';
+
+            document.getElementById('champResultats').innerHTML = joues.length
+                ? joues.map(m => rowHtml(m, true)).join('')
+                : '<p class="empty-msg" style="padding:16px 0;">Aucun résultat disponible.</p>';
         }
 
         function loadEff() {
