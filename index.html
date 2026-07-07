@@ -1261,4 +1261,585 @@
 
         function changeMonth(delta) {
             calMonth += delta;
-            if (calMonth 
+            if (calMonth < 0) { calMonth = 11; calYear--; }
+            if (calMonth > 11) { calMonth = 0; calYear++; }
+            renderCalendar();
+        }
+
+        let allMatchsCache = [];
+        function loadCal() {
+            watch('calendrier', 'matchs', snap => {
+                allMatchsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderCalendar();
+                if (document.getElementById('modal-day-details').classList.contains('active') && currentDayDate) {
+                    renderDayDetails(currentDayDate);
+                }
+            });
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const label = document.getElementById('calMonthLabel');
+            const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+            label.textContent = `${monthNames[calMonth]} ${calYear}`;
+
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === calYear && today.getMonth() === calMonth;
+
+            grid.innerHTML = '';
+            ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(d => {
+                grid.innerHTML += `<div class="calendar-day-head">${d}</div>`;
+            });
+
+            const firstOfMonth = new Date(calYear, calMonth, 1);
+            let startOffset = firstOfMonth.getDay() - 1;
+            if (startOffset < 0) startOffset = 6;
+
+            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+            const monthStr = String(calMonth + 1).padStart(2, '0');
+
+            for (let i = 0; i < startOffset; i++) {
+                grid.innerHTML += `<div class="calendar-day empty"></div>`;
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayStr = String(i).padStart(2, '0');
+                const fullDatePrefix = `${calYear}-${monthStr}-${dayStr}`;
+                const evs = allMatchsCache
+                    .filter(m => m.date === fullDatePrefix)
+                    .map(m => {
+                        const cls = 'event-' + (EVENT_TYPES[m.type] ? m.type : 'match');
+                        const icon = (EVENT_TYPES[m.type] || EVENT_TYPES.match).icon;
+                        return `<div class="event-item ${cls}">${icon} ${m.heure || ''} ${eventText(m)}</div>`;
+                    })
+                    .join('');
+                const isToday = isCurrentMonth && today.getDate() === i;
+                grid.innerHTML += `<div class="calendar-day${isToday ? ' today' : ''}" onclick="openDayDetails('${fullDatePrefix}')"><strong>${i}</strong>${evs}</div>`;
+            }
+        }
+
+        function openDayDetails(dateStr) {
+            currentDayDate = dateStr;
+            renderDayDetails(dateStr);
+            openModal('day-details');
+        }
+
+        function renderDayDetails(dateStr) {
+            const [y, m, d] = dateStr.split('-');
+            const dateObj = new Date(y, m - 1, d);
+            document.getElementById('dayDetailsTitle').textContent = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+            const evs = allMatchsCache.filter(ev => ev.date === dateStr);
+            const list = document.getElementById('dayDetailsList');
+
+            if (evs.length === 0) {
+                list.innerHTML = '<p class="empty-msg" style="padding:20px 0;">Aucun événement ce jour.</p>';
+                return;
+            }
+
+            list.innerHTML = evs.map(ev => {
+                const t = EVENT_TYPES[ev.type] || EVENT_TYPES.match;
+                return `<div class="day-event-row">
+                    <div class="day-event-badge" style="background:${t.color};">${t.icon}</div>
+                    <div class="day-event-info">
+                        <div class="ev-heure">${t.label}${ev.heure ? ' · ' + ev.heure : ''}</div>
+                        <div class="ev-text">${eventText(ev) || '<em>Sans détail</em>'}</div>
+                    </div>
+                    <div class="day-event-actions admin-only">
+                        <button onclick="editMatch('${ev.id}')" aria-label="Modifier">✏️</button>
+                        <button onclick="deleteMatchFromDay('${ev.id}')" aria-label="Supprimer">🗑️</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleMatchFields() {
+            const type = document.getElementById('matchType').value;
+            document.getElementById('matchAdvField').style.display = (type === 'match') ? 'block' : 'none';
+            document.getElementById('matchCommentField').style.display = (type === 'anniversaire' || type === 'repas' || type === 'autre') ? 'block' : 'none';
+            document.getElementById('matchNoFieldNote').style.display = (type === 'entrainement') ? 'block' : 'none';
+        }
+
+        function newMatchModal() {
+            document.getElementById('matchId').value = '';
+            document.getElementById('matchModalTitle').textContent = 'Nouvel événement';
+            document.getElementById('matchDate').value = '';
+            document.getElementById('matchHeure').value = '';
+            document.getElementById('matchType').value = 'match';
+            document.getElementById('matchAdv').value = '';
+            document.getElementById('matchCommentaire').value = '';
+            toggleMatchFields();
+            openModal('match');
+        }
+
+        function openMatchModalForDate(dateStr) {
+            newMatchModal();
+            document.getElementById('matchDate').value = dateStr;
+            closeModal('day-details');
+            openModal('match');
+        }
+
+        async function editMatch(id) {
+            const doc = await db.collection('matchs').doc(id).get();
+            if (!doc.exists) return;
+            const d = doc.data();
+            document.getElementById('matchId').value = id;
+            document.getElementById('matchModalTitle').textContent = 'Modifier l\'événement';
+            document.getElementById('matchDate').value = d.date || '';
+            document.getElementById('matchHeure').value = d.heure || '';
+            document.getElementById('matchType').value = d.type || 'match';
+            document.getElementById('matchAdv').value = d.matchAdv || '';
+            document.getElementById('matchCommentaire').value = d.commentaire || '';
+            toggleMatchFields();
+            closeModal('day-details');
+            openModal('match');
+        }
+
+        async function deleteMatchFromDay(id) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (!confirm('Supprimer cet événement ?')) return;
+            try {
+                await db.collection('matchs').doc(id).delete();
+                allMatchsCache = allMatchsCache.filter(m => m.id !== id);
+                renderDayDetails(currentDayDate);
+                renderCalendar();
+                toast('Événement supprimé', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        // ---- Statistiques : saisie par match (équipe + tous les joueurs), agrégation dernier match / saison ----
+        let statsMatchPlayersCache = [];
+        let allStatsMatchsCache = [];
+
+        async function openStatsMatchModal(id) {
+            let joueursSnap;
+            try {
+                joueursSnap = await db.collection('joueurs').get();
+            } catch (e) {
+                return toast('Impossible de charger la liste des joueurs.', 'error');
+            }
+            statsMatchPlayersCache = joueursSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a, b) => (a.numero || 0) - (b.numero || 0));
+
+            let existing = null;
+            if (id) {
+                const doc = await db.collection('statsMatchs').doc(id).get();
+                if (doc.exists) existing = doc.data();
+            }
+
+            document.getElementById('statsMatchId').value = id || '';
+            document.getElementById('statsMatchModalTitle').textContent = id ? 'Modifier les stats du match' : 'Stats d\'un match';
+            document.getElementById('statsMatchDate').value = existing ? (existing.date || '') : '';
+            document.getElementById('statsMatchAdv').value = existing ? (existing.adversaire || '') : '';
+            document.getElementById('statsMatchScoreEquipe').value = existing ? (existing.scoreEquipe ?? '') : '';
+            document.getElementById('statsMatchScoreAdv').value = existing ? (existing.scoreAdversaire ?? '') : '';
+
+            const headRow = `<div class="stat-input-row head">
+                <div>Joueur</div><div>3pts</div><div>2pts</div><div>LF</div><div>Fautes</div><div>F. Off.</div><div>F. Tech.</div><div>F. Disq.</div>
+            </div>`;
+
+            const playerRows = statsMatchPlayersCache.map(j => {
+                const ex = existing ? (existing.joueurs || []).find(x => x.joueurId === j.id) : null;
+                const val = v => (ex && ex[v]) ? ex[v] : '';
+                return `<div class="stat-input-row" data-joueur-id="${j.id}" data-joueur-nom="${(j.prenom || '') + ' ' + (j.nom || '')}">
+                    <div class="stat-player-name">${j.prenom || ''} ${j.nom || ''}</div>
+                    <input type="number" min="0" class="statPts3" value="${val('pts3')}" placeholder="0">
+                    <input type="number" min="0" class="statPts2" value="${val('pts2')}" placeholder="0">
+                    <input type="number" min="0" class="statPts1" value="${val('pts1')}" placeholder="0">
+                    <input type="number" min="0" class="statFautes" value="${val('fautes')}" placeholder="0">
+                    <input type="number" min="0" class="statFautesOff" value="${val('fautesOffensives')}" placeholder="0">
+                    <input type="number" min="0" class="statFautesTech" value="${val('fautesTechniques')}" placeholder="0">
+                    <input type="number" min="0" class="statFautesDisq" value="${val('fautesDisqualifiantes')}" placeholder="0">
+                </div>`;
+            }).join('');
+
+            document.getElementById('statsMatchPlayersRows').innerHTML = headRow + (playerRows || '<p class="empty-msg">Ajoute d\'abord des joueurs dans l\'effectif.</p>');
+            openModal('statsMatch');
+        }
+
+        async function saveStatsMatch() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const id = document.getElementById('statsMatchId').value;
+            const date = document.getElementById('statsMatchDate').value;
+            if (!date) return toast('La date du match est obligatoire', 'error');
+
+            const rows = Array.from(document.querySelectorAll('#statsMatchPlayersRows .stat-input-row[data-joueur-id]'));
+            const joueursData = rows.map(row => {
+                const num = sel => parseInt(row.querySelector(sel).value) || 0;
+                return {
+                    joueurId: row.dataset.joueurId,
+                    joueurNom: row.dataset.joueurNom,
+                    pts3: num('.statPts3'),
+                    pts2: num('.statPts2'),
+                    pts1: num('.statPts1'),
+                    fautes: num('.statFautes'),
+                    fautesOffensives: num('.statFautesOff'),
+                    fautesTechniques: num('.statFautesTech'),
+                    fautesDisqualifiantes: num('.statFautesDisq')
+                };
+            }).filter(j => j.pts3 || j.pts2 || j.pts1 || j.fautes || j.fautesOffensives || j.fautesTechniques || j.fautesDisqualifiantes);
+
+            const data = {
+                date: date,
+                adversaire: document.getElementById('statsMatchAdv').value.trim(),
+                scoreEquipe: parseInt(document.getElementById('statsMatchScoreEquipe').value) || 0,
+                scoreAdversaire: parseInt(document.getElementById('statsMatchScoreAdv').value) || 0,
+                joueurs: joueursData
+            };
+
+            try {
+                if (id) await db.collection('statsMatchs').doc(id).update(data);
+                else await db.collection('statsMatchs').add(data);
+                closeModal('statsMatch');
+                toast('Stats du match enregistrées', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        function loadStats() {
+            document.getElementById('statsDernierMatch').innerHTML = '<p class="empty-msg" style="padding:16px 0;">Chargement…</p>';
+            document.getElementById('statsSaisonEquipe').innerHTML = '<p class="empty-msg" style="padding:16px 0;">Chargement…</p>';
+            document.getElementById('statsPlayersGrid').innerHTML = skeletonCards(4, 0);
+            watch('stats', 'statsMatchs', snap => {
+                allStatsMatchsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderStatsPage();
+            });
+        }
+
+        function foulTotalsForMatch(m) {
+            return (m.joueurs || []).reduce((acc, j) => {
+                acc.fautes += j.fautes || 0;
+                acc.off += j.fautesOffensives || 0;
+                acc.tech += j.fautesTechniques || 0;
+                acc.disq += j.fautesDisqualifiantes || 0;
+                return acc;
+            }, { fautes: 0, off: 0, tech: 0, disq: 0 });
+        }
+
+        function renderStatsPage() {
+            const dernierMatchEl = document.getElementById('statsDernierMatch');
+            const saisonEquipeEl = document.getElementById('statsSaisonEquipe');
+            const playersGridEl = document.getElementById('statsPlayersGrid');
+            const matchsListEl = document.getElementById('statsMatchsList');
+
+            if (allStatsMatchsCache.length === 0) {
+                dernierMatchEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">Aucun match enregistré pour le moment.</p>';
+                saisonEquipeEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">Aucun match enregistré pour le moment.</p>';
+                playersGridEl.innerHTML = '<p class="empty-msg">Aucune statistique pour le moment.</p>';
+                if (matchsListEl) matchsListEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">Aucun match enregistré.</p>';
+                return;
+            }
+
+            const sorted = [...allStatsMatchsCache].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const dernier = sorted[0];
+            const dFouls = foulTotalsForMatch(dernier);
+            const totalFautesDernier = dFouls.fautes + dFouls.off + dFouls.tech;
+            const resultat = dernier.scoreEquipe > dernier.scoreAdversaire ? 'Victoire' : (dernier.scoreEquipe < dernier.scoreAdversaire ? 'Défaite' : 'Match nul');
+            const resultClass = dernier.scoreEquipe > dernier.scoreAdversaire ? 'win' : (dernier.scoreEquipe < dernier.scoreAdversaire ? 'loss' : '');
+
+            dernierMatchEl.innerHTML = `
+                <p style="color:var(--ink-soft); font-size:0.82rem; margin-bottom:6px;">${dernier.adversaire ? 'vs ' + dernier.adversaire + ' — ' : ''}${formatDateFr(dernier.date)}</p>
+                <div class="stat-metrics">
+                    <div class="stat-metric"><div class="stat-label">Score</div><div class="stat-value">${dernier.scoreEquipe} - ${dernier.scoreAdversaire}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Résultat</div><div class="stat-value ${resultClass}">${resultat}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Fautes équipe</div><div class="stat-value">${totalFautesDernier}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Tech. / Disqual.</div><div class="stat-value">${dFouls.tech} / ${dFouls.disq}</div></div>
+                </div>`;
+
+            const nbMatchs = sorted.length;
+            const victoires = sorted.filter(m => m.scoreEquipe > m.scoreAdversaire).length;
+            const defaites = sorted.filter(m => m.scoreEquipe < m.scoreAdversaire).length;
+            const totalFoulsSaison = sorted.reduce((acc, m) => {
+                const f = foulTotalsForMatch(m);
+                acc.fautes += f.fautes; acc.off += f.off; acc.tech += f.tech; acc.disq += f.disq;
+                return acc;
+            }, { fautes: 0, off: 0, tech: 0, disq: 0 });
+            const totalFautesSaisonTotal = totalFoulsSaison.fautes + totalFoulsSaison.off + totalFoulsSaison.tech;
+            const moyFautes = nbMatchs ? (totalFautesSaisonTotal / nbMatchs).toFixed(1) : '0.0';
+
+            saisonEquipeEl.innerHTML = `
+                <div class="stat-metrics">
+                    <div class="stat-metric"><div class="stat-label">Matchs joués</div><div class="stat-value">${nbMatchs}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Bilan</div><div class="stat-value">${victoires}V - ${defaites}D</div></div>
+                    <div class="stat-metric"><div class="stat-label">Moy. fautes / match</div><div class="stat-value">${moyFautes}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Tech. / Disqual.</div><div class="stat-value">${totalFoulsSaison.tech} / ${totalFoulsSaison.disq}</div></div>
+                </div>`;
+
+            const playerTotals = {};
+            sorted.forEach(m => {
+                (m.joueurs || []).forEach(j => {
+                    if (!playerTotals[j.joueurId]) playerTotals[j.joueurId] = { joueurNom: j.joueurNom, pts: 0, fautes: 0, off: 0, tech: 0, disq: 0 };
+                    const pts = (j.pts3 || 0) * 3 + (j.pts2 || 0) * 2 + (j.pts1 || 0);
+                    playerTotals[j.joueurId].pts += pts;
+                    playerTotals[j.joueurId].fautes += j.fautes || 0;
+                    playerTotals[j.joueurId].off += j.fautesOffensives || 0;
+                    playerTotals[j.joueurId].tech += j.fautesTechniques || 0;
+                    playerTotals[j.joueurId].disq += j.fautesDisqualifiantes || 0;
+                });
+            });
+
+            const dernierByPlayer = {};
+            (dernier.joueurs || []).forEach(j => { dernierByPlayer[j.joueurId] = j; });
+
+            const playersArr = Object.entries(playerTotals).map(([id, t]) => ({ id, ...t }));
+            playersArr.sort((a, b) => b.pts - a.pts);
+
+            if (playersArr.length === 0) {
+                playersGridEl.innerHTML = '<p class="empty-msg">Aucune statistique individuelle pour le moment.</p>';
+            } else {
+                playersGridEl.innerHTML = playersArr.map((p, idx) => {
+                    const dj = dernierByPlayer[p.id];
+                    const dPts = dj ? (dj.pts3 || 0) * 3 + (dj.pts2 || 0) * 2 + (dj.pts1 || 0) : 0;
+                    const dFautesTotal = dj ? (dj.fautes || 0) + (dj.fautesOffensives || 0) + (dj.fautesTechniques || 0) : 0;
+                    const totalFautesSaisonJoueur = p.fautes + p.off + p.tech;
+                    return `<div class="stat-player-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:8px;">
+                            <h4>${p.joueurNom}</h4>
+                            ${idx === 0 && p.pts > 0 ? '<span class="stat-badge">Top marqueur</span>' : ''}
+                        </div>
+                        <div class="stat-section-label">Dernier match</div>
+                        <div class="stat-row strong"><span>Points</span><span>${dPts}</span></div>
+                        <div class="stat-row strong"><span>Fautes</span><span>${dFautesTotal}</span></div>
+                        <div class="stat-subrow"><span>Classiques</span><span>${dj ? (dj.fautes || 0) : 0}</span></div>
+                        <div class="stat-subrow"><span>Offensives</span><span>${dj ? (dj.fautesOffensives || 0) : 0}</span></div>
+                        <div class="stat-subrow"><span>Techniques</span><span>${dj ? (dj.fautesTechniques || 0) : 0}</span></div>
+                        <div class="stat-subrow"><span>Disqualifiante</span><span>${dj ? (dj.fautesDisqualifiantes || 0) : 0}</span></div>
+                        <div class="stat-section-label">Saison</div>
+                        <div class="stat-row strong"><span>Points</span><span>${p.pts}</span></div>
+                        <div class="stat-row strong"><span>Fautes</span><span>${totalFautesSaisonJoueur}</span></div>
+                        <div class="stat-subrow"><span>Classiques</span><span>${p.fautes}</span></div>
+                        <div class="stat-subrow"><span>Offensives</span><span>${p.off}</span></div>
+                        <div class="stat-subrow"><span>Techniques</span><span>${p.tech}</span></div>
+                        <div class="stat-subrow"><span>Disqualifiante</span><span>${p.disq}</span></div>
+                    </div>`;
+                }).join('');
+            }
+
+            if (matchsListEl) {
+                matchsListEl.innerHTML = sorted.map(m => `
+                    <div class="match-row">
+                        <div class="match-date">${formatDateFr(m.date)}</div>
+                        <div class="match-teams" style="flex:1;">${m.adversaire ? 'vs ' + m.adversaire : 'Match'} — ${m.scoreEquipe ?? 0} / ${m.scoreAdversaire ?? 0}</div>
+                        <div class="day-event-actions">
+                            <button onclick="openStatsMatchModal('${m.id}')" aria-label="Modifier">✏️</button>
+                            <button onclick="deleteDoc('statsMatchs','${m.id}')" aria-label="Supprimer">🗑️</button>
+                        </div>
+                    </div>`).join('');
+            }
+        }
+
+        function loadInf() {
+            watch('infos', 'infos', s => {
+                if (s.docs.length === 0) {
+                    document.getElementById('infosGrid').innerHTML = '<p class="empty-msg">Aucune info publiée.</p>';
+                    return;
+                }
+                document.getElementById('infosGrid').innerHTML = s.docs.map(d => `<div class="player-card info-card"><h4>${d.data().titre}</h4><p>${d.data().texte}</p><button class="btn-ghost admin-only" style="margin-top:14px;" onclick="deleteDoc('infos','${d.id}')">Supprimer</button></div>`).join('');
+            });
+        }
+
+        function loadGallery() {
+            document.getElementById('galleryGrid').innerHTML = skeletonCards(4, 220);
+            watch('galerie', 'photos', s => {
+                if (s.docs.length === 0) {
+                    document.getElementById('galleryGrid').innerHTML = '<p class="empty-msg">Aucune photo pour le moment.</p>';
+                    return;
+                }
+                document.getElementById('galleryGrid').innerHTML = s.docs.map(d => `
+                    <div class="player-card gallery-card">
+                        <div class="player-img-container">
+                            <img src="${d.data().url || 'logo-alcf.png'}" class="player-img" alt="Photo galerie" onclick="window.open('${d.data().url || 'logo-alcf.png'}', '_blank')" onerror="this.src='logo-alcf.png'; this.onerror=null;">
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn-ghost admin-only" onclick="deleteDoc('photos','${d.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        async function saveJoueur() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const id = document.getElementById('joueurId').value;
+            const data = {
+                prenom: document.getElementById('joueurPrenom').value.trim(),
+                nom: document.getElementById('joueurNom').value.trim(),
+                dateNaissance: document.getElementById('joueurNaissance').value,
+                taille: parseInt(document.getElementById('joueurTaille').value) || 0,
+                rue: document.getElementById('joueurRue').value.trim(),
+                adresseNum: document.getElementById('joueurAdresseNum').value.trim(),
+                codePostal: document.getElementById('joueurCodePostal').value.trim(),
+                ville: document.getElementById('joueurVille').value.trim(),
+                numero: parseInt(document.getElementById('joueurNumero').value) || 0,
+                licence: document.getElementById('joueurLicence').value.trim(),
+                telephone: document.getElementById('joueurTelephone').value.trim(),
+                email: document.getElementById('joueurEmail').value.trim(),
+                poste: document.getElementById('joueurPoste').value,
+                photo: document.getElementById('joueurPhoto').value.trim()
+            };
+            if (!data.prenom || !data.nom) return toast('Prénom et nom sont obligatoires', 'error');
+            try {
+                if (id) await db.collection('joueurs').doc(id).update(data);
+                else await db.collection('joueurs').add(data);
+                closeModal('joueur');
+                toast('Joueur enregistré', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function saveMatch() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const id = document.getElementById('matchId').value;
+            const date = document.getElementById('matchDate').value;
+            const type = document.getElementById('matchType').value;
+            const titre = document.getElementById('matchAdv').value.trim();
+            const commentaire = document.getElementById('matchCommentaire').value.trim();
+
+            if (!date) return toast('La date est obligatoire', 'error');
+            if (type === 'match' && !titre) return toast('Le nom de l\'adversaire est obligatoire', 'error');
+            if ((type === 'anniversaire' || type === 'repas' || type === 'autre') && !commentaire) return toast('Le commentaire est obligatoire', 'error');
+
+            const data = {
+                date: date,
+                heure: document.getElementById('matchHeure').value,
+                type: type,
+                matchAdv: (type === 'match') ? titre : '',
+                commentaire: (type === 'anniversaire' || type === 'repas' || type === 'autre') ? commentaire : ''
+            };
+
+            try {
+                if (id) await db.collection('matchs').doc(id).update(data);
+                else await db.collection('matchs').add(data);
+                closeModal('match');
+                toast(id ? 'Événement modifié' : 'Événement ajouté', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function saveInfo() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const titre = document.getElementById('infoTitre').value.trim();
+            if (!titre) return toast('Le titre est obligatoire', 'error');
+            try {
+                await db.collection('infos').add({ titre: titre, texte: document.getElementById('infoTexte').value.trim() });
+                closeModal('info');
+                toast('Info publiée', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function savePhoto() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const url = document.getElementById('galUrl').value.trim();
+            if (!url) return toast('URL obligatoire', 'error');
+            try {
+                await db.collection('photos').add({ url: url });
+                closeModal('galerie');
+                toast('Photo ajoutée', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function editJoueur(id) {
+            const doc = await db.collection('joueurs').doc(id).get();
+            if (!doc.exists) return;
+            const d = doc.data();
+            document.getElementById('joueurId').value = id;
+            document.getElementById('joueurPrenom').value = d.prenom || '';
+            document.getElementById('joueurNom').value = d.nom || '';
+            document.getElementById('joueurNaissance').value = d.dateNaissance || '';
+            document.getElementById('joueurTaille').value = d.taille || '';
+            document.getElementById('joueurRue').value = d.rue || '';
+            document.getElementById('joueurAdresseNum').value = d.adresseNum || '';
+            document.getElementById('joueurCodePostal').value = d.codePostal || '';
+            document.getElementById('joueurVille').value = d.ville || '';
+            document.getElementById('joueurNumero').value = d.numero || '';
+            document.getElementById('joueurLicence').value = d.licence || '';
+            document.getElementById('joueurTelephone').value = d.telephone || '';
+            document.getElementById('joueurEmail').value = d.email || '';
+            document.getElementById('joueurPoste').value = d.poste || 'Meneur';
+            document.getElementById('joueurPhoto').value = d.photo || '';
+            openModal('joueur');
+        }
+
+        async function deleteDoc(c, i) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (confirm('Supprimer ?')) {
+                try {
+                    await db.collection(c).doc(i).delete();
+                    toast('Supprimé', 'success');
+                } catch (e) {
+                    toast('Erreur : ' + e.message, 'error');
+                }
+            }
+        }
+
+        function openModal(id) { document.getElementById('modal-' + id).classList.add('active'); }
+
+        function closeModal(id) {
+            document.getElementById('modal-' + id).classList.remove('active');
+            if (id === 'joueur') {
+                document.getElementById('joueurId').value = '';
+                document.getElementById('joueurPrenom').value = '';
+                document.getElementById('joueurNom').value = '';
+                document.getElementById('joueurNaissance').value = '';
+                document.getElementById('joueurTaille').value = '';
+                document.getElementById('joueurRue').value = '';
+                document.getElementById('joueurAdresseNum').value = '';
+                document.getElementById('joueurCodePostal').value = '';
+                document.getElementById('joueurVille').value = '';
+                document.getElementById('joueurNumero').value = '';
+                document.getElementById('joueurLicence').value = '';
+                document.getElementById('joueurTelephone').value = '';
+                document.getElementById('joueurEmail').value = '';
+                document.getElementById('joueurPoste').value = 'Meneur';
+                document.getElementById('joueurPhoto').value = '';
+            }
+            if (id === 'match') {
+                document.getElementById('matchId').value = '';
+                document.getElementById('matchModalTitle').textContent = 'Nouvel événement';
+                document.getElementById('matchDate').value = '';
+                document.getElementById('matchHeure').value = '';
+                document.getElementById('matchAdv').value = '';
+                document.getElementById('matchCommentaire').value = '';
+                document.getElementById('matchType').value = 'match';
+                toggleMatchFields();
+            }
+            if (id === 'statsMatch') {
+                document.getElementById('statsMatchId').value = '';
+                document.getElementById('statsMatchDate').value = '';
+                document.getElementById('statsMatchAdv').value = '';
+                document.getElementById('statsMatchScoreEquipe').value = '';
+                document.getElementById('statsMatchScoreAdv').value = '';
+                document.getElementById('statsMatchPlayersRows').innerHTML = '';
+            }
+            if (id === 'info') {
+                document.getElementById('infoTitre').value = '';
+                document.getElementById('infoTexte').value = '';
+            }
+            if (id === 'galerie') {
+                document.getElementById('galUrl').value = '';
+            }
+        }
+
+        async function doLogin() {
+            try {
+                await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+            } catch (e) {
+                toast('Erreur de connexion : ' + e.message, 'error');
+            }
+        }
+
+        function doLogout() { auth.signOut(); location.reload(); }
+
+        showPage('accueil');
+    </script>
+</body>
+</html>
