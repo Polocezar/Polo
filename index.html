@@ -141,6 +141,8 @@
         .btn-ghost:hover { background: rgba(28,15,51,0.12); }
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: inline-flex !important; }
+        .staff-only { display: none !important; }
+        body.is-admin .staff-only, body.is-coach .staff-only { display: inline-flex !important; }
 
         /* ===== PAGES ===== */
         .page { display: none; width: 100%; min-height: 92vh; }
@@ -415,7 +417,8 @@
         .status-pending { background: #fdeecb; color: #a5680c; }
         .status-approved { background: #d9f2e3; color: var(--success); }
         .status-revoked { background: #fbe0dc; color: var(--danger); }
-        .member-actions { display: flex; gap: 8px; }
+        .role-badge { padding: 5px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; background: #e4dcf7; color: #5b3ea6; }
+        .member-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
         /* ===== MOBILE ===== */
         @media (max-width: 990px) {
@@ -561,7 +564,7 @@
     <!-- CALENDRIER -->
     <div id="page-calendrier" class="page">
         <div class="container">
-            <div class="page-header"><h2>Calendrier</h2><button class="btn btn-gold admin-only" onclick="newMatchModal()">+ Ajouter un événement</button></div>
+            <div class="page-header"><h2>Calendrier</h2><button class="btn btn-gold staff-only" onclick="newMatchModal()">+ Ajouter un événement</button></div>
             <div class="calendar-nav">
                 <button onclick="changeMonth(-1)" aria-label="Mois précédent">‹</button>
                 <h3 id="calMonthLabel"></h3>
@@ -574,7 +577,7 @@
     <!-- STATS -->
     <div id="page-stats" class="page">
         <div class="container">
-            <div class="page-header"><h2>Statistiques</h2><button class="btn btn-gold admin-only" onclick="openStatsMatchModal()">+ Ajouter les stats d'un match</button></div>
+            <div class="page-header"><h2>Statistiques</h2><button class="btn btn-gold staff-only" onclick="openStatsMatchModal()">+ Ajouter les stats d'un match</button></div>
 
             <div class="champ-block" style="margin-bottom:24px;">
                 <h3>🏀 Dernier match</h3>
@@ -589,7 +592,7 @@
             <h3 style="color:var(--violet-deep); font-size:1.05rem; margin-bottom:14px;">Statistiques individuelles</h3>
             <div class="players-grid" id="statsPlayersGrid" style="margin-bottom:32px;"></div>
 
-            <div class="champ-block admin-only">
+            <div class="champ-block staff-only">
                 <h3>🗂️ Matchs enregistrés</h3>
                 <div id="statsMatchsList"><p class="empty-msg" style="padding:16px 0;">Chargement…</p></div>
             </div>
@@ -600,7 +603,7 @@
     <div id="page-galerie" class="page"><div class="container"><div class="page-header"><h2>Galerie</h2><button class="btn btn-gold admin-only" onclick="openModal('galerie')">+ Ajouter une photo</button></div><div class="players-grid" id="galleryGrid"></div></div></div>
 
     <!-- INFOS -->
-    <div id="page-infos" class="page"><div class="container"><div class="page-header"><h2>Infos du club</h2><button class="btn btn-gold admin-only" onclick="openModal('info')">+ Publier une info</button></div><div id="infosGrid" class="players-grid"></div></div></div>
+    <div id="page-infos" class="page"><div class="container"><div class="page-header"><h2>Infos du club</h2><button class="btn btn-gold staff-only" onclick="openModal('info')">+ Publier une info</button></div><div id="infosGrid" class="players-grid"></div></div></div>
 
     <!-- MESSAGERIE -->
     <div id="page-messagerie" class="page"><div class="container">
@@ -618,7 +621,7 @@
     <!-- MEMBRES (admin) -->
     <div id="page-membres" class="page"><div class="container">
         <div class="page-header"><h2>Membres inscrits</h2></div>
-        <p style="color:var(--ink-soft); margin-bottom:20px;">Approuve les nouvelles inscriptions pour leur donner accès au site, ou révoque l'accès d'un membre à tout moment.</p>
+        <p style="color:var(--ink-soft); margin-bottom:20px;">Approuve les nouvelles inscriptions pour leur donner accès au site, révoque l'accès d'un membre à tout moment, ou promeus un membre approuvé au rôle de coach pour lui donner des droits d'écriture supplémentaires (calendrier, stats, infos).</p>
         <div id="membresList"></div>
     </div></div>
     </div><!-- /siteContent -->
@@ -657,7 +660,7 @@
         <p class="full-width" id="matchNoFieldNote" style="display:none; color:var(--ink-soft); font-size:0.85rem; margin:0;">Il suffit d'indiquer la date et l'heure ci-dessus, aucune autre information n'est nécessaire.</p>
     </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveMatch()">Enregistrer</button></div></div>
 
-    <div class="modal-overlay" id="modal-day-details"><div class="modal"><button class="modal-close" onclick="closeModal('day-details')">×</button><h3 id="dayDetailsTitle">Jour</h3><div id="dayDetailsList" style="margin-top:18px;"></div><button class="btn btn-gold admin-only" style="width:100%; margin-top:12px; justify-content:center;" onclick="openMatchModalForDate(currentDayDate)">+ Ajouter un événement ce jour</button></div></div>
+    <div class="modal-overlay" id="modal-day-details"><div class="modal"><button class="modal-close" onclick="closeModal('day-details')">×</button><h3 id="dayDetailsTitle">Jour</h3><div id="dayDetailsList" style="margin-top:18px;"></div><button class="btn btn-gold staff-only" style="width:100%; margin-top:12px; justify-content:center;" onclick="openMatchModalForDate(currentDayDate)">+ Ajouter un événement ce jour</button></div></div>
 
     <div class="modal-overlay" id="modal-message"><div class="modal"><button class="modal-close" onclick="closeModal('message')">×</button><h3>Nouveau message</h3>
         <div class="field-block full-width">
@@ -716,6 +719,7 @@
         const db = firebase.firestore(), auth = firebase.auth();
         const ADMIN = "polocezar@gmail.com";
         let isAdmin = false;
+        let isCoachUser = false;
 
         // ---- Notifications push (Firebase Cloud Messaging) ----
         const VAPID_KEY = "BAvYrLQvhFiKRnZnP4d5OOIK7IwivxCCbOLUOTacNsMlO-UKGFvZ6ZJPcoAh2JslsZ4k2wGhfKJJWHiFn6u-7qg";
@@ -865,6 +869,8 @@
             userStatusUnsub = userDocRef.onSnapshot(docSnap => {
                 const data = docSnap.data();
                 const status = data ? data.status : 'pending';
+                isCoachUser = !!data && data.role === 'coach';
+                document.body.classList.toggle('is-coach', isCoachUser);
                 if (status === 'approved') {
                     enterSite();
                 } else if (status === 'revoked') {
@@ -916,15 +922,20 @@
                 };
                 document.getElementById('membresList').innerHTML = docs.map(m => {
                     const s = statusInfo[m.status] || statusInfo.pending;
+                    const isCoachRole = m.role === 'coach';
                     return `<div class="member-row">
                         <div class="member-info">
                             <strong>${m.prenom || ''} ${m.nom || ''}</strong>
                             <div class="member-email">${m.email || ''}</div>
                         </div>
                         <span class="status-badge ${s.cls}">${s.label}</span>
+                        ${isCoachRole ? '<span class="role-badge">Coach</span>' : ''}
                         <div class="member-actions">
                             ${m.status !== 'approved' ? `<button class="btn-ghost" onclick="setMemberStatus('${m.id}','approved')">Approuver</button>` : ''}
                             ${m.status !== 'revoked' ? `<button class="btn-ghost" onclick="setMemberStatus('${m.id}','revoked')">Révoquer</button>` : ''}
+                            ${m.status === 'approved' ? (isCoachRole
+                                ? `<button class="btn-ghost" onclick="setMemberRole('${m.id}', null)">Retirer coach</button>`
+                                : `<button class="btn-ghost" onclick="setMemberRole('${m.id}', 'coach')">Promouvoir coach</button>`) : ''}
                             <button class="btn-ghost" onclick="deleteMember('${m.id}')">Supprimer</button>
                         </div>
                     </div>`;
@@ -937,6 +948,21 @@
             try {
                 await db.collection('users').doc(uid).update({ status });
                 toast(status === 'approved' ? 'Membre approuvé' : 'Accès révoqué', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function setMemberRole(uid, role) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            try {
+                if (role) {
+                    await db.collection('users').doc(uid).update({ role });
+                    toast('Membre promu coach', 'success');
+                } else {
+                    await db.collection('users').doc(uid).update({ role: firebase.firestore.FieldValue.delete() });
+                    toast('Rôle coach retiré', 'success');
+                }
             } catch (e) {
                 toast('Erreur : ' + e.message, 'error');
             }
@@ -1355,7 +1381,7 @@
                         <div class="ev-heure">${t.label}${ev.heure ? ' · ' + ev.heure : ''}</div>
                         <div class="ev-text">${eventText(ev) || '<em>Sans détail</em>'}</div>
                     </div>
-                    <div class="day-event-actions admin-only">
+                    <div class="day-event-actions staff-only">
                         <button onclick="editMatch('${ev.id}')" aria-label="Modifier">✏️</button>
                         <button onclick="deleteMatchFromDay('${ev.id}')" aria-label="Supprimer">🗑️</button>
                     </div>
@@ -1406,7 +1432,7 @@
         }
 
         async function deleteMatchFromDay(id) {
-            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (!isAdmin && !isCoachUser) return toast('Accès refusé', 'error');
             if (!confirm('Supprimer cet événement ?')) return;
             try {
                 await db.collection('matchs').doc(id).delete();
@@ -1470,7 +1496,7 @@
         }
 
         async function saveStatsMatch() {
-            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (!isAdmin && !isCoachUser) return toast('Accès refusé', 'error');
             const id = document.getElementById('statsMatchId').value;
             const date = document.getElementById('statsMatchDate').value;
             if (!date) return toast('La date du match est obligatoire', 'error');
@@ -1659,7 +1685,7 @@
                     document.getElementById('infosGrid').innerHTML = '<p class="empty-msg">Aucune info publiée.</p>';
                     return;
                 }
-                document.getElementById('infosGrid').innerHTML = s.docs.map(d => `<div class="player-card info-card"><h4>${d.data().titre}</h4><p>${d.data().texte}</p><button class="btn-ghost admin-only" style="margin-top:14px;" onclick="deleteDoc('infos','${d.id}')">Supprimer</button></div>`).join('');
+                document.getElementById('infosGrid').innerHTML = s.docs.map(d => `<div class="player-card info-card"><h4>${d.data().titre}</h4><p>${d.data().texte}</p><button class="btn-ghost staff-only" style="margin-top:14px;" onclick="deleteDoc('infos','${d.id}')">Supprimer</button></div>`).join('');
             });
         }
 
@@ -1714,7 +1740,7 @@
         }
 
         async function saveMatch() {
-            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (!isAdmin && !isCoachUser) return toast('Accès refusé', 'error');
             const id = document.getElementById('matchId').value;
             const date = document.getElementById('matchDate').value;
             const type = document.getElementById('matchType').value;
@@ -1744,7 +1770,7 @@
         }
 
         async function saveInfo() {
-            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (!isAdmin && !isCoachUser) return toast('Accès refusé', 'error');
             const titre = document.getElementById('infoTitre').value.trim();
             if (!titre) return toast('Le titre est obligatoire', 'error');
             try {
@@ -1792,7 +1818,9 @@
         }
 
         async function deleteDoc(c, i) {
-            if (!isAdmin) return toast('Accès refusé', 'error');
+            const staffCollections = ['statsMatchs', 'infos', 'matchs'];
+            const allowed = isAdmin || (isCoachUser && staffCollections.includes(c));
+            if (!allowed) return toast('Accès refusé', 'error');
             if (confirm('Supprimer ?')) {
                 try {
                     await db.collection(c).doc(i).delete();
