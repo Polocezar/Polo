@@ -55,7 +55,10 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--parquet);
+            background-color: var(--parquet);
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iOTAwIiB2aWV3Qm94PSIwIDAgOTAwIDkwMCI+CjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzJkMTQ1MCIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjA2Ij4KICA8Y2lyY2xlIGN4PSI0NTAiIGN5PSI0NTAiIHI9IjExMCIvPgogIDxjaXJjbGUgY3g9IjQ1MCIgY3k9IjQ1MCIgcj0iMyIgZmlsbD0iIzJkMTQ1MCIvPgogIDxsaW5lIHgxPSIwIiB5MT0iNDUwIiB4Mj0iOTAwIiB5Mj0iNDUwIi8+CiAgPHJlY3QgeD0iMCIgeT0iMzMwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjI0MCIvPgogIDxyZWN0IHg9IjczMCIgeT0iMzMwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjI0MCIvPgogIDxwYXRoIGQ9Ik0gMCAxNTAgQSAzODAgMzgwIDAgMCAxIDAgNzUwIi8+CiAgPHBhdGggZD0iTSA5MDAgMTUwIEEgMzgwIDM4MCAwIDAgMCA5MDAgNzUwIi8+CiAgPGNpcmNsZSBjeD0iMTcwIiBjeT0iNDUwIiByPSI2MCIvPgogIDxjaXJjbGUgY3g9IjczMCIgY3k9IjQ1MCIgcj0iNjAiLz4KPC9nPgo8L3N2Zz4=");
+            background-attachment: fixed;
+            background-position: center top;
             color: var(--ink);
             overflow-x: hidden;
             line-height: 1.5;
@@ -226,7 +229,7 @@
         #champUpdatedAt::before { content: '●'; color: #3fa96a; font-size: 0.6rem; }
 
         /* ===== EFFECTIF ===== */
-        #page-effectif { background: var(--parquet); }
+        #page-effectif { background: transparent; }
         .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px; padding: 30px 0; }
         .player-card {
             background: var(--paper);
@@ -293,10 +296,10 @@
         .container { max-width: 1300px; margin: 0 auto; padding: 48px 24px; }
         .page-header {
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
-            margin-bottom: 28px; background: var(--paper); padding: 22px 26px;
-            border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+            margin-bottom: 28px; background: var(--violet-deep); padding: 22px 26px;
+            border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border-left: 5px solid var(--gold-bright);
         }
-        .page-header h2 { font-size: 1.5rem; color: var(--violet-deep); font-weight: 600; }
+        .page-header h2 { font-size: 1.5rem; color: var(--gold-bright); font-weight: 600; letter-spacing: 0.02em; }
 
         .table-responsive { width: 100%; overflow-x: auto; background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
         .data-table { width: 100%; min-width: 700px; border-collapse: collapse; }
