@@ -1288,7 +1288,7 @@
                     return `<div class="player-card" onclick="openPlayer('${doc.id}')">
                         <div class="player-num-panini">${j.numero || '0'}</div>
                         <div class="player-img-container"><img src="${j.photo || 'logo-alcf.png'}" class="player-img" alt="${j.prenom} ${j.nom}" onerror="this.src='logo-alcf.png'; this.onerror=null;"></div>
-                        <div class="player-info-banner"><h4>${j.prenom} ${j.nom}</h4><p>${j.poste}</p></div>
+                        <div class="player-info-banner"><h4>${j.prenom} ${j.nom}</h4><p>${j.poste}</p>${j.licence ? `<p style="color:var(--violet-deep); margin-top:6px; font-weight:700;">Licence n° ${j.licence}</p>` : ''}</div>
                         <div class="admin-only card-actions">
                             <button onclick="event.stopPropagation(); editJoueur('${doc.id}')" aria-label="Modifier">✏️</button>
                             <button onclick="event.stopPropagation(); deleteDoc('joueurs','${doc.id}')" aria-label="Supprimer">🗑️</button>
