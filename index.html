@@ -30,11 +30,11 @@
             --violet-light: #4a2680;
             --gold: #e8a13c;
             --gold-bright: #f8c667;
-            --parquet: #f7f2e9;
-            --paper: #fffdf8;
-            --ink: #1b1425;
-            --ink-soft: #6b6478;
-            --line: #e7e0d4;
+            --parquet: #0a0612;
+            --paper: #190f2e;
+            --ink: #f5f2fa;
+            --ink-soft: #a89dc7;
+            --line: rgba(255,255,255,0.09);
             --danger: #e0553f;
             --success: #3fa66a;
 
@@ -56,7 +56,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--parquet);
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iOTAwIiB2aWV3Qm94PSIwIDAgOTAwIDkwMCI+CjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzJkMTQ1MCIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjA2Ij4KICA8Y2lyY2xlIGN4PSI0NTAiIGN5PSI0NTAiIHI9IjExMCIvPgogIDxjaXJjbGUgY3g9IjQ1MCIgY3k9IjQ1MCIgcj0iMyIgZmlsbD0iIzJkMTQ1MCIvPgogIDxsaW5lIHgxPSIwIiB5MT0iNDUwIiB4Mj0iOTAwIiB5Mj0iNDUwIi8+CiAgPHJlY3QgeD0iMCIgeT0iMzMwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjI0MCIvPgogIDxyZWN0IHg9IjczMCIgeT0iMzMwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjI0MCIvPgogIDxwYXRoIGQ9Ik0gMCAxNTAgQSAzODAgMzgwIDAgMCAxIDAgNzUwIi8+CiAgPHBhdGggZD0iTSA5MDAgMTUwIEEgMzgwIDM4MCAwIDAgMCA5MDAgNzUwIi8+CiAgPGNpcmNsZSBjeD0iMTcwIiBjeT0iNDUwIiByPSI2MCIvPgogIDxjaXJjbGUgY3g9IjczMCIgY3k9IjQ1MCIgcj0iNjAiLz4KPC9nPgo8L3N2Zz4=");
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iOTAwIiB2aWV3Qm94PSIwIDAgOTAwIDkwMCI+CjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U4YTEzYyIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjA5Ij4KICA8Y2lyY2xlIGN4PSI0NTAiIGN5PSI0NTAiIHI9IjExMCIvPgogIDxjaXJjbGUgY3g9IjQ1MCIgY3k9IjQ1MCIgcj0iMyIgZmlsbD0iI2U4YTEzYyIvPgogIDxsaW5lIHgxPSIwIiB5MT0iNDUwIiB4Mj0iOTAwIiB5Mj0iNDUwIi8+CiAgPHJlY3QgeD0iMCIgeT0iMzMwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjI0MCIvPgogIDxyZWN0IHg9IjczMCIgeT0iMzMwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjI0MCIvPgogIDxwYXRoIGQ9Ik0gMCAxNTAgQSAzODAgMzgwIDAgMCAxIDAgNzUwIi8+CiAgPHBhdGggZD0iTSA5MDAgMTUwIEEgMzgwIDM4MCAwIDAgMCA5MDAgNzUwIi8+CiAgPGNpcmNsZSBjeD0iMTcwIiBjeT0iNDUwIiByPSI2MCIvPgogIDxjaXJjbGUgY3g9IjczMCIgY3k9IjQ1MCIgcj0iNjAiLz4KPC9nPgo8L3N2Zz4=");
             background-attachment: fixed;
             background-position: center top;
             color: var(--ink);
@@ -192,7 +192,7 @@
         /* Cartes de match */
         .match-row { display: flex; align-items: center; gap: 14px; padding: 14px 4px; border-bottom: 1px solid var(--line); transition: background 0.15s; }
         .match-row:last-child { border-bottom: none; }
-        .match-row:hover { background: #faf6ec; border-radius: var(--radius-sm); }
+        .match-row:hover { background: rgba(255,255,255,0.05); border-radius: var(--radius-sm); }
         .match-date { font-size: 0.68rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; min-width: 76px; line-height: 1.35; }
         .match-date strong { display: block; color: var(--ink); font-size: 0.78rem; letter-spacing: 0.02em; }
         .match-teams { flex: 1; font-size: 0.86rem; line-height: 1.5; }
@@ -270,9 +270,9 @@
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--line); gap: 1px; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
         .calendar-day { background: var(--paper); min-height: 128px; padding: 10px; transition: background 0.15s, box-shadow 0.15s; }
         .calendar-day:not(.empty) { cursor: pointer; }
-        .calendar-day:not(.empty):hover { background: #faf6ec; box-shadow: inset 0 0 0 2px rgba(232,161,60,0.4); }
-        .calendar-day.empty { background: #f2ede2; }
-        .calendar-day.today { background: #fff6e6; box-shadow: inset 0 0 0 2px var(--gold); }
+        .calendar-day:not(.empty):hover { background: rgba(255,255,255,0.06); box-shadow: inset 0 0 0 2px rgba(232,161,60,0.4); }
+        .calendar-day.empty { background: rgba(255,255,255,0.02); }
+        .calendar-day.today { background: rgba(232,161,60,0.14); box-shadow: inset 0 0 0 2px var(--gold); }
         .calendar-day strong { font-size: 0.9rem; color: var(--ink-soft); font-weight: 600; }
         .calendar-day.today strong { color: var(--gold); }
         .calendar-day-head { background: var(--violet-deep); color: white; padding: 12px; text-align: center; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -290,7 +290,7 @@
         .day-event-info .ev-heure { font-size: 0.75rem; color: var(--ink-soft); font-weight: 600; }
         .day-event-info .ev-text { font-size: 0.92rem; margin-top: 2px; }
         .day-event-actions { display: flex; gap: 6px; flex-shrink: 0; }
-        .day-event-actions button { background: rgba(0,0,0,0.06); border: none; border-radius: 6px; width: 28px; height: 28px; font-size: 0.8rem; }
+        .day-event-actions button { background: rgba(255,255,255,0.1); border: none; border-radius: 6px; width: 28px; height: 28px; font-size: 0.8rem; }
 
         /* ===== CONTAINERS ===== */
         .container { max-width: 1300px; margin: 0 auto; padding: 48px 24px; }
@@ -306,7 +306,7 @@
         .data-table th, .data-table td { padding: 14px; border-bottom: 1px solid var(--line); text-align: center; }
         .data-table th { background: var(--violet-deep); color: white; font-weight: 500; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.04em; }
         .data-table tbody tr { transition: background 0.15s; }
-        .data-table tbody tr:hover { background: #faf6ec; }
+        .data-table tbody tr:hover { background: rgba(255,255,255,0.05); }
         .data-table td:first-child { font-weight: 600; text-align: left; }
 
         .empty-msg { text-align: center; color: var(--ink-soft); padding: 50px 20px; grid-column: 1 / -1; font-size: 0.95rem; }
