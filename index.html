@@ -151,14 +151,14 @@
         #page-accueil { background: radial-gradient(ellipse at top, var(--violet) 0%, var(--court-bg) 70%); }
 
         /* ===== HERO ===== */
-        .hero { color: white; padding: 64px 3% 0; display: block; min-height: 88vh; position: relative; }
+        .hero { color: white; padding: 64px 3%; display: flex; align-items: center; min-height: 88vh; position: relative; }
         .hero::before {
             content: '';
             position: absolute; inset: 0;
             background-image: repeating-linear-gradient(90deg, transparent, transparent 78px, rgba(255,255,255,0.025) 78px, rgba(255,255,255,0.025) 79px);
             pointer-events: none;
         }
-        .hero-content { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 56px; max-width: 1560px; margin: 0 auto; align-items: center; width: 100%; position: relative; padding-bottom: 70px; }
+        .hero-content { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 56px; max-width: 1560px; margin: 0 auto; align-items: center; width: 100%; position: relative; }
         .hero-side-img { position: relative; }
         .hero-side-img img { width: 100%; display: block; filter: saturate(1.05) contrast(1.05); box-shadow: var(--shadow-lg); }
         .hero-side-left img { clip-path: polygon(0 0, 94% 0, 100% 100%, 0 92%); }
