@@ -168,10 +168,10 @@
         /* ===== HERO ===== */
         .hero {
             color: white; padding: 56px 4% 64px; display: flex; align-items: center; position: relative;
-            min-height: 400px;
+            min-height: 360px;
             background:
-                linear-gradient(90deg, rgba(14,10,23,0.97) 0%, rgba(14,10,23,0.9) 22%, rgba(14,10,23,0.5) 50%, rgba(14,10,23,0.1) 75%, rgba(14,10,23,0) 90%),
-                url('equipe-2025-2026.png') center 12% / cover no-repeat;
+                linear-gradient(90deg, rgba(14,10,23,0.9) 0%, rgba(14,10,23,0.78) 20%, rgba(14,10,23,0.35) 48%, rgba(14,10,23,0.05) 70%, rgba(14,10,23,0) 88%),
+                url('equipe-2025-2026.png') 25% 30% / cover no-repeat;
         }
         .hero::before {
             content: '';
@@ -888,13 +888,19 @@
                 return;
             }
             if (Notification.permission === 'granted') {
-                btn.textContent = '🔔 Notifications activées';
+                btn.textContent = '🔔';
+                btn.title = 'Notifications activées';
+                btn.style.color = 'var(--success)';
                 btn.disabled = true;
             } else if (Notification.permission === 'denied') {
-                btn.textContent = '🔕 Notifications bloquées';
+                btn.textContent = '🔕';
+                btn.title = 'Notifications bloquées';
+                btn.style.color = 'var(--danger)';
                 btn.disabled = true;
             } else {
-                btn.textContent = '🔔 Activer les notifications';
+                btn.textContent = '🔔';
+                btn.title = 'Activer les notifications';
+                btn.style.color = '';
                 btn.disabled = false;
             }
         }
