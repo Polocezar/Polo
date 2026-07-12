@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALCF Basket - PNM | AL Chazeau Fayol</title>
+    <meta name="description" content="Site officiel de l'AL Chazeau Fayol Basket-Ball, équipe PNM de Firminy (Loire). Retrouvez le calendrier, le classement, l'effectif et les statistiques de l'équipe.">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ALCF Basket - PNM">
+    <meta property="og:description" content="Site officiel de l'AL Chazeau Fayol Basket-Ball, équipe PNM de Firminy (Loire).">
+    <meta property="og:image" content="https://polocezar.github.io/Polo/equipe-2025-2026.png">
+    <meta property="og:url" content="https://polocezar.github.io/Polo/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+    <style>
+        :root {
+            /* Palette — parquet blanc, inspirée du tableau d'affichage et des lignes de terrain */
+            --court-bg: #0e0a17;
+            --violet-deep: #14101e;
+            --violet: #1c1230;
+            --violet-light: #241536;
+            --gold: #e8a13c;
+            --gold-bright: #f8c667;
+            --gold-deep: #a56a1a;
+            --parquet: #241536;
+            --paper: #ffffff;
+            --ink: #17141d;
+            --ink-soft: #6b6478;
+            --line: #e7e4dc;
+            --danger: #e0553f;
+            --success: #3fa66a;
+
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --shadow-sm: 0 2px 8px rgba(28, 15, 51, 0.08);
+            --shadow-md: 0 8px 24px rgba(28, 15, 51, 0.12);
+            --shadow-lg: 0 20px 50px rgba(28, 15, 51, 0.25);
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--parquet);
+            color: var(--ink);
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        h1, h2, h3, h4, .scoreboard {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        button, input, select, textarea { font-family: inherit; }
+        button { cursor: pointer; }
+        img { max-width: 100%; display: block; }
+
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 3px solid var(--gold);
+            outline-offset: 2px;
+        }
+
+        /* ===== APP SHELL (sidebar + main) ===== */
+        .app-shell { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 224px; flex-shrink: 0; background: var(--violet-deep); color: white;
+            display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh;
+            overflow-y: auto; z-index: 1200; transition: transform 0.25s var(--ease);
+        }
+        .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 22px 20px 18px; }
+        .sidebar-logo img { width: 38px; height: 38px; object-fit: contain; }
+        .sidebar-logo span { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.02em; }
+        .sidebar-logo span em { color: var(--gold-bright); font-style: normal; }
+        .sidebar-nav { flex: 1; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+        .sidebar-nav button.nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px;
+            background: none; border: none; color: rgba(255,255,255,0.6); font-size: 0.8rem; font-weight: 500;
+            text-align: left; transition: background 0.15s, color 0.15s; width: 100%;
+        }
+        .sidebar-nav button.nav-link .ic { font-size: 0.95rem; width: 18px; text-align: center; flex-shrink: 0; }
+        .sidebar-nav button.nav-link:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .sidebar-nav button.nav-link.active { background: var(--gold); color: var(--violet-deep); font-weight: 700; }
+        .sidebar-nav button.nav-link .side-badge { margin-left: auto; background: var(--danger); color: #fff; font-size: 0.62rem; font-weight: 700; padding: 2px 6px; border-radius: 999px; }
+        .sidebar-footer { padding: 14px 18px 22px; }
+        .sidebar-season-box { background: rgba(255,255,255,0.06); border-radius: 10px; padding: 12px 14px; font-size: 0.7rem; margin-bottom: 18px; line-height: 1.5; }
+        .sidebar-season-box strong { display: block; font-size: 0.78rem; margin-bottom: 2px; }
+        .sidebar-tagline { font-family: 'Oswald', sans-serif; font-size: 0.68rem; color: rgba(255,255,255,0.55); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+        .sidebar-tagline em { color: var(--gold-bright); font-style: normal; display: block; }
+        .sidebar-close-btn { display: none; }
+
+        .main-area { flex: 1; min-width: 0; }
+        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 28px; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 900; }
+        .topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+        .topbar-title { font-weight: 700; font-size: 0.9rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .topbar-badge { background: var(--gold); color: var(--violet-deep); font-size: 0.62rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-left: 8px; letter-spacing: 0.03em; }
+        .topbar-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+        .hamburger-btn { display: none; background: none; border: none; font-size: 1.3rem; color: var(--ink); padding: 4px; }
+        .bell-btn { position: relative; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .user-chip { display: flex; align-items: center; gap: 8px; background: none; border: none; padding: 4px 6px; border-radius: 10px; }
+        .user-chip:hover { background: var(--parquet); }
+        .user-chip .avatar-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); color: var(--violet-deep); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.78rem; flex-shrink: 0; }
+        .user-chip .u-text { text-align: left; }
+        .user-chip .u-name { font-size: 0.78rem; font-weight: 600; color: var(--ink); line-height: 1.2; }
+        .user-chip .u-role { font-size: 0.65rem; color: var(--ink-soft); line-height: 1.2; }
+        .sidebar-overlay { display: none; }
+
+        @media (max-width: 900px) {
+            .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-close-btn { display: block; margin-left: auto; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 1.1rem; padding: 8px 12px; }
+            .hamburger-btn { display: block; }
+            .sidebar-overlay.open { display: block; position: fixed; inset: 0; background: rgba(14,10,23,0.5); z-index: 1100; }
+            .topbar-title { max-width: 140px; }
+            .user-chip .u-text { display: none; }
+            .bell-btn span { display: none; }
+        }
+
+        /* ===== BOUTONS ===== */
+        .btn {
+            padding: 11px 24px;
+            border-radius: 999px;
+            font-weight: 600;
+            border: none;
+            transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s var(--ease);
+            text-transform: uppercase;
+            font-size: 0.82rem;
+            letter-spacing: 0.04em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-gold { background: linear-gradient(135deg, var(--gold-bright), var(--gold)); color: var(--violet-deep); }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(232, 161, 60, 0.35); }
+        .btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.5); color: white; }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: white; }
+        .navbar .btn-outline { border-color: var(--line); color: var(--ink-soft); }
+        .navbar .btn-outline:hover { background: var(--parquet); border-color: var(--ink-soft); color: var(--ink); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(224, 85, 63, 0.35); }
+        .btn-ghost { background: rgba(28,15,51,0.06); color: var(--ink); padding: 8px 14px; font-size: 0.75rem; border-radius: var(--radius-sm); }
+        .btn-ghost:hover { background: rgba(28,15,51,0.12); }
+        .admin-only { display: none !important; }
+        body.is-admin .admin-only { display: inline-flex !important; }
+        .staff-only { display: none !important; }
+        body.is-admin .staff-only, body.is-coach .staff-only { display: inline-flex !important; }
+
+        /* ===== PAGES ===== */
+        .page { display: none; width: 100%; min-height: 92vh; }
+        .page.active { display: block !important; animation: fadeIn 0.4s var(--ease); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ===== HERO ===== */
+        .hero {
+            color: white; padding: 32px 4%; display: flex; align-items: center; position: relative;
+            min-height: 420px; overflow: hidden;
+            background: linear-gradient(120deg, #241536 0%, #1c1230 55%, #14101e 100%);
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 78px, rgba(255,255,255,0.025) 78px, rgba(255,255,255,0.025) 79px);
+            pointer-events: none;
+        }
+        .hero-content { max-width: 1300px; margin: 0 auto; width: 100%; position: relative; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 20px; }
+        .hero-text { text-align: left; max-width: 480px; }
+        .hero-photo { justify-self: end; max-height: 380px; width: auto; max-width: 100%; object-fit: contain; }
+        .hero h1 { font-size: 3.4rem; line-height: 1; margin-bottom: 10px; font-weight: 700; }
+        .hero h1 span { color: var(--gold-bright); }
+        .hero-subtitle { font-size: 0.95rem; color: rgba(255,255,255,0.85); font-weight: 500; letter-spacing: 0.02em; margin-bottom: 14px; }
+        .hero-tagline { font-family: 'Oswald', sans-serif; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 26px; }
+        .hero-btns { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+        @media (max-width: 900px) {
+            .hero-content { grid-template-columns: 1fr; }
+            .hero-photo { display: none; }
+            .hero-text { padding-bottom: 24px; }
+        }
+
+        /* ===== DASHBOARD CARD ROWS ===== */
+        .dash-card.dash-card-dark { background: linear-gradient(120deg, #241536 0%, #1c1230 55%, #14101e 100%); color: rgba(255,255,255,0.9); }
+        .dash-card-dark .dash-card-head { color: #fff; }
+        .dash-card-dark .dash-empty { color: rgba(255,255,255,0.5); }
+        .dash-card-dark .dash-mini-table th { color: rgba(255,255,255,0.45); }
+        .dash-card-dark .dash-mini-table td { border-top-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.75); }
+        .dash-card-dark .dash-mini-table tr.row-alcf td { background: rgba(232,161,60,0.18); color: var(--gold-bright); }
+        .dash-card-dark .dash-stat-tile { background: rgba(255,255,255,0.07); }
+        .dash-card-dark .dash-stat-tile .v { color: var(--gold-bright); }
+        .dash-card-dark .dash-stat-tile .l { color: rgba(255,255,255,0.5); }
+        .dash-card-dark .dash-match-team { color: #fff; }
+        .dash-card-dark .dash-match-meta, .dash-card-dark .dash-match-loc, .dash-card-dark .dash-match-vs { color: rgba(255,255,255,0.55); }
+        .dash-card-dark .dash-link { background: rgba(255,255,255,0.08); color: var(--gold-bright); }
+        .dash-card-dark .dash-link:hover { background: rgba(255,255,255,0.15); }
+
+        .dash-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1300px; margin: -40px auto 0; padding: 0 24px; position: relative; z-index: 5; }
+        @media (max-width: 980px) { .dash-row { grid-template-columns: 1fr; margin-top: -20px; } }
+        .dash-card { background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 20px 22px; }
+        .dash-card-head { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; color: var(--ink); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.03em; }
+        .dash-card-head .ic { font-size: 0.95rem; }
+        .dash-empty { color: var(--ink-soft); font-size: 0.82rem; padding: 10px 0; }
+
+        .dash-match-teams { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0 14px; }
+        .dash-match-badge { width: 50px; height: 50px; border-radius: 50%; background: var(--violet-deep); color: var(--gold-bright); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; margin: 0 auto 6px; }
+        .dash-match-team { text-align: center; font-size: 0.72rem; font-weight: 700; color: var(--ink); text-transform: uppercase; }
+        .dash-match-vs { font-size: 0.72rem; color: var(--ink-soft); font-weight: 700; }
+        .dash-match-meta { font-size: 0.76rem; color: var(--ink-soft); text-align: center; margin-bottom: 4px; }
+        .dash-match-loc { font-size: 0.72rem; color: var(--ink-soft); text-align: center; margin-bottom: 14px; }
+
+        .dash-mini-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+        .dash-mini-table th { text-align: left; color: var(--ink-soft); font-weight: 600; padding: 4px 6px; font-size: 0.68rem; text-transform: uppercase; }
+        .dash-mini-table td { padding: 7px 6px; border-top: 1px solid var(--line); }
+        .dash-mini-table tr.row-alcf td { background: rgba(232,161,60,0.12); font-weight: 700; }
+        .dash-mini-table td:first-child { color: var(--ink-soft); }
+
+        .dash-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .dash-stat-tile { background: var(--parquet); border-radius: 10px; padding: 12px 14px; }
+        .dash-stat-tile .v { font-family: 'Oswald', sans-serif; font-size: 1.3rem; font-weight: 600; color: var(--violet-deep); }
+        .dash-stat-tile .l { font-size: 0.62rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; margin-top: 2px; }
+
+        .dash-link { display: block; text-align: center; margin-top: 14px; font-size: 0.76rem; font-weight: 600; color: var(--violet-deep); background: var(--parquet); padding: 9px; border-radius: var(--radius-sm); border: none; width: 100%; }
+        .dash-link:hover { background: var(--line); }
+
+        .dash-row-2 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; max-width: 1300px; margin: 22px auto 50px; padding: 0 24px; }
+        @media (max-width: 980px) { .dash-row-2 { grid-template-columns: 1fr; } }
+        .effectif-preview-strip { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 6px; }
+        .effectif-preview-strip .mini-card { flex: 0 0 108px; background: var(--violet-deep); border-radius: 12px; overflow: hidden; color: #fff; text-align: center; }
+        .effectif-preview-strip .mini-card img { width: 100%; height: 116px; object-fit: cover; }
+        .effectif-preview-strip .mini-card .num { font-size: 0.62rem; color: var(--gold-bright); font-weight: 700; padding-top: 7px; }
+        .effectif-preview-strip .mini-card .nm { font-size: 0.7rem; font-weight: 700; padding: 3px 6px 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .effectif-preview-strip .mini-card .ps { font-size: 0.58rem; color: rgba(255,255,255,0.5); padding-bottom: 9px; text-transform: uppercase; letter-spacing: 0.02em; }
+        .actu-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 0.8rem; }
+        .actu-item:last-child { border-bottom: none; }
+        .actu-ic { width: 34px; height: 34px; border-radius: 8px; background: var(--parquet); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+        .actu-item .actu-title { font-weight: 600; color: var(--ink); font-size: 0.78rem; }
+        .actu-item .actu-txt { color: var(--ink-soft); font-size: 0.7rem; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+
+        /* ===== CHAMPIONNAT ===== */
+        /* Championnat — classement et matchs FFBB, données propres via Firestore */
+        .champ-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+        @media (max-width: 900px) { .champ-layout { grid-template-columns: 1fr; } }
+        .champ-block { background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 24px 24px 8px; }
+        .champ-block h3 { color: var(--violet-deep); font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+
+        /* Cartes de match */
+        .match-row { display: flex; align-items: center; gap: 14px; padding: 14px 4px; border-bottom: 1px solid var(--line); transition: background 0.15s; }
+        .match-row:last-child { border-bottom: none; }
+        .match-row:hover { background: #faf6ec; border-radius: var(--radius-sm); }
+        .match-date { font-size: 0.68rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; min-width: 76px; line-height: 1.35; }
+        .match-date strong { display: block; color: var(--ink); font-size: 0.78rem; letter-spacing: 0.02em; }
+        .match-teams { flex: 1; font-size: 0.86rem; line-height: 1.5; }
+        .match-teams .team-line { display: flex; justify-content: space-between; gap: 10px; }
+        .match-teams .alcf { color: var(--violet-deep); font-weight: 700; }
+        .match-teams-scored { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .match-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.86rem; padding: 4px 10px; border-radius: 8px; }
+        .match-line .alcf { color: var(--violet-deep); font-weight: 700; }
+        .match-line .score { font-weight: 700; min-width: 32px; text-align: right; color: var(--ink); }
+        .match-line.win { background: rgba(45, 148, 96, 0.16); }
+        .match-line.win .alcf, .match-line.win .score { color: #1f7a4d; }
+        .match-line.loss { background: rgba(196, 68, 68, 0.14); }
+        .match-line.loss .alcf, .match-line.loss .score { color: #b8382f; }
+        .score-pill { min-width: 62px; text-align: center; font-weight: 700; font-size: 0.86rem; border-radius: 999px; padding: 5px 10px; white-space: nowrap; background: rgba(28,15,51,0.06); color: var(--ink); }
+        .score-pill.win { background: rgba(45, 148, 96, 0.15); color: #1f7a4d; }
+        .score-pill.loss { background: rgba(196, 68, 68, 0.14); color: #b8382f; }
+        .score-pill.upcoming { background: transparent; color: var(--ink-soft); font-weight: 600; font-size: 0.72rem; }
+
+        /* Classement */
+        .pos-badge { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--violet-deep); color: var(--gold-bright); font-weight: 700; font-size: 0.78rem; }
+        .row-alcf .pos-badge { background: var(--gold); color: var(--violet-deep); }
+        .data-table tr.row-alcf td { background: rgba(232, 161, 60, 0.14); }
+        .data-table td.col-equipe { font-weight: 700; }
+        .data-table th.col-hide, .data-table td.col-hide { display: table-cell; }
+        @media (max-width: 620px) {
+            .data-table th.col-hide, .data-table td.col-hide { display: none; }
+            .data-table th:first-child, .data-table td:first-child,
+            .data-table th.col-equipe, .data-table td.col-equipe { position: sticky; left: 0; background: var(--paper); z-index: 1; }
+            .data-table th:first-child, .data-table td:first-child { left: 0; }
+            .data-table th.col-equipe, .data-table td.col-equipe { left: 46px; }
+            .data-table th { background: var(--violet-deep); }
+        }
+        #champUpdatedAt { display: inline-flex; align-items: center; gap: 6px; }
+        #champUpdatedAt::before { content: '●'; color: #3fa96a; font-size: 0.6rem; }
+
+        /* ===== EFFECTIF ===== */
+        #page-effectif { background: var(--parquet); }
+        .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px; padding: 30px 0; }
+        .player-card {
+            background: var(--paper);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+            overflow: hidden;
+        }
+        .player-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+        .player-img-container { width: 100%; height: 250px; overflow: hidden; position: relative; background: var(--violet-deep); }
+        .player-img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; transition: transform 0.4s var(--ease); }
+        .player-card:hover .player-img { transform: scale(1.06); }
+        .player-num-panini {
+            position: absolute; top: 10px; left: 10px;
+            background: var(--gold-bright); color: var(--violet-deep);
+            width: 38px; height: 38px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.1rem;
+            box-shadow: var(--shadow-sm); z-index: 5;
+        }
+        .player-info-banner { padding: 14px; text-align: center; }
+        .player-info-banner h4 { font-size: 1.05rem; font-weight: 600; }
+        .player-info-banner p { color: var(--gold); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+        .player-card .admin-only.card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; z-index: 20; }
+        .player-card .card-actions button { background: rgba(255,255,255,0.9); border: none; border-radius: 8px; width: 30px; height: 30px; font-size: 0.85rem; }
+
+        /* ===== CALENDRIER ===== */
+        .calendar-nav { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 24px; }
+        .calendar-nav button {
+            background: var(--violet); color: white; border: none;
+            border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem;
+            transition: background 0.15s;
+        }
+        .calendar-nav button:hover { background: var(--violet-light); }
+        .calendar-nav h3 { min-width: 220px; text-align: center; font-size: 1.3rem; color: var(--violet-deep); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--line); gap: 1px; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+        .calendar-day { background: var(--paper); min-height: 128px; padding: 10px; transition: background 0.15s, box-shadow 0.15s; }
+        .calendar-day:not(.empty) { cursor: pointer; }
+        .calendar-day:not(.empty):hover { background: #faf6ec; box-shadow: inset 0 0 0 2px rgba(232,161,60,0.4); }
+        .calendar-day.empty { background: #f2ede2; }
+        .calendar-day.today { background: #fff6e6; box-shadow: inset 0 0 0 2px var(--gold); }
+        .calendar-day strong { font-size: 0.9rem; color: var(--ink-soft); font-weight: 600; }
+        .calendar-day.today strong { color: var(--gold); }
+        .calendar-day-head { background: var(--violet-deep); color: white; padding: 12px; text-align: center; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+        .event-item { font-size: 0.82rem; padding: 6px 8px; border-radius: 6px; margin-top: 5px; color: white; font-weight: 700; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .event-match { background: var(--violet); border-left: 3px solid var(--gold); }
+        .event-entrainement { background: #2f7fb8; border-left: 3px solid #1d5f8f; }
+        .event-anniversaire { background: #c2478a; border-left: 3px solid #8f3266; }
+        .event-repas { background: #d97a2e; border-left: 3px solid #a55a20; }
+        .event-autre { background: #6b6478; border-left: 3px solid #4d4759; }
+
+        /* Détails du jour */
+        .day-event-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: var(--radius-sm); background: #faf7f0; margin-bottom: 10px; }
+        .day-event-badge { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: white; }
+        .day-event-info { flex: 1; text-align: left; }
+        .day-event-info .ev-heure { font-size: 0.75rem; color: var(--ink-soft); font-weight: 600; }
+        .day-event-info .ev-text { font-size: 0.92rem; margin-top: 2px; }
+        .day-event-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .day-event-actions button { background: rgba(0,0,0,0.06); border: none; border-radius: 6px; width: 28px; height: 28px; font-size: 0.8rem; }
+
+        /* ===== CONTAINERS ===== */
+        .container { max-width: 1300px; margin: 0 auto; padding: 48px 24px; }
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+            margin-bottom: 28px; background: var(--paper); padding: 22px 26px;
+            border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+        }
+        .page-header h2 { font-size: 1.5rem; color: var(--violet-deep); font-weight: 600; }
+
+        .table-responsive { width: 100%; overflow-x: auto; background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+        .data-table { width: 100%; min-width: 700px; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 14px; border-bottom: 1px solid var(--line); text-align: center; }
+        .data-table th { background: var(--violet-deep); color: white; font-weight: 500; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.04em; }
+        .data-table tbody tr { transition: background 0.15s; }
+        .data-table tbody tr:hover { background: #faf6ec; }
+        .data-table td:first-child { font-weight: 600; text-align: left; }
+
+        .empty-msg { text-align: center; color: var(--ink-soft); padding: 50px 20px; grid-column: 1 / -1; font-size: 0.95rem; }
+
+        /* ===== MODALES ===== */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(18, 10, 31, 0.72); backdrop-filter: blur(4px);
+            z-index: 2000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; animation: overlayIn 0.2s var(--ease); }
+        @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: var(--paper); border-radius: var(--radius-lg); padding: 32px;
+            max-width: 550px; width: 100%; position: relative; max-height: 90vh; overflow-y: auto;
+            animation: modalIn 0.3s var(--ease);
+        }
+        @keyframes modalIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal h3 { color: var(--violet-deep); font-size: 1.3rem; margin-bottom: 6px; }
+        .modal-close {
+            position: absolute; top: 20px; right: 20px; border: none;
+            background: #f0ece2; border-radius: 50%; width: 34px; height: 34px;
+            font-weight: bold; color: var(--ink-soft); transition: background 0.15s;
+        }
+        .modal-close:hover { background: #e5dfd0; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; text-align: left; margin-top: 18px; }
+        .field-block { display: flex; flex-direction: column; }
+        .full-width { grid-column: 1 / -1; }
+        .modal label { font-size: 0.75rem; color: var(--ink-soft); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+        .modal input, .modal select, .modal textarea {
+            width: 100%; padding: 12px 14px; border: 1.5px solid var(--line);
+            border-radius: var(--radius-sm); font-size: 0.95rem; transition: border-color 0.15s;
+            background: var(--paper); color: var(--ink);
+        }
+        .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--gold); outline: none; }
+        .modal textarea { resize: vertical; min-height: 100px; }
+
+        /* ===== LOGIN ===== */
+        .login-box { background: var(--paper); padding: 44px 36px; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-md); }
+        .login-box h3 { color: var(--violet-deep); margin-bottom: 20px; font-size: 1.3rem; }
+        .login-box input { width: 100%; margin: 8px 0; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 0.95rem; }
+        .login-box input:focus { border-color: var(--gold); outline: none; }
+
+        /* ===== SKELETON LOADING ===== */
+        .skeleton-card { background: var(--paper); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+        .skeleton-block { background: linear-gradient(90deg, #ece6d9 25%, #f5f1e6 50%, #ece6d9 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .skeleton-card .skeleton-block.img { height: 250px; }
+        .skeleton-card .skeleton-block.line { height: 14px; margin: 14px auto; width: 60%; border-radius: 4px; }
+
+        /* ===== TOASTS ===== */
+        #toastContainer { position: fixed; bottom: 24px; right: 24px; z-index: 5000; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: var(--violet-deep); color: white; padding: 14px 20px;
+            border-radius: var(--radius-sm); box-shadow: var(--shadow-md);
+            font-size: 0.88rem; font-weight: 500; max-width: 320px;
+            animation: toastIn 0.3s var(--ease);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .toast.hide { animation: toastOut 0.25s var(--ease) forwards; }
+        @keyframes toastOut { to { opacity: 0; transform: translateX(30px); } }
+
+        /* ===== GALERIE ===== */
+        .gallery-card { padding: 10px; }
+        .gallery-card .player-img-container { height: 220px; border-radius: var(--radius-sm); }
+        .gallery-card .card-footer { padding: 10px; text-align: center; }
+
+        /* ===== STATS ===== */
+        .stat-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-top: 14px; }
+        .stat-metric { background: #faf7f0; border-radius: var(--radius-sm); padding: 14px 16px; }
+        .stat-metric .stat-label { font-size: 0.72rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; font-weight: 600; }
+        .stat-metric .stat-value { font-family: 'Oswald', sans-serif; font-size: 1.4rem; color: var(--violet-deep); font-weight: 600; margin-top: 4px; }
+        .stat-metric .stat-value.win { color: var(--success); }
+        .stat-metric .stat-value.loss { color: var(--danger); }
+        .stat-player-card { background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 18px 20px; }
+        .stat-player-card h4 { font-size: 1.05rem; color: var(--violet-deep); margin-bottom: 2px; }
+        .stat-badge { background: #fdeecb; color: #a5680c; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; letter-spacing: 0.03em; white-space: nowrap; }
+        .stat-section-label { font-size: 0.7rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; margin: 14px 0 6px; }
+        .stat-row { display: flex; justify-content: space-between; font-size: 0.88rem; padding: 3px 0; }
+        .stat-row.strong { font-weight: 700; color: var(--ink); }
+        .stat-subrow { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--ink-soft); padding: 2px 0 2px 12px; }
+        .stat-input-row { display: grid; grid-template-columns: minmax(110px, 1.4fr) repeat(7, minmax(44px, 1fr)); gap: 8px; align-items: center; }
+        .stat-input-row.head { font-size: 0.66rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.02em; font-weight: 700; }
+        .stat-input-row .stat-player-name { font-weight: 600; color: var(--violet-deep); font-size: 0.82rem; }
+        .stat-input-row input { padding: 8px 6px; font-size: 0.85rem; text-align: center; border: 1.5px solid var(--line); border-radius: var(--radius-sm); }
+        @media (max-width: 700px) {
+            .stat-input-row { grid-template-columns: 90px repeat(7, 40px); font-size: 0.7rem; overflow-x: auto; }
+        }
+
+        /* ===== INFOS ===== */
+        .info-card { text-align: left; padding: 22px; }
+        .info-card h4 { color: var(--violet-deep); margin-bottom: 8px; font-size: 1.1rem; }
+        .info-card p { color: var(--ink-soft); font-size: 0.9rem; line-height: 1.6; }
+
+        /* ===== AUTH GATE ===== */
+        #authGate {
+            position: fixed; inset: 0; z-index: 9000;
+            background: radial-gradient(ellipse at top, var(--violet) 0%, var(--court-bg) 70%);
+            display: flex; align-items: center; justify-content: center; padding: 24px;
+            overflow-y: auto;
+        }
+        .gate-card { background: var(--paper); border-radius: var(--radius-lg); padding: 40px 36px; max-width: 400px; width: 100%; box-shadow: var(--shadow-lg); text-align: center; }
+        .gate-card h2 { color: var(--violet-deep); font-size: 1.4rem; margin-bottom: 6px; }
+        .gate-card p.gate-sub { color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 20px; }
+        .gate-tabs { display: flex; gap: 6px; background: #f0ece2; border-radius: 999px; padding: 4px; margin-bottom: 24px; }
+        .gate-tabs button { flex: 1; border: none; background: none; padding: 9px; border-radius: 999px; font-weight: 600; font-size: 0.82rem; color: var(--ink-soft); transition: all 0.2s var(--ease); }
+        .gate-tabs button.active { background: var(--violet-deep); color: white; }
+        .gate-form input, .gate-form select { width: 100%; margin: 6px 0; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 0.92rem; }
+        .gate-form input:focus { border-color: var(--gold); outline: none; }
+        .gate-icon { font-size: 2.6rem; margin-bottom: 10px; }
+        #gatePending, #gateRevoked { display: none; }
+
+        /* ===== MEMBRES (admin) ===== */
+        .member-row { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--paper); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 12px; flex-wrap: wrap; }
+        .member-info { flex: 1; min-width: 180px; text-align: left; }
+        .member-info strong { color: var(--violet-deep); }
+        .member-info div.member-email { color: var(--ink-soft); font-size: 0.82rem; }
+        .status-badge { padding: 5px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+        .status-pending { background: #fdeecb; color: #a5680c; }
+        .status-approved { background: #d9f2e3; color: var(--success); }
+        .status-revoked { background: #fbe0dc; color: var(--danger); }
+        .role-badge { padding: 5px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; background: #e4dcf7; color: #5b3ea6; }
+        .member-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 990px) {
+            .hero-content { grid-template-columns: 1fr; }
+            .hero-text { text-align: left; max-width: none; }
+            .hero h1 { font-size: 2.3rem; }
+            .navbar { padding: 10px 16px; }
+            .nav-menu button.nav-link { padding: 8px 10px; font-size: 0.75rem; }
+            .nav-logo span { font-size: 1.1rem; }
+            .nav-logo img { height: 36px; }
+            .players-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+            .calendar-day { min-height: 82px; font-size: 0.7rem; padding: 6px; }
+            .calendar-nav h3 { min-width: 150px; font-size: 1.05rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .container { padding: 28px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toastContainer"></div>
+
+    <div id="authGate">
+        <div class="gate-card">
+            <div id="gateAuthForms">
+                <div class="gate-icon">🏀</div>
+                <h2>ALCF Basket</h2>
+                <p class="gate-sub">Ce site est réservé aux membres approuvés du club.</p>
+                <div class="gate-tabs">
+                    <button id="gateTabLogin" class="active" onclick="switchGateTab('login')">Connexion</button>
+                    <button id="gateTabRegister" onclick="switchGateTab('register')">Inscription</button>
+                </div>
+                <div id="gateLoginForm" class="gate-form">
+                    <input type="email" id="loginEmail" placeholder="Adresse email">
+                    <input type="password" id="loginPassword" placeholder="Mot de passe">
+                    <button class="btn btn-gold" style="width:100%; margin-top:14px; justify-content:center;" onclick="doLogin()">Se connecter</button>
+                </div>
+                <div id="gateRegisterForm" class="gate-form" style="display:none;">
+                    <input type="text" id="regPrenom" placeholder="Prénom">
+                    <input type="text" id="regNom" placeholder="Nom">
+                    <input type="email" id="regEmail" placeholder="Adresse email">
+                    <input type="password" id="regPassword" placeholder="Mot de passe (6 caractères min.)">
+                    <input type="password" id="regPassword2" placeholder="Confirmer le mot de passe">
+                    <label style="display:flex; align-items:flex-start; gap:8px; margin-top:12px; text-align:left; font-size:0.8rem; color:var(--ink-soft); cursor:pointer; font-weight:400;">
+                        <input type="checkbox" id="regConsent" style="margin-top:3px; width:auto;">
+                        <span>J'accepte les <a href="#" onclick="event.preventDefault(); openModal('confidentialite');" style="color:var(--violet-deep); font-weight:600; text-decoration:underline;">conditions d'utilisation et la politique de confidentialité</a> du site.</span>
+                    </label>
+                    <button class="btn btn-gold" style="width:100%; margin-top:14px; justify-content:center;" onclick="doRegister()">Créer mon compte</button>
+                </div>
+            </div>
+            <div id="gatePending">
+                <div class="gate-icon">⏳</div>
+                <h2>En attente de validation</h2>
+                <p class="gate-sub">Ton inscription a bien été reçue. L'administrateur du club doit valider ton compte avant que tu puisses accéder au site.</p>
+                <button class="btn btn-outline" style="width:100%; justify-content:center; color:var(--violet-deep); border-color:var(--violet-deep);" onclick="doLogout()">Se déconnecter</button>
+            </div>
+            <div id="gateRevoked">
+                <div class="gate-icon">🚫</div>
+                <h2>Accès non autorisé</h2>
+                <p class="gate-sub">Ton accès à ce site a été révoqué. Contacte l'administrateur du club si tu penses qu'il s'agit d'une erreur.</p>
+                <button class="btn btn-outline" style="width:100%; justify-content:center; color:var(--violet-deep); border-color:var(--violet-deep);" onclick="doLogout()">Se déconnecter</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-confidentialite" style="z-index:9500;"><div class="modal" style="max-width:640px;"><button class="modal-close" onclick="closeModal('confidentialite')">×</button><h3>Politique de confidentialité</h3>
+        <div style="margin-top:16px; text-align:left; display:flex; flex-direction:column; gap:14px; font-size:0.88rem; color:var(--ink);">
+            <div>
+                <strong style="color:var(--violet-deep);">Qui collecte vos données ?</strong>
+                <p style="margin-top:4px; color:var(--ink-soft);">L'AL Chazeau Fayol Basket-Ball (ALCF), via ce site de gestion interne du club, utilisé pour la communication, l'organisation des matchs/entraînements et le suivi de l'équipe PNM.</p>
+            </div>
+            <div>
+                <strong style="color:var(--violet-deep);">Quelles données sont collectées ?</strong>
+                <p style="margin-top:4px; color:var(--ink-soft);">Lors de l'inscription : prénom, nom, adresse email. Pour les membres de l'effectif, des informations complémentaires peuvent être ajoutées par un administrateur : date de naissance, taille, adresse postale, numéro de téléphone, numéro de licence FFBB et photo.</p>
+            </div>
+            <div>
+                <strong style="color:var(--violet-deep);">Pourquoi ces données ?</strong>
+                <p style="margin-top:4px; color:var(--ink-soft);">Ces informations servent uniquement à la gestion sportive et administrative du club (contact des joueurs, organisation de la saison, suivi des licences) et ne sont jamais transmises à des tiers ni utilisées à des fins commerciales.</p>
+            </div>
+            <div>
+                <strong style="color:var(--violet-deep);">Qui peut voir ces données ?</strong>
+                <p style="margin-top:4px; color:var(--ink-soft);">Uniquement les membres du club dont l'accès a été approuvé par l'administrateur, et l'administrateur lui-même. L'accès est protégé par authentification et peut être révoqué à tout moment.</p>
+            </div>
+            <div>
+                <strong style="color:var(--violet-deep);">Combien de temps sont-elles conservées ?</strong>
+                <p style="margin-top:4px; color:var(--ink-soft);">Les données sont conservées pendant la durée d'activité du membre au sein du club, et supprimées sur simple demande ou lors du départ du club.</p>
+            </div>
+            <div>
+                <strong style="color:var(--violet-deep);">Vos droits</strong>
+                <p style="margin-top:4px; color:var(--ink-soft);">Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour exercer ce droit, contactez l'administrateur du club via la messagerie interne du site ou par téléphone (coordonnées disponibles sur la page d'accueil).</p>
+            </div>
+        </div>
+        <button class="btn btn-outline" style="width:100%; margin-top:22px; justify-content:center; color:var(--violet-deep); border-color:var(--violet-deep);" onclick="closeModal('confidentialite')">Fermer</button>
+    </div></div>
+
+    <div id="siteContent" style="display:none;">
+    <div class="app-shell">
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <img src="logo-alcf.png" alt="Logo ALCF Basket" onerror="this.onerror=null; this.src='https://placehold.co/40x40/1c0f33/e8a13c?text=A';">
+                <span>ALCF <em>BASKET</em></span>
+                <button class="sidebar-close-btn" onclick="closeSidebar()">✕</button>
+            </div>
+            <nav class="sidebar-nav" id="navLinks">
+                <button class="nav-link" onclick="showPage('accueil')" id="nav-accueil"><span class="ic">🏠</span> Accueil</button>
+                <button class="nav-link" onclick="showPage('calendrier')" id="nav-calendrier"><span class="ic">📅</span> Calendrier</button>
+                <button class="nav-link" onclick="showPage('championnat')" id="nav-championnat"><span class="ic">🏆</span> Classement</button>
+                <button class="nav-link" onclick="showPage('effectif')" id="nav-effectif"><span class="ic">👥</span> Équipe</button>
+                <button class="nav-link" onclick="showPage('stats')" id="nav-stats"><span class="ic">📊</span> Statistiques</button>
+                <button class="nav-link" onclick="showPage('galerie')" id="nav-galerie"><span class="ic">🖼️</span> Galerie</button>
+                <button class="nav-link" onclick="showPage('infos')" id="nav-infos"><span class="ic">📰</span> Infos</button>
+                <button class="nav-link" onclick="showPage('messagerie')" id="nav-messagerie"><span class="ic">💬</span> Messagerie</button>
+                <button class="nav-link admin-only" onclick="showPage('membres')" id="nav-membres"><span class="ic">⚙️</span> Membres</button>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-season-box"><strong>Saison 2025/2026</strong>PNM · Poule A</div>
+                <div class="sidebar-tagline">Ensemble.<em>Plus forts.</em></div>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <button class="hamburger-btn" onclick="openSidebar()" aria-label="Menu">☰</button>
+                    <img src="logo-alcf.png" alt="Logo ALCF" style="width:30px; height:30px; object-fit:contain; flex-shrink:0;" onerror="this.onerror=null; this.src='https://placehold.co/30x30/1c0f33/e8a13c?text=A';">
+                    <span class="topbar-title">AL Chazeau Fayol Basket</span>
+                    <span class="topbar-badge">PNM</span>
+                </div>
+                <div class="topbar-right">
+                    <button class="bell-btn" id="btnNotif" onclick="enableNotifications()" aria-label="Notifications" title="Activer les notifications">🔔</button>
+                    <div style="position:relative;">
+                        <button class="user-chip" onclick="toggleUserMenu()">
+                            <span class="avatar-circle" id="userAvatarInitials">?</span>
+                            <span class="u-text"><span class="u-name" id="userChipName">Membre</span><br><span class="u-role" id="userChipRole"></span></span>
+                        </button>
+                        <div id="userMenu" style="display:none; position:absolute; right:0; top:46px; background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-sm); box-shadow:var(--shadow-md); min-width:170px; overflow:hidden; z-index:950;">
+                            <button class="btn-danger" style="width:100%; border-radius:0; justify-content:center; padding:12px;" onclick="doLogout()" id="btnLogout">Déconnexion</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <!-- ACCUEIL -->
+    <div id="page-accueil" class="page active">
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+                        <img src="logo-alcf.png" alt="Logo ALCF" style="width:52px; height:52px; object-fit:contain;" onerror="this.onerror=null; this.src='https://placehold.co/52x52/1c0f33/e8a13c?text=A';">
+                        <h1 style="margin-bottom:0;">ALCF <span>Basket</span></h1>
+                    </div>
+                    <div class="hero-subtitle">PNM - Saison 2025/2026</div>
+                    <div class="hero-tagline">Travail · Engagement · Cohésion · Dépassement</div>
+                    <div class="hero-btns">
+                        <button onclick="showPage('calendrier')" class="btn btn-gold">📅 Voir le calendrier</button>
+                        <button onclick="openModal('coordonnees')" class="btn btn-outline">📍 Coordonnées</button>
+                    </div>
+                </div>
+                <img src="equipe-2025-2026.png" class="hero-photo" alt="Photo d'équipe ALCF" onerror="this.style.display='none';">
+            </div>
+        </section>
+
+        <div class="dash-row">
+            <div class="dash-card">
+                <div class="dash-card-head"><span class="ic">📅</span> Prochain match</div>
+                <div id="dashProchainMatch"><p class="dash-empty">Chargement…</p></div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-head"><span class="ic">🏆</span> Classement — PNM</div>
+                <div id="dashClassement"><p class="dash-empty">Chargement…</p></div>
+                <button class="dash-link" onclick="showPage('championnat')">Voir le classement complet →</button>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-head"><span class="ic">📊</span> Stats équipe</div>
+                <div id="dashStatsEquipe"><p class="dash-empty">Chargement…</p></div>
+                <button class="dash-link" onclick="showPage('stats')">Voir toutes les stats →</button>
+            </div>
+        </div>
+
+        <div class="dash-row-2">
+            <div class="dash-card">
+                <div class="dash-card-head"><span class="ic">👥</span> Effectif 2025/2026</div>
+                <div class="effectif-preview-strip" id="dashEffectifStrip"><p class="dash-empty">Chargement…</p></div>
+                <button class="dash-link" onclick="showPage('effectif')">Voir l'effectif complet →</button>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-head"><span class="ic">📰</span> Dernières actualités</div>
+                <div id="dashActualites"><p class="dash-empty">Chargement…</p></div>
+                <button class="dash-link" onclick="showPage('infos')">Voir toutes les actualités →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAMPIONNAT -->
+    <div id="page-championnat" class="page">
+        <div class="container">
+            <div class="page-header">
+                <h2>Championnat — Poule A PNM</h2>
+                <span id="champUpdatedAt" style="color:var(--ink-soft); font-size:0.78rem;"></span>
+            </div>
+            <div class="champ-layout">
+                <div>
+                    <div class="champ-block">
+                        <h3>🏀 Prochains matchs</h3>
+                        <div id="champProchains"><p class="empty-msg" style="padding:16px 0;">Chargement…</p></div>
+                    </div>
+                    <div class="champ-block" style="margin-top:20px;">
+                        <h3>📋 Derniers résultats</h3>
+                        <div id="champResultats"><p class="empty-msg" style="padding:16px 0;">Chargement…</p></div>
+                    </div>
+                </div>
+                <div class="champ-block">
+                    <h3>🏆 Classement officiel</h3>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead><tr><th>Pos</th><th class="col-equipe" style="text-align:left;">Équipe</th><th class="col-hide">J</th><th class="col-hide">V</th><th class="col-hide">D</th><th class="col-hide">+/-</th><th>Pts</th></tr></thead>
+                            <tbody id="champClassementBody"><tr><td colspan="7" class="empty-msg">Chargement…</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EFFECTIF -->
+    <div id="page-effectif" class="page">
+        <div class="container">
+            <div class="page-header"><h2>Effectif PNM</h2><button class="btn btn-gold admin-only" onclick="openModal('joueur')">+ Ajouter un joueur</button></div>
+            <div class="players-grid" id="effectifGrid"></div>
+        </div>
+    </div>
+
+    <!-- CALENDRIER -->
+    <div id="page-calendrier" class="page">
+        <div class="container">
+            <div class="page-header"><h2>Calendrier</h2><button class="btn btn-gold staff-only" onclick="newMatchModal()">+ Ajouter un événement</button></div>
+            <div class="calendar-nav">
+                <button onclick="changeMonth(-1)" aria-label="Mois précédent">‹</button>
+                <h3 id="calMonthLabel"></h3>
+                <button onclick="changeMonth(1)" aria-label="Mois suivant">›</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div id="page-stats" class="page">
+        <div class="container">
+            <div class="page-header"><h2>Statistiques</h2><button class="btn btn-gold staff-only" onclick="openStatsMatchModal()">+ Ajouter les stats d'un match</button></div>
+
+            <div class="champ-block" style="margin-bottom:24px;">
+                <h3>🏀 Dernier match</h3>
+                <div id="statsDernierMatch"><p class="empty-msg" style="padding:16px 0;">Chargement…</p></div>
+            </div>
+
+            <div class="champ-block" style="margin-bottom:32px;">
+                <h3>📅 Saison 2025-2026 — Équipe</h3>
+                <div id="statsSaisonEquipe"><p class="empty-msg" style="padding:16px 0;">Chargement…</p></div>
+            </div>
+
+            <h3 style="color:var(--violet-deep); font-size:1.05rem; margin-bottom:14px;">Statistiques individuelles</h3>
+            <div class="players-grid" id="statsPlayersGrid" style="margin-bottom:32px;"></div>
+
+            <div class="champ-block staff-only">
+                <h3>🗂️ Matchs enregistrés</h3>
+                <div id="statsMatchsList"><p class="empty-msg" style="padding:16px 0;">Chargement…</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GALERIE -->
+    <div id="page-galerie" class="page"><div class="container"><div class="page-header"><h2>Galerie</h2><button class="btn btn-gold admin-only" onclick="openModal('galerie')">+ Ajouter une photo</button></div><div class="players-grid" id="galleryGrid"></div></div></div>
+
+    <!-- INFOS -->
+    <div id="page-infos" class="page"><div class="container"><div class="page-header"><h2>Infos du club</h2><button class="btn btn-gold staff-only" onclick="openModal('info')">+ Publier une info</button></div><div id="infosGrid" class="players-grid"></div></div></div>
+
+    <!-- MESSAGERIE -->
+    <div id="page-messagerie" class="page"><div class="container">
+        <div class="page-header"><h2>Messagerie</h2><button class="btn btn-gold" onclick="openNewMessageModal()">+ Nouveau message</button></div>
+        <div class="gate-tabs" style="max-width:480px;">
+            <button id="msgTabInboxBtn" class="active" onclick="switchMsgTab('inbox')">Boîte de réception</button>
+            <button id="msgTabSentBtn" onclick="switchMsgTab('sent')">Envoyés</button>
+            <button id="msgTabAllBtn" class="admin-only" onclick="switchMsgTab('all')">Tous les messages</button>
+        </div>
+        <div id="msgInboxList"></div>
+        <div id="msgSentList" style="display:none;"></div>
+        <div id="msgAllList" style="display:none;"></div>
+    </div></div>
+
+    <!-- MEMBRES (admin) -->
+    <div id="page-membres" class="page"><div class="container">
+        <div class="page-header"><h2>Membres inscrits</h2></div>
+        <p style="color:var(--ink-soft); margin-bottom:20px;">Approuve les nouvelles inscriptions pour leur donner accès au site, révoque l'accès d'un membre à tout moment, ou promeus un membre approuvé au rôle de coach pour lui donner des droits d'écriture supplémentaires (calendrier, stats, infos).</p>
+        <div id="membresList"></div>
+    </div></div>
+        </div><!-- /main-area -->
+    </div><!-- /app-shell -->
+    </div><!-- /siteContent -->
+
+    <!-- MODALES ADMIN -->
+    <div class="modal-overlay" id="modal-joueur"><div class="modal"><button class="modal-close" onclick="closeModal('joueur')">×</button><h3>Joueur</h3><input type="hidden" id="joueurId"><div class="form-grid">
+        <div class="field-block"><label for="joueurPrenom">Prénom</label><input type="text" id="joueurPrenom" placeholder="Prénom"></div>
+        <div class="field-block"><label for="joueurNom">Nom</label><input type="text" id="joueurNom" placeholder="Nom"></div>
+        <div class="field-block"><label for="joueurNaissance">Date de naissance</label><input type="date" id="joueurNaissance"></div>
+        <div class="field-block"><label for="joueurTaille">Taille (cm)</label><input type="number" id="joueurTaille" placeholder="Ex : 188"></div>
+        <div class="field-block full-width" style="margin-top:4px; font-size:0.75rem; color:var(--ink-soft); font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Adresse</div>
+        <div class="field-block"><label for="joueurRue">Rue</label><input type="text" id="joueurRue" placeholder="Ex : Rue des Noyers"></div>
+        <div class="field-block"><label for="joueurAdresseNum">N°</label><input type="text" id="joueurAdresseNum" placeholder="Ex : 3"></div>
+        <div class="field-block"><label for="joueurCodePostal">Code postal</label><input type="text" id="joueurCodePostal" placeholder="Ex : 42700"></div>
+        <div class="field-block"><label for="joueurVille">Ville</label><input type="text" id="joueurVille" placeholder="Ex : Firminy"></div>
+        <div class="field-block"><label for="joueurNumero">N° Maillot</label><input type="number" id="joueurNumero" placeholder="N° Maillot"></div>
+        <div class="field-block"><label for="joueurLicence">N° de licence</label><input type="text" id="joueurLicence" placeholder="N° de licence"></div>
+        <div class="field-block"><label for="joueurTelephone">Téléphone</label><input type="tel" id="joueurTelephone" placeholder="Ex : 06 12 34 56 78"></div>
+        <div class="field-block"><label for="joueurEmail">Email</label><input type="email" id="joueurEmail" placeholder="Ex : prenom.nom@mail.com"></div>
+        <div class="field-block"><label for="joueurPoste">Poste</label><select id="joueurPoste"><option value="Meneur">Meneur</option><option value="Arrière">Arrière</option><option value="Ailier">Ailier</option><option value="Ailier Fort">Ailier Fort</option><option value="Pivot">Pivot</option><option value="Coach">Coach</option><option value="Coach adjoint">Coach adjoint</option></select></div>
+        <div class="field-block"><label for="joueurPhoto">Photo (URL)</label><input type="text" id="joueurPhoto" placeholder="https://..."></div>
+    </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveJoueur()">Enregistrer</button></div></div>
+
+    <div class="modal-overlay" id="modal-match"><div class="modal"><button class="modal-close" onclick="closeModal('match')">×</button><h3 id="matchModalTitle">Nouvel événement</h3><input type="hidden" id="matchId"><div class="form-grid">
+        <div class="field-block"><label for="matchDate">Date</label><input type="date" id="matchDate"></div>
+        <div class="field-block"><label for="matchHeure">Heure (facultatif)</label><input type="time" id="matchHeure"></div>
+        <div class="field-block full-width"><label for="matchType">Type</label><select id="matchType" onchange="toggleMatchFields()">
+            <option value="match">Match</option>
+            <option value="entrainement">Entraînement</option>
+            <option value="anniversaire">Anniversaire</option>
+            <option value="repas">Repas</option>
+            <option value="autre">Autre</option>
+        </select></div>
+        <div class="field-block full-width" id="matchAdvField"><label for="matchAdv">Adversaire</label><input type="text" id="matchAdv" placeholder="Ex : Clermont"></div>
+        <div class="field-block full-width" id="matchCommentField" style="display:none;"><label for="matchCommentaire">Commentaire</label><textarea id="matchCommentaire" placeholder="Ex : Anniversaire de Léo, repas de fin de saison..."></textarea></div>
+        <p class="full-width" id="matchNoFieldNote" style="display:none; color:var(--ink-soft); font-size:0.85rem; margin:0;">Il suffit d'indiquer la date et l'heure ci-dessus, aucune autre information n'est nécessaire.</p>
+    </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveMatch()">Enregistrer</button></div></div>
+
+    <div class="modal-overlay" id="modal-day-details"><div class="modal"><button class="modal-close" onclick="closeModal('day-details')">×</button><h3 id="dayDetailsTitle">Jour</h3><div id="dayDetailsList" style="margin-top:18px;"></div><button class="btn btn-gold staff-only" style="width:100%; margin-top:12px; justify-content:center;" onclick="openMatchModalForDate(currentDayDate)">+ Ajouter un événement ce jour</button></div></div>
+
+    <div class="modal-overlay" id="modal-message"><div class="modal"><button class="modal-close" onclick="closeModal('message')">×</button><h3>Nouveau message</h3>
+        <div class="field-block full-width">
+            <label>Destinataire(s)</label>
+            <div id="msgRecipientsList" style="max-height:200px; overflow-y:auto; border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px; display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+        <div class="field-block full-width" style="margin-top:16px;">
+            <label for="msgTexte">Message</label>
+            <textarea id="msgTexte" placeholder="Écris ton message..." rows="5"></textarea>
+        </div>
+        <button class="btn btn-gold" style="width:100%; margin-top:20px; justify-content:center;" onclick="sendMessage()">Envoyer</button>
+    </div></div>
+
+    <div class="modal-overlay" id="modal-statsMatch"><div class="modal" style="max-width:860px;"><button class="modal-close" onclick="closeModal('statsMatch')">×</button><h3 id="statsMatchModalTitle">Stats d'un match</h3><input type="hidden" id="statsMatchId"><div class="form-grid">
+        <div class="field-block"><label for="statsMatchDate">Date du match</label><input type="date" id="statsMatchDate"></div>
+        <div class="field-block"><label for="statsMatchAdv">Adversaire</label><input type="text" id="statsMatchAdv" placeholder="Ex : Clermont"></div>
+        <div class="field-block"><label for="statsMatchScoreEquipe">Score ALCF</label><input type="number" id="statsMatchScoreEquipe" placeholder="0"></div>
+        <div class="field-block"><label for="statsMatchScoreAdv">Score adversaire</label><input type="number" id="statsMatchScoreAdv" placeholder="0"></div>
+    </div>
+    <div id="statsMatchPlayersRows" style="margin-top:22px; display:flex; flex-direction:column; gap:8px; overflow-x:auto;"></div>
+    <button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveStatsMatch()">Enregistrer</button></div></div>
+
+    <div class="modal-overlay" id="modal-info"><div class="modal"><button class="modal-close" onclick="closeModal('info')">×</button><h3>Nouvelle info</h3><div class="field-block" style="margin-top:14px;"><label for="infoTitre">Titre</label><input type="text" id="infoTitre"></div><div class="field-block" style="margin-top:14px;"><label for="infoTexte">Contenu</label><textarea id="infoTexte"></textarea></div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="saveInfo()">Publier</button></div></div>
+
+    <div class="modal-overlay" id="modal-galerie"><div class="modal"><button class="modal-close" onclick="closeModal('galerie')">×</button><h3>Ajouter une photo</h3><div class="field-block" style="margin-top:14px;"><label for="galUrl">URL de la photo</label><input type="text" id="galUrl" placeholder="https://..."></div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="savePhoto()">Ajouter</button></div></div>
+
+    <div class="modal-overlay" id="modal-player-details"><div class="modal"><button class="modal-close" onclick="closeModal('player-details')">×</button><div id="detContent"></div></div></div>
+
+    <div class="modal-overlay" id="modal-coordonnees"><div class="modal"><button class="modal-close" onclick="closeModal('coordonnees')">×</button><h3>Coordonnées</h3>
+        <div style="margin-top:20px; text-align:left; display:flex; flex-direction:column; gap:18px;">
+            <div>
+                <div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.75rem; font-weight:700; letter-spacing:0.04em;">Adresse du club</div>
+                <div style="font-size:1rem; margin-top:4px; color:var(--ink);">Rue Sainte Poulette, Chazeau, 42700 Firminy</div>
+            </div>
+            <div>
+                <div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.75rem; font-weight:700; letter-spacing:0.04em;">Responsable de l'équipe</div>
+                <a href="tel:0000000000" style="font-size:1rem; margin-top:4px; color:var(--violet-deep); font-weight:700; text-decoration:underline; display:inline-block;">00 00 00 00 00</a>
+            </div>
+            <div>
+                <div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.75rem; font-weight:700; letter-spacing:0.04em;">Salle de sport</div>
+                <a href="https://www.google.com/maps/search/?api=1&query=3+rue+des+Noyers+42700+Firminy" target="_blank" rel="noopener" style="font-size:1rem; margin-top:4px; color:var(--violet-deep); font-weight:700; text-decoration:underline; display:inline-block;">3 rue des Noyers, 42700 Firminy</a>
+            </div>
+        </div>
+    </div></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYZuhh6iKsUMM-MBA3fANDGgCQOhANfVU",
+            authDomain: "alcf-basket.firebaseapp.com",
+            projectId: "alcf-basket",
+            storageBucket: "alcf-basket.firebasestorage.app",
+            messagingSenderId: "1082312491425",
+            appId: "1:1082312491425:web:646f4c5158d2707b0d8be0"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(), auth = firebase.auth();
+        const ADMIN = "polocezar@gmail.com";
+        let isAdmin = false;
+        let isCoachUser = false;
+
+        // ---- Notifications push (Firebase Cloud Messaging) ----
+        const VAPID_KEY = "BAvYrLQvhFiKRnZnP4d5OOIK7IwivxCCbOLUOTacNsMlO-UKGFvZ6ZJPcoAh2JslsZ4k2wGhfKJJWHiFn6u-7qg";
+        let messaging = null;
+        try {
+            if (firebase.messaging.isSupported()) messaging = firebase.messaging();
+        } catch (e) {
+            console.warn('Firebase Messaging non disponible sur ce navigateur', e);
+        }
+
+        function updateNotifButtonState() {
+            const btn = document.getElementById('btnNotif');
+            if (!btn) return;
+            if (!messaging || typeof Notification === 'undefined') {
+                btn.style.display = 'none';
+                return;
+            }
+            if (Notification.permission === 'granted') {
+                btn.innerHTML = '🔔 <span>Notifications activées</span>';
+                btn.title = 'Notifications activées';
+                btn.style.color = 'var(--success)';
+                btn.disabled = true;
+            } else if (Notification.permission === 'denied') {
+                btn.innerHTML = '🔕 <span>Notifications bloquées</span>';
+                btn.title = 'Notifications bloquées';
+                btn.style.color = 'var(--danger)';
+                btn.disabled = true;
+            } else {
+                btn.innerHTML = '🔔 <span>Activer les notifications</span>';
+                btn.title = 'Activer les notifications';
+                btn.style.color = '';
+                btn.disabled = false;
+            }
+        }
+
+        async function enableNotifications() {
+            if (!messaging) return toast('Les notifications ne sont pas supportées sur cet appareil.', 'error');
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') return toast('Notifications refusées.', 'error');
+                await navigator.serviceWorker.register('firebase-messaging-sw.js');
+                const registration = await navigator.serviceWorker.ready;
+                const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
+                if (!token) return toast('Impossible de générer le jeton de notification.', 'error');
+                const uid = auth.currentUser.uid;
+                await db.collection('users').doc(uid).update({
+                    fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
+                });
+                toast('Notifications activées ! 🔔', 'success');
+                updateNotifButtonState();
+            } catch (e) {
+                console.error('Erreur activation notifications', e);
+                toast('Erreur lors de l\'activation des notifications : ' + e.message, 'error');
+            }
+        }
+
+        if (messaging) {
+            messaging.onMessage(payload => {
+                const body = (payload.notification && payload.notification.body) || 'Nouvelle notification';
+                toast(body, 'info');
+            });
+        }
+
+        // ---- Toasts (remplace les alert() natifs, plus agréables) ----
+        function toast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.textContent = message;
+            container.appendChild(el);
+            setTimeout(() => {
+                el.classList.add('hide');
+                setTimeout(() => el.remove(), 300);
+            }, 3200);
+        }
+
+        // Etat du calendrier
+        let calYear = new Date().getFullYear();
+        let calMonth = new Date().getMonth();
+        let currentDayDate = null;
+
+        const EVENT_TYPES = {
+            match:         { label: 'Match',         icon: '🏀', color: 'var(--violet)' },
+            entrainement:  { label: 'Entraînement',  icon: '💪', color: '#2f7fb8' },
+            anniversaire:  { label: 'Anniversaire',  icon: '🎂', color: '#c2478a' },
+            repas:         { label: 'Repas',         icon: '🍽️', color: '#d97a2e' },
+            autre:         { label: 'Autre',         icon: '📌', color: '#6b6478' }
+        };
+        function eventText(m) {
+            if (m.type === 'match') return 'Match' + (m.matchAdv ? ' vs ' + m.matchAdv : '');
+            if (m.type === 'entrainement') return 'Entraînement';
+            return m.commentaire || '';
+        }
+
+        // Stocke les listeners actifs pour pouvoir les couper en changeant de page
+        const activeListeners = {};
+        function watch(page, collectionName, callback) {
+            if (activeListeners[page]) activeListeners[page]();
+            activeListeners[page] = db.collection(collectionName).onSnapshot(callback, err => {
+                console.error('Erreur Firestore sur', collectionName, err);
+                toast('Impossible de charger les données. Vérifiez votre connexion.', 'error');
+            });
+        }
+
+        function skeletonCards(n, imgHeight) {
+            let html = '';
+            for (let i = 0; i < n; i++) {
+                html += `<div class="skeleton-card"><div class="skeleton-block img" style="height:${imgHeight}px;"></div><div class="skeleton-block line"></div></div>`;
+            }
+            return html;
+        }
+
+        let userStatusUnsub = null;
+
+        function showGateMode(mode) {
+            document.getElementById('gateAuthForms').style.display = (mode === 'auth') ? 'block' : 'none';
+            document.getElementById('gatePending').style.display = (mode === 'pending') ? 'block' : 'none';
+            document.getElementById('gateRevoked').style.display = (mode === 'revoked') ? 'block' : 'none';
+            document.getElementById('authGate').style.display = 'flex';
+            document.getElementById('siteContent').style.display = 'none';
+        }
+
+        function enterSite() {
+            document.getElementById('authGate').style.display = 'none';
+            document.getElementById('siteContent').style.display = 'block';
+            updateNotifButtonState();
+            updateUserChip();
+            loadAccueilHome();
+        }
+
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('sidebarOverlay').classList.add('open');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
+        }
+        function toggleUserMenu() {
+            const m = document.getElementById('userMenu');
+            m.style.display = (m.style.display === 'none') ? 'block' : 'none';
+        }
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('userMenu');
+            const chip = e.target.closest('.user-chip');
+            if (menu && menu.style.display === 'block' && !chip) menu.style.display = 'none';
+        });
+
+        async function updateUserChip() {
+            const u = auth.currentUser;
+            if (!u) return;
+            let prenom = '', nom = '';
+            if (isAdmin) {
+                prenom = 'Admin'; nom = '';
+            } else {
+                try {
+                    const doc = await db.collection('users').doc(u.uid).get();
+                    const d = doc.exists ? doc.data() : {};
+                    prenom = d.prenom || ''; nom = d.nom || '';
+                } catch (e) { prenom = u.email; }
+            }
+            const initials = ((prenom[0] || '') + (nom[0] || '')).toUpperCase() || 'U';
+            document.getElementById('userAvatarInitials').textContent = initials;
+            document.getElementById('userChipName').textContent = (prenom + ' ' + nom).trim() || u.email;
+            document.getElementById('userChipRole').textContent = isAdmin ? 'Admin' : (isCoachUser ? 'Coach' : 'Membre');
+        }
+
+        function switchGateTab(tab) {
+            document.getElementById('gateTabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('gateTabRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('gateLoginForm').style.display = (tab === 'login') ? 'block' : 'none';
+            document.getElementById('gateRegisterForm').style.display = (tab === 'register') ? 'block' : 'none';
+        }
+
+        auth.onAuthStateChanged(u => {
+            if (userStatusUnsub) { userStatusUnsub(); userStatusUnsub = null; }
+            isAdmin = !!u && u.email === ADMIN;
+            document.body.classList.toggle('is-admin', isAdmin);
+
+            if (!u) {
+                showGateMode('auth');
+                return;
+            }
+
+            if (isAdmin) {
+                enterSite();
+                return;
+            }
+
+            // Membre normal : on écoute son statut d'approbation en temps réel
+            const userDocRef = db.collection('users').doc(u.uid);
+            userStatusUnsub = userDocRef.onSnapshot(docSnap => {
+                const data = docSnap.data();
+                const status = data ? data.status : 'pending';
+                isCoachUser = !!data && data.role === 'coach';
+                document.body.classList.toggle('is-coach', isCoachUser);
+                if (status === 'approved') {
+                    enterSite();
+                } else if (status === 'revoked') {
+                    showGateMode('revoked');
+                } else {
+                    showGateMode('pending');
+                }
+            }, err => {
+                console.error('Erreur de vérification du statut', err);
+                showGateMode('pending');
+            });
+        });
+
+        async function doRegister() {
+            const prenom = document.getElementById('regPrenom').value.trim();
+            const nom = document.getElementById('regNom').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const pass = document.getElementById('regPassword').value;
+            const pass2 = document.getElementById('regPassword2').value;
+            const consent = document.getElementById('regConsent').checked;
+
+            if (!prenom || !nom || !email || !pass) return toast('Tous les champs sont obligatoires', 'error');
+            if (pass.length < 6) return toast('Le mot de passe doit contenir au moins 6 caractères', 'error');
+            if (pass !== pass2) return toast('Les mots de passe ne correspondent pas', 'error');
+            if (!consent) return toast('Merci d\'accepter les conditions d\'utilisation et la politique de confidentialité pour continuer.', 'error');
+
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                await db.collection('users').doc(cred.user.uid).set({
+                    prenom, nom, email,
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    rgpdConsent: true,
+                    rgpdConsentDate: new Date().toISOString()
+                });
+                toast('Compte créé ! En attente de validation.', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        function loadMembres() {
+            watch('membres', 'users', snap => {
+                const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (docs.length === 0) {
+                    document.getElementById('membresList').innerHTML = '<p class="empty-msg">Aucune inscription pour le moment.</p>';
+                    return;
+                }
+                const statusInfo = {
+                    pending: { label: 'En attente', cls: 'status-pending' },
+                    approved: { label: 'Approuvé', cls: 'status-approved' },
+                    revoked: { label: 'Révoqué', cls: 'status-revoked' }
+                };
+                document.getElementById('membresList').innerHTML = docs.map(m => {
+                    const s = statusInfo[m.status] || statusInfo.pending;
+                    const isCoachRole = m.role === 'coach';
+                    return `<div class="member-row">
+                        <div class="member-info">
+                            <strong>${m.prenom || ''} ${m.nom || ''}</strong>
+                            <div class="member-email">${m.email || ''}</div>
+                        </div>
+                        <span class="status-badge ${s.cls}">${s.label}</span>
+                        ${isCoachRole ? '<span class="role-badge">Coach</span>' : ''}
+                        <div class="member-actions">
+                            ${m.status !== 'approved' ? `<button class="btn-ghost" onclick="setMemberStatus('${m.id}','approved')">Approuver</button>` : ''}
+                            ${m.status !== 'revoked' ? `<button class="btn-ghost" onclick="setMemberStatus('${m.id}','revoked')">Révoquer</button>` : ''}
+                            ${m.status === 'approved' ? (isCoachRole
+                                ? `<button class="btn-ghost" onclick="setMemberRole('${m.id}', null)">Retirer coach</button>`
+                                : `<button class="btn-ghost" onclick="setMemberRole('${m.id}', 'coach')">Promouvoir coach</button>`) : ''}
+                            <button class="btn-ghost" onclick="deleteMember('${m.id}')">Supprimer</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        async function setMemberStatus(uid, status) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            try {
+                await db.collection('users').doc(uid).update({ status });
+                toast(status === 'approved' ? 'Membre approuvé' : 'Accès révoqué', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function setMemberRole(uid, role) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            try {
+                if (role) {
+                    await db.collection('users').doc(uid).update({ role });
+                    toast('Membre promu coach', 'success');
+                } else {
+                    await db.collection('users').doc(uid).update({ role: firebase.firestore.FieldValue.delete() });
+                    toast('Rôle coach retiré', 'success');
+                }
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function deleteMember(uid) {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            if (!confirm('Supprimer cette inscription ? Cela ne supprime pas son compte de connexion, seulement son accès au site.')) return;
+            try {
+                await db.collection('users').doc(uid).delete();
+                toast('Inscription supprimée', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        function showPage(id) {
+            closeSidebar();
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-menu button.nav-link').forEach(a => a.classList.remove('active'));
+            document.getElementById('page-' + id).classList.add('active');
+            if (document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
+            if (id === 'accueil') loadAccueilHome();
+            if (id === 'championnat') loadChampionnat();
+            if (id === 'messagerie') loadMessagerie();
+            if (id === 'effectif') loadEff();
+            if (id === 'calendrier') loadCal();
+            if (id === 'stats') loadStats();
+            if (id === 'infos') loadInf();
+            if (id === 'galerie') loadGallery();
+            if (id === 'membres') loadMembres();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ---- Championnat : classement + matchs FFBB, lus en temps réel depuis Firestore ----
+        function isAlcf(nomEquipe) {
+            return (nomEquipe || '').toUpperCase().includes('CHAZEAU');
+        }
+
+        function formatDateChamp(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            if (isNaN(d)) return dateStr;
+            return d.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        }
+
+        // ---- Accueil : cartes tableau de bord (prochain match, classement, stats, effectif, actus), alimentées en direct ----
+        let accueilLoaded = false;
+        async function loadAccueilHome() {
+            if (accueilLoaded) return;
+            try {
+                const [pouleDoc, rencontresDoc, joueursSnap, statsSnap, infosSnap] = await Promise.all([
+                    db.collection('ffbb').doc('poule').get(),
+                    db.collection('ffbb').doc('rencontres').get(),
+                    db.collection('joueurs').get(),
+                    db.collection('statsMatchs').get(),
+                    db.collection('infos').get()
+                ]);
+
+                const poule = pouleDoc.exists ? pouleDoc.data() : null;
+                const rencontres = rencontresDoc.exists ? rencontresDoc.data() : null;
+                const joueurs = joueursSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const statsMatchs = statsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const infos = infosSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                renderDashProchainMatch(rencontres);
+                renderDashClassement(poule);
+                renderDashStatsEquipe(statsMatchs);
+                renderDashEffectifStrip(joueurs);
+                renderDashActualites(infos);
+                accueilLoaded = true;
+            } catch (e) {
+                console.error('Erreur chargement tableau de bord accueil', e);
+            }
+        }
+
+        function renderDashProchainMatch(rencontres) {
+            const matchs = (rencontres && rencontres.matchs) || [];
+            const aVenir = matchs.filter(m => !m.joue).sort((a, b) => new Date(a.date) - new Date(b.date));
+            const prochain = aVenir[0];
+            const el = document.getElementById('dashProchainMatch');
+            if (!prochain) {
+                el.innerHTML = '<p class="dash-empty">Aucun match programmé pour le moment.</p>';
+                return;
+            }
+            const initials = s => (s || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+            el.innerHTML = `
+                <div class="dash-match-meta">${formatDateChamp(prochain.date)}${prochain.heure ? ' — ' + formatHeureChamp(prochain.heure) : ''}</div>
+                <div class="dash-match-teams">
+                    <div><div class="dash-match-badge">${initials(prochain.equipe1)}</div><div class="dash-match-team">${prochain.equipe1 || ''}</div></div>
+                    <span class="dash-match-vs">VS</span>
+                    <div><div class="dash-match-badge">${initials(prochain.equipe2)}</div><div class="dash-match-team">${prochain.equipe2 || ''}</div></div>
+                </div>
+                <div class="dash-match-loc">📍 Gymnase — Firminy</div>`;
+        }
+
+        function renderDashClassement(poule) {
+            const classement = (poule && poule.classement) || [];
+            const el = document.getElementById('dashClassement');
+            if (classement.length === 0) {
+                el.innerHTML = '<p class="dash-empty">Classement indisponible.</p>';
+                return;
+            }
+            const top = classement.slice(0, 5);
+            el.innerHTML = `<table class="dash-mini-table">
+                <thead><tr><th>#</th><th>Équipe</th><th>V-D</th><th>Pts</th></tr></thead>
+                <tbody>${top.map(c => `<tr${isAlcf(c.equipe) ? ' class="row-alcf"' : ''}><td>${c.position ?? ''}</td><td>${c.equipe || ''}</td><td>${c.gagnes ?? 0}V-${c.perdus ?? 0}D</td><td>${c.points ?? ''}</td></tr>`).join('')}</tbody>
+            </table>`;
+        }
+
+        function renderDashStatsEquipe(statsMatchs) {
+            const el = document.getElementById('dashStatsEquipe');
+            if (statsMatchs.length === 0) {
+                el.innerHTML = '<p class="dash-empty">Aucune statistique enregistrée.</p>';
+                return;
+            }
+            const nb = statsMatchs.length;
+            const victoires = statsMatchs.filter(m => m.scoreEquipe > m.scoreAdversaire).length;
+            const defaites = statsMatchs.filter(m => m.scoreEquipe < m.scoreAdversaire).length;
+            const totalMarques = statsMatchs.reduce((s, m) => s + (m.scoreEquipe || 0), 0);
+            const totalEncaisses = statsMatchs.reduce((s, m) => s + (m.scoreAdversaire || 0), 0);
+            const totalFautes = statsMatchs.reduce((s, m) => s + foulTotalsForMatch(m).fautes + foulTotalsForMatch(m).off + foulTotalsForMatch(m).tech, 0);
+            el.innerHTML = `<div class="dash-stats-grid">
+                <div class="dash-stat-tile"><div class="v">${(totalMarques / nb).toFixed(1)}</div><div class="l">Points / match</div></div>
+                <div class="dash-stat-tile"><div class="v">${(totalEncaisses / nb).toFixed(1)}</div><div class="l">Points encaissés</div></div>
+                <div class="dash-stat-tile"><div class="v">${victoires}V - ${defaites}D</div><div class="l">Bilan (${nb} matchs)</div></div>
+                <div class="dash-stat-tile"><div class="v">${(totalFautes / nb).toFixed(1)}</div><div class="l">Moy. fautes / match</div></div>
+            </div>`;
+        }
+
+        function renderDashEffectifStrip(joueurs) {
+            const el = document.getElementById('dashEffectifStrip');
+            if (joueurs.length === 0) {
+                el.innerHTML = '<p class="dash-empty">Aucun joueur pour le moment.</p>';
+                return;
+            }
+            const sorted = [...joueurs].sort((a, b) => (a.numero || 0) - (b.numero || 0)).slice(0, 6);
+            el.innerHTML = sorted.map(j => `
+                <div class="mini-card">
+                    <img src="${j.photo || 'logo-alcf.png'}" alt="" onerror="this.src='logo-alcf.png'; this.onerror=null;">
+                    <div class="num">#${j.numero || '0'}</div>
+                    <div class="nm">${j.prenom || ''} ${j.nom || ''}</div>
+                    <div class="ps">${j.poste || ''}</div>
+                </div>`).join('');
+        }
+
+        function renderDashActualites(infos) {
+            const el = document.getElementById('dashActualites');
+            if (infos.length === 0) {
+                el.innerHTML = '<p class="dash-empty">Aucune actualité publiée.</p>';
+                return;
+            }
+            el.innerHTML = infos.slice(0, 3).map(i => `
+                <div class="actu-item">
+                    <div class="actu-ic">📰</div>
+                    <div style="flex:1; min-width:0;">
+                        <div class="actu-title">${i.titre || ''}</div>
+                        <div class="actu-txt">${i.texte || ''}</div>
+                    </div>
+                </div>`).join('');
+        }
+
+        function loadChampionnat() {
+            if (activeListeners['championnat']) activeListeners['championnat']();
+
+            const unsubPoule = db.collection('ffbb').doc('poule').onSnapshot(
+                doc => renderClassement(doc.exists ? doc.data() : null),
+                err => { console.error('Erreur Firestore ffbb/poule', err); toast('Impossible de charger le classement.', 'error'); }
+            );
+            const unsubRencontres = db.collection('ffbb').doc('rencontres').onSnapshot(
+                doc => renderMatchsFFBB(doc.exists ? doc.data() : null),
+                err => { console.error('Erreur Firestore ffbb/rencontres', err); toast('Impossible de charger les matchs.', 'error'); }
+            );
+
+            activeListeners['championnat'] = () => { unsubPoule(); unsubRencontres(); };
+        }
+
+        function renderClassement(data) {
+            const tbody = document.getElementById('champClassementBody');
+            const classement = (data && data.classement) || [];
+
+            if (classement.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Classement indisponible pour le moment.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = classement.map(c => `
+                <tr${isAlcf(c.equipe) ? ' class="row-alcf"' : ''}>
+                    <td><span class="pos-badge">${c.position ?? ''}</span></td>
+                    <td class="col-equipe" style="text-align:left;">${c.equipe || ''}</td>
+                    <td class="col-hide">${c.joues ?? ''}</td>
+                    <td class="col-hide">${c.gagnes ?? ''}</td>
+                    <td class="col-hide">${c.perdus ?? ''}</td>
+                    <td class="col-hide">${c.difference ?? ''}</td>
+                    <td><strong>${c.points ?? ''}</strong></td>
+                </tr>`).join('');
+
+            const updated = data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate() : null;
+            document.getElementById('champUpdatedAt').textContent = updated
+                ? 'Mis à jour à ' + updated.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                : '';
+        }
+
+        function formatHeureChamp(heure) {
+            if (!heure) return '';
+            const digits = String(heure).replace(/\D/g, '');
+            if (digits.length === 3) return `${digits.slice(0, 1)}h${digits.slice(1)}`;
+            if (digits.length === 4) return `${digits.slice(0, 2)}h${digits.slice(2)}`;
+            return heure;
+        }
+
+        function renderMatchsFFBB(data) {
+            const matchs = (data && data.matchs) || [];
+            const joues = matchs.filter(m => m.joue).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
+            const aVenir = matchs.filter(m => !m.joue).sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 6);
+
+            const lineClass = (estAlcf, score, scoreAdv) => {
+                if (!estAlcf || score == null || scoreAdv == null) return '';
+                const s = Number(score), sAdv = Number(scoreAdv);
+                if (s > sAdv) return 'win';
+                if (s < sAdv) return 'loss';
+                return '';
+            };
+
+            const rowHtml = (m, showScore) => {
+                if (showScore && m.score1 != null && m.score2 != null) {
+                    return `
+                    <div class="match-row">
+                        <div class="match-date">${formatDateChamp(m.date)}</div>
+                        <div class="match-teams-scored">
+                            <div class="match-line ${lineClass(isAlcf(m.equipe1), m.score1, m.score2)}">
+                                <span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span>
+                                <span class="score">${m.score1}</span>
+                            </div>
+                            <div class="match-line ${lineClass(isAlcf(m.equipe2), m.score2, m.score1)}">
+                                <span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span>
+                                <span class="score">${m.score2}</span>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+                return `
+                <div class="match-row">
+                    <div class="match-date">${formatDateChamp(m.date)}${m.heure ? `<strong>${formatHeureChamp(m.heure)}</strong>` : ''}</div>
+                    <div class="match-teams">
+                        <div class="team-line"><span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span></div>
+                        <div class="team-line"><span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span></div>
+                    </div>
+                    <span class="score-pill upcoming">${formatHeureChamp(m.heure) || 'à venir'}</span>
+                </div>`;
+            };
+
+            document.getElementById('champProchains').innerHTML = aVenir.length
+                ? aVenir.map(m => rowHtml(m, false)).join('')
+                : '<p class="empty-msg" style="padding:16px 0;">Aucun match à venir programmé.</p>';
+
+            document.getElementById('champResultats').innerHTML = joues.length
+                ? joues.map(m => rowHtml(m, true)).join('')
+                : '<p class="empty-msg" style="padding:16px 0;">Aucun résultat disponible.</p>';
+        }
+
+        // ---- Messagerie : messages privés ciblés entre membres approuvés ----
+        let msgMembersCache = [];
+
+        function switchMsgTab(tab) {
+            document.getElementById('msgTabInboxBtn').classList.toggle('active', tab === 'inbox');
+            document.getElementById('msgTabSentBtn').classList.toggle('active', tab === 'sent');
+            document.getElementById('msgTabAllBtn').classList.toggle('active', tab === 'all');
+            document.getElementById('msgInboxList').style.display = tab === 'inbox' ? 'block' : 'none';
+            document.getElementById('msgSentList').style.display = tab === 'sent' ? 'block' : 'none';
+            document.getElementById('msgAllList').style.display = tab === 'all' ? 'block' : 'none';
+        }
+
+        function loadMessagerie() {
+            if (activeListeners['messagerie']) activeListeners['messagerie']();
+            const uid = auth.currentUser.uid;
+            const unsubs = [];
+
+            unsubs.push(db.collection('messages').where('to', 'array-contains', uid).onSnapshot(snap => {
+                const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                renderMsgList('msgInboxList', msgs, false);
+            }, err => { console.error('Erreur Firestore messages (reçus)', err); toast('Impossible de charger la boîte de réception.', 'error'); }));
+
+            unsubs.push(db.collection('messages').where('from', '==', uid).onSnapshot(snap => {
+                const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                renderMsgList('msgSentList', msgs, true);
+            }, err => { console.error('Erreur Firestore messages (envoyés)', err); toast('Impossible de charger les messages envoyés.', 'error'); }));
+
+            if (isAdmin) {
+                unsubs.push(db.collection('messages').onSnapshot(snap => {
+                    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                        .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                    renderMsgList('msgAllList', msgs, true, true);
+                }, err => { console.error('Erreur Firestore messages (modération)', err); toast('Impossible de charger tous les messages.', 'error'); }));
+            }
+
+            activeListeners['messagerie'] = () => unsubs.forEach(u => u());
+        }
+
+        function renderMsgList(containerId, msgs, isSent, isModeration) {
+            const el = document.getElementById(containerId);
+            if (msgs.length === 0) {
+                el.innerHTML = '<p class="empty-msg" style="padding:20px 0;">Aucun message.</p>';
+                return;
+            }
+            el.innerHTML = msgs.map(m => {
+                const date = m.createdAt && m.createdAt.toDate
+                    ? m.createdAt.toDate().toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                    : 'Envoi en cours…';
+                const noms = (m.toNoms || []).join(', ') || 'destinataire(s)';
+                const entete = isModeration
+                    ? `${m.fromNom || 'Un membre'} → ${noms}`
+                    : (isSent ? 'À : ' + noms : 'De : ' + (m.fromNom || 'Un membre'));
+                const canDelete = isSent || isAdmin;
+                return `<div class="champ-block" style="margin-bottom:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
+                        <strong style="color:var(--violet-deep);">${entete}</strong>
+                        <span style="font-size:0.75rem; color:var(--ink-soft); white-space:nowrap;">${date}</span>
+                    </div>
+                    <p style="white-space:pre-wrap; margin:0;">${m.texte || ''}</p>
+                    ${canDelete ? `<button class="btn-ghost" style="margin-top:10px;" onclick="deleteMessage('${m.id}')">Supprimer</button>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        async function openNewMessageModal() {
+            document.getElementById('msgTexte').value = '';
+            const uid = auth.currentUser.uid;
+            try {
+                const snap = await db.collection('users').where('status', '==', 'approved').get();
+                msgMembersCache = snap.docs.map(d => ({ uid: d.id, ...d.data() })).filter(u => u.uid !== uid);
+            } catch (e) {
+                console.error('Erreur chargement des membres', e);
+                msgMembersCache = [];
+            }
+            document.getElementById('msgRecipientsList').innerHTML = msgMembersCache.length
+                ? msgMembersCache.map(u => `<label style="display:flex; gap:8px; align-items:center; font-weight:400; cursor:pointer;">
+                        <input type="checkbox" value="${u.uid}" data-nom="${(u.prenom || '') + ' ' + (u.nom || '')}"> ${u.prenom || ''} ${u.nom || ''}
+                    </label>`).join('')
+                : '<p class="empty-msg">Aucun autre membre approuvé pour le moment.</p>';
+            openModal('message');
+        }
+
+        async function sendMessage() {
+            const texte = document.getElementById('msgTexte').value.trim();
+            const checked = Array.from(document.querySelectorAll('#msgRecipientsList input:checked'));
+
+            if (!texte) return toast('Écris un message avant d\'envoyer.', 'error');
+            if (checked.length === 0) return toast('Choisis au moins un destinataire.', 'error');
+
+            const to = checked.map(c => c.value);
+            const toNoms = checked.map(c => c.dataset.nom.trim());
+            const u = auth.currentUser;
+
+            let fromNom = 'Administrateur ALCF';
+            if (!isAdmin) {
+                try {
+                    const ownDoc = await db.collection('users').doc(u.uid).get();
+                    const od = ownDoc.exists ? ownDoc.data() : {};
+                    fromNom = `${od.prenom || ''} ${od.nom || ''}`.trim() || u.email;
+                } catch (e) { fromNom = u.email; }
+            }
+
+            try {
+                await db.collection('messages').add({
+                    from: u.uid,
+                    fromNom,
+                    to,
+                    toNoms,
+                    texte,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                closeModal('message');
+                toast('Message envoyé !', 'success');
+            } catch (e) {
+                console.error('Erreur envoi message', e);
+                toast('Erreur lors de l\'envoi du message.', 'error');
+            }
+        }
+
+        async function deleteMessage(id) {
+            if (!confirm('Supprimer ce message ?')) return;
+            try {
+                await db.collection('messages').doc(id).delete();
+            } catch (e) {
+                console.error('Erreur suppression message', e);
+                toast('Impossible de supprimer ce message.', 'error');
+            }
+        }
+
+        function loadEff() {
+            document.getElementById('effectifGrid').innerHTML = skeletonCards(4, 250);
+            watch('effectif', 'joueurs', snap => {
+                const docs = snap.docs.sort((a, b) => (a.data().numero || 0) - (b.data().numero || 0));
+                if (docs.length === 0) {
+                    document.getElementById('effectifGrid').innerHTML = '<p class="empty-msg">Aucun joueur pour le moment.</p>';
+                    return;
+                }
+                document.getElementById('effectifGrid').innerHTML = docs.map(doc => {
+                    const j = doc.data();
+                    return `<div class="player-card" onclick="openPlayer('${doc.id}')">
+                        <div class="player-num-panini">${j.numero || '0'}</div>
+                        <div class="player-img-container"><img src="${j.photo || 'logo-alcf.png'}" class="player-img" alt="${j.prenom} ${j.nom}" onerror="this.src='logo-alcf.png'; this.onerror=null;"></div>
+                        <div class="player-info-banner"><h4>${j.prenom} ${j.nom}</h4><p>${j.poste}</p>${j.licence ? `<p style="color:var(--violet-deep); margin-top:6px; font-weight:700;">Licence n° ${j.licence}</p>` : ''}</div>
+                        <div class="admin-only card-actions">
+                            <button onclick="event.stopPropagation(); editJoueur('${doc.id}')" aria-label="Modifier">✏️</button>
+                            <button onclick="event.stopPropagation(); deleteDoc('joueurs','${doc.id}')" aria-label="Supprimer">🗑️</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        function formatDateFr(dateStr) {
+            if (!dateStr) return '';
+            const [y, m, d] = dateStr.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
+        async function openPlayer(id) {
+            const doc = await db.collection('joueurs').doc(id).get();
+            if (!doc.exists) return;
+            const d = doc.data();
+            const adresse = [
+                [d.rue, d.adresseNum].filter(Boolean).join(' n°'),
+                [d.codePostal, d.ville].filter(Boolean).join(' ')
+            ].filter(Boolean).join(', ');
+
+            document.getElementById('detContent').innerHTML = `
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <img src="${d.photo || 'logo-alcf.png'}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--gold);" onerror="this.src='logo-alcf.png'; this.onerror=null;">
+                    <div style="text-align:left">
+                        <h3 style="margin:0; color:var(--violet-deep);">${d.prenom} ${d.nom}</h3>
+                        <p style="color:var(--gold); font-weight:600; margin-top:6px;">${d.poste} · Maillot n° ${d.numero}</p>
+                    </div>
+                </div>
+                <div style="text-align:left; margin-top:22px; display:flex; flex-direction:column; gap:14px;">
+                    ${d.dateNaissance ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Date de naissance</div><div style="margin-top:2px;">${formatDateFr(d.dateNaissance)}</div></div>` : ''}
+                    ${d.taille ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Taille</div><div style="margin-top:2px;">${d.taille} cm</div></div>` : ''}
+                    ${adresse ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Adresse</div><div style="margin-top:2px;">${adresse}</div></div>` : ''}
+                    ${d.licence ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">N° de licence</div><div style="margin-top:2px;">${d.licence}</div></div>` : ''}
+                    ${d.telephone ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Téléphone</div><a href="tel:${d.telephone.replace(/\s+/g,'')}" style="margin-top:2px; display:inline-block; color:var(--violet-deep); font-weight:700; text-decoration:underline;">${d.telephone}</a></div>` : ''}
+                    ${d.email ? `<div><div style="text-transform:uppercase; color:var(--ink-soft); font-size:0.72rem; font-weight:700; letter-spacing:0.04em;">Email</div><a href="mailto:${d.email}" style="margin-top:2px; display:inline-block; color:var(--violet-deep); font-weight:700; text-decoration:underline;">${d.email}</a></div>` : ''}
+                </div>
+                <button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="closeModal('player-details'); showPage('stats');">📊 Voir ses statistiques</button>`;
+            openModal('player-details');
+        }
+
+        function changeMonth(delta) {
+            calMonth += delta;
+            if (calMonth < 0) { calMonth = 11; calYear--; }
+            if (calMonth > 11) { calMonth = 0; calYear++; }
+            renderCalendar();
+        }
+
+        let allMatchsCache = [];
+        function loadCal() {
+            watch('calendrier', 'matchs', snap => {
+                allMatchsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderCalendar();
+                if (document.getElementById('modal-day-details').classList.contains('active') && currentDayDate) {
+                    renderDayDetails(currentDayDate);
+                }
+            });
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const label = document.getElementById('calMonthLabel');
+            const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+            label.textContent = `${monthNames[calMonth]} ${calYear}`;
+
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === calYear && today.getMonth() === calMonth;
+
+            grid.innerHTML = '';
+            ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(d => {
+                grid.innerHTML += `<div class="calendar-day-head">${d}</div>`;
+            });
+
+            const firstOfMonth = new Date(calYear, calMonth, 1);
+            let startOffset = firstOfMonth.getDay() - 1;
+            if (startOffset < 0) startOffset = 6;
+
+            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+            const monthStr = String(calMonth + 1).padStart(2, '0');
+
+            for (let i = 0; i < startOffset; i++) {
+                grid.innerHTML += `<div class="calendar-day empty"></div>`;
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayStr = String(i).padStart(2, '0');
+                const fullDatePrefix = `${calYear}-${monthStr}-${dayStr}`;
+                const evs = allMatchsCache
+                    .filter(m => m.date === fullDatePrefix)
+                    .map(m => {
+                        const cls = 'event-' + (EVENT_TYPES[m.type] ? m.type : 'match');
+                        const icon = (EVENT_TYPES[m.type] || EVENT_TYPES.match).icon;
+                        return `<div class="event-item ${cls}">${icon} ${m.heure || ''} ${eventText(m)}</div>`;
+                    })
+                    .join('');
+                const isToday = isCurrentMonth && today.getDate() === i;
+                grid.innerHTML += `<div class="calendar-day${isToday ? ' today' : ''}" onclick="openDayDetails('${fullDatePrefix}')"><strong>${i}</strong>${evs}</div>`;
+            }
+        }
+
+        function openDayDetails(dateStr) {
+            currentDayDate = dateStr;
+            renderDayDetails(dateStr);
+            openModal('day-details');
+        }
+
+        function renderDayDetails(dateStr) {
+            const [y, m, d] = dateStr.split('-');
+            const dateObj = new Date(y, m - 1, d);
+            document.getElementById('dayDetailsTitle').textContent = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+            const evs = allMatchsCache.filter(ev => ev.date === dateStr);
+            const list = document.getElementById('dayDetailsList');
+
+            if (evs.length === 0) {
+                list.innerHTML = '<p class="empty-msg" style="padding:20px 0;">Aucun événement ce jour.</p>';
+                return;
+            }
+
+            list.innerHTML = evs.map(ev => {
+                const t = EVENT_TYPES[ev.type] || EVENT_TYPES.match;
+                return `<div class="day-event-row">
+                    <div class="day-event-badge" style="background:${t.color};">${t.icon}</div>
+                    <div class="day-event-info">
+                        <div class="ev-heure">${t.label}${ev.heure ? ' · ' + ev.heure : ''}</div>
+                        <div class="ev-text">${eventText(ev) || '<em>Sans détail</em>'}</div>
+                    </div>
+                    <div class="day-event-actions staff-only">
+                        <button onclick="editMatch('${ev.id}')" aria-label="Modifier">✏️</button>
+                        <button onclick="deleteMatchFromDay('${ev.id}')" aria-label="Supprimer">🗑️</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleMatchFields() {
+            const type = document.getElementById('matchType').value;
+            document.getElementById('matchAdvField').style.display = (type === 'match') ? 'block' : 'none';
+            document.getElementById('matchCommentField').style.display = (type === 'anniversaire' || type === 'repas' || type === 'autre') ? 'block' : 'none';
+            document.getElementById('matchNoFieldNote').style.display = (type === 'entrainement') ? 'block' : 'none';
+        }
+
+        function newMatchModal() {
+            document.getElementById('matchId').value = '';
+            document.getElementById('matchModalTitle').textContent = 'Nouvel événement';
+            document.getElementById('matchDate').value = '';
+            document.getElementById('matchHeure').value = '';
+            document.getElementById('matchType').value = 'match';
+            document.getElementById('matchAdv').value = '';
+            document.getElementById('matchCommentaire').value = '';
+            toggleMatchFields();
+            openModal('match');
+        }
+
+        function openMatchModalForDate(dateStr) {
+            newMatchModal();
+            document.getElementById('matchDate').value = dateStr;
+            closeModal('day-details');
+            openModal('match');
+        }
+
+        async function editMatch(id) {
+            const doc = await db.collection('matchs').doc(id).get();
+            if (!doc.exists) return;
+            const d = doc.data();
+            document.getElementById('matchId').value = id;
+            document.getElementById('matchModalTitle').textContent = 'Modifier l\'événement';
+            document.getElementById('matchDate').value = d.date || '';
+            document.getElementById('matchHeure').value = d.heure || '';
+            document.getElementById('matchType').value = d.type || 'match';
+            document.getElementById('matchAdv').value = d.matchAdv || '';
+            document.getElementById('matchCommentaire').value = d.commentaire || '';
+            toggleMatchFields();
+            closeModal('day-details');
+            openModal('match');
+        }
+
+        async function deleteMatchFromDay(id) {
+            if (!isAdmin && !isCoachUser) return toast('Accès refusé', 'error');
+            if (!confirm('Supprimer cet événement ?')) return;
+            try {
+                await db.collection('matchs').doc(id).delete();
+                allMatchsCache = allMatchsCache.filter(m => m.id !== id);
+                renderDayDetails(currentDayDate);
+                renderCalendar();
+                toast('Événement supprimé', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        // ---- Statistiques : saisie par match (équipe + tous les joueurs), agrégation dernier match / saison ----
+        let statsMatchPlayersCache = [];
+        let allStatsMatchsCache = [];
+
+        async function openStatsMatchModal(id) {
+            let joueursSnap;
+            try {
+                joueursSnap = await db.collection('joueurs').get();
+            } catch (e) {
+                return toast('Impossible de charger la liste des joueurs.', 'error');
+            }
+            statsMatchPlayersCache = joueursSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a, b) => (a.numero || 0) - (b.numero || 0));
+
+            let existing = null;
+            if (id) {
+                const doc = await db.collection('statsMatchs').doc(id).get();
+                if (doc.exists) existing = doc.data();
+            }
+
+            document.getElementById('statsMatchId').value = id || '';
+            document.getElementById('statsMatchModalTitle').textContent = id ? 'Modifier les stats du match' : 'Stats d\'un match';
+            document.getElementById('statsMatchDate').value = existing ? (existing.date || '') : '';
+            document.getElementById('statsMatchAdv').value = existing ? (existing.adversaire || '') : '';
+            document.getElementById('statsMatchScoreEquipe').value = existing ? (existing.scoreEquipe ?? '') : '';
+            document.getElementById('statsMatchScoreAdv').value = existing ? (existing.scoreAdversaire ?? '') : '';
+
+            const headRow = `<div class="stat-input-row head">
+                <div>Joueur</div><div>3pts</div><div>2pts</div><div>LF</div><div>Fautes</div><div>F. Off.</div><div>F. Tech.</div><div>F. Disq.</div>
+            </div>`;
+
+            const playerRows = statsMatchPlayersCache.map(j => {
+                const ex = existing ? (existing.joueurs || []).find(x => x.joueurId === j.id) : null;
+                const val = v => (ex && ex[v]) ? ex[v] : '';
+                return `<div class="stat-input-row" data-joueur-id="${j.id}" data-joueur-nom="${(j.prenom || '') + ' ' + (j.nom || '')}">
+                    <div class="stat-player-name">${j.prenom || ''} ${j.nom || ''}</div>
+                    <input type="number" min="0" class="statPts3" value="${val('pts3')}" placeholder="0">
+                    <input type="number" min="0" class="statPts2" value="${val('pts2')}" placeholder="0">
+                    <input type="number" min="0" class="statPts1" value="${val('pts1')}" placeholder="0">
+                    <input type="number" min="0" class="statFautes" value="${val('fautes')}" placeholder="0">
+                    <input type="number" min="0" class="statFautesOff" value="${val('fautesOffensives')}" placeholder="0">
+                    <input type="number" min="0" class="statFautesTech" value="${val('fautesTechniques')}" placeholder="0">
+                    <input type="number" min="0" class="statFautesDisq" value="${val('fautesDisqualifiantes')}" placeholder="0">
+                </div>`;
+            }).join('');
+
+            document.getElementById('statsMatchPlayersRows').innerHTML = headRow + (playerRows || '<p class="empty-msg">Ajoute d\'abord des joueurs dans l\'effectif.</p>');
+            openModal('statsMatch');
+        }
+
+        async function saveStatsMatch() {
+            if (!isAdmin && !isCoachUser) return toast('Accès refusé', 'error');
+            const id = document.getElementById('statsMatchId').value;
+            const date = document.getElementById('statsMatchDate').value;
+            if (!date) return toast('La date du match est obligatoire', 'error');
+
+            const rows = Array.from(document.querySelectorAll('#statsMatchPlayersRows .stat-input-row[data-joueur-id]'));
+            const joueursData = rows.map(row => {
+                const num = sel => parseInt(row.querySelector(sel).value) || 0;
+                return {
+                    joueurId: row.dataset.joueurId,
+                    joueurNom: row.dataset.joueurNom,
+                    pts3: num('.statPts3'),
+                    pts2: num('.statPts2'),
+                    pts1: num('.statPts1'),
+                    fautes: num('.statFautes'),
+                    fautesOffensives: num('.statFautesOff'),
+                    fautesTechniques: num('.statFautesTech'),
+                    fautesDisqualifiantes: num('.statFautesDisq')
+                };
+            }).filter(j => j.pts3 || j.pts2 || j.pts1 || j.fautes || j.fautesOffensives || j.fautesTechniques || j.fautesDisqualifiantes);
+
+            const data = {
+                date: date,
+                adversaire: document.getElementById('statsMatchAdv').value.trim(),
+                scoreEquipe: parseInt(document.getElementById('statsMatchScoreEquipe').value) || 0,
+                scoreAdversaire: parseInt(document.getElementById('statsMatchScoreAdv').value) || 0,
+                joueurs: joueursData
+            };
+
+            try {
+                if (id) await db.collection('statsMatchs').doc(id).update(data);
+                else await db.collection('statsMatchs').add(data);
+                closeModal('statsMatch');
+                toast('Stats du match enregistrées', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        function loadStats() {
+            document.getElementById('statsDernierMatch').innerHTML = '<p class="empty-msg" style="padding:16px 0;">Chargement…</p>';
+            document.getElementById('statsSaisonEquipe').innerHTML = '<p class="empty-msg" style="padding:16px 0;">Chargement…</p>';
+            document.getElementById('statsPlayersGrid').innerHTML = skeletonCards(4, 0);
+            watch('stats', 'statsMatchs', snap => {
+                allStatsMatchsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderStatsPage();
+            });
+        }
+
+        function foulTotalsForMatch(m) {
+            return (m.joueurs || []).reduce((acc, j) => {
+                acc.fautes += j.fautes || 0;
+                acc.off += j.fautesOffensives || 0;
+                acc.tech += j.fautesTechniques || 0;
+                acc.disq += j.fautesDisqualifiantes || 0;
+                return acc;
+            }, { fautes: 0, off: 0, tech: 0, disq: 0 });
+        }
+
+        function renderStatsPage() {
+            const dernierMatchEl = document.getElementById('statsDernierMatch');
+            const saisonEquipeEl = document.getElementById('statsSaisonEquipe');
+            const playersGridEl = document.getElementById('statsPlayersGrid');
+            const matchsListEl = document.getElementById('statsMatchsList');
+
+            if (allStatsMatchsCache.length === 0) {
+                dernierMatchEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">Aucun match enregistré pour le moment.</p>';
+                saisonEquipeEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">Aucun match enregistré pour le moment.</p>';
+                playersGridEl.innerHTML = '<p class="empty-msg">Aucune statistique pour le moment.</p>';
+                if (matchsListEl) matchsListEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">Aucun match enregistré.</p>';
+                return;
+            }
+
+            const sorted = [...allStatsMatchsCache].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const dernier = sorted[0];
+            const dFouls = foulTotalsForMatch(dernier);
+            const totalFautesDernier = dFouls.fautes + dFouls.off + dFouls.tech;
+            const resultat = dernier.scoreEquipe > dernier.scoreAdversaire ? 'Victoire' : (dernier.scoreEquipe < dernier.scoreAdversaire ? 'Défaite' : 'Match nul');
+            const resultClass = dernier.scoreEquipe > dernier.scoreAdversaire ? 'win' : (dernier.scoreEquipe < dernier.scoreAdversaire ? 'loss' : '');
+
+            dernierMatchEl.innerHTML = `
+                <p style="color:var(--ink-soft); font-size:0.82rem; margin-bottom:6px;">${dernier.adversaire ? 'vs ' + dernier.adversaire + ' — ' : ''}${formatDateFr(dernier.date)}</p>
+                <div class="stat-metrics">
+                    <div class="stat-metric"><div class="stat-label">Score</div><div class="stat-value">${dernier.scoreEquipe} - ${dernier.scoreAdversaire}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Résultat</div><div class="stat-value ${resultClass}">${resultat}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Fautes équipe</div><div class="stat-value">${totalFautesDernier}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Tech. / Disqual.</div><div class="stat-value">${dFouls.tech} / ${dFouls.disq}</div></div>
+                </div>`;
+
+            const nbMatchs = sorted.length;
+            const victoires = sorted.filter(m => m.scoreEquipe > m.scoreAdversaire).length;
+            const defaites = sorted.filter(m => m.scoreEquipe < m.scoreAdversaire).length;
+            const totalFoulsSaison = sorted.reduce((acc, m) => {
+                const f = foulTotalsForMatch(m);
+                acc.fautes += f.fautes; acc.off += f.off; acc.tech += f.tech; acc.disq += f.disq;
+                return acc;
+            }, { fautes: 0, off: 0, tech: 0, disq: 0 });
+            const totalFautesSaisonTotal = totalFoulsSaison.fautes + totalFoulsSaison.off + totalFoulsSaison.tech;
+            const moyFautes = nbMatchs ? (totalFautesSaisonTotal / nbMatchs).toFixed(1) : '0.0';
+
+            const totalPointsMarques = sorted.reduce((s, m) => s + (m.scoreEquipe || 0), 0);
+            const totalPointsEncaisses = sorted.reduce((s, m) => s + (m.scoreAdversaire || 0), 0);
+            const moyPointsMarques = nbMatchs ? (totalPointsMarques / nbMatchs).toFixed(1) : '0.0';
+            const moyPointsEncaisses = nbMatchs ? (totalPointsEncaisses / nbMatchs).toFixed(1) : '0.0';
+            const diffMoyenNum = nbMatchs ? ((totalPointsMarques - totalPointsEncaisses) / nbMatchs) : 0;
+            const diffMoyen = diffMoyenNum.toFixed(1);
+            const diffClass = diffMoyenNum > 0 ? 'win' : (diffMoyenNum < 0 ? 'loss' : '');
+            const diffLabel = diffMoyenNum > 0 ? '+' + diffMoyen : diffMoyen;
+
+            saisonEquipeEl.innerHTML = `
+                <div class="stat-metrics">
+                    <div class="stat-metric"><div class="stat-label">Matchs joués</div><div class="stat-value">${nbMatchs}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Bilan</div><div class="stat-value">${victoires}V - ${defaites}D</div></div>
+                    <div class="stat-metric"><div class="stat-label">Moy. points marqués</div><div class="stat-value">${moyPointsMarques}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Moy. points encaissés</div><div class="stat-value">${moyPointsEncaisses}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Différentiel moyen</div><div class="stat-value ${diffClass}">${diffLabel}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Moy. fautes / match</div><div class="stat-value">${moyFautes}</div></div>
+                    <div class="stat-metric"><div class="stat-label">Tech. / Disqual.</div><div class="stat-value">${totalFoulsSaison.tech} / ${totalFoulsSaison.disq}</div></div>
+                </div>`;
+
+            const playerTotals = {};
+            sorted.forEach(m => {
+                (m.joueurs || []).forEach(j => {
+                    if (!playerTotals[j.joueurId]) playerTotals[j.joueurId] = { joueurNom: j.joueurNom, pts: 0, fautes: 0, off: 0, tech: 0, disq: 0 };
+                    const pts = (j.pts3 || 0) * 3 + (j.pts2 || 0) * 2 + (j.pts1 || 0);
+                    playerTotals[j.joueurId].pts += pts;
+                    playerTotals[j.joueurId].fautes += j.fautes || 0;
+                    playerTotals[j.joueurId].off += j.fautesOffensives || 0;
+                    playerTotals[j.joueurId].tech += j.fautesTechniques || 0;
+                    playerTotals[j.joueurId].disq += j.fautesDisqualifiantes || 0;
+                });
+            });
+
+            const dernierByPlayer = {};
+            (dernier.joueurs || []).forEach(j => { dernierByPlayer[j.joueurId] = j; });
+
+            const playersArr = Object.entries(playerTotals).map(([id, t]) => ({ id, ...t }));
+            playersArr.sort((a, b) => b.pts - a.pts);
+
+            if (playersArr.length === 0) {
+                playersGridEl.innerHTML = '<p class="empty-msg">Aucune statistique individuelle pour le moment.</p>';
+            } else {
+                playersGridEl.innerHTML = playersArr.map((p, idx) => {
+                    const dj = dernierByPlayer[p.id];
+                    const dPts = dj ? (dj.pts3 || 0) * 3 + (dj.pts2 || 0) * 2 + (dj.pts1 || 0) : 0;
+                    const dFautesTotal = dj ? (dj.fautes || 0) + (dj.fautesOffensives || 0) + (dj.fautesTechniques || 0) : 0;
+                    const totalFautesSaisonJoueur = p.fautes + p.off + p.tech;
+                    return `<div class="stat-player-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:8px;">
+                            <h4>${p.joueurNom}</h4>
+                            ${idx === 0 && p.pts > 0 ? '<span class="stat-badge">Top marqueur</span>' : ''}
+                        </div>
+                        <div class="stat-section-label">Dernier match</div>
+                        <div class="stat-row strong"><span>Points</span><span>${dPts}</span></div>
+                        <div class="stat-row strong"><span>Fautes</span><span>${dFautesTotal}</span></div>
+                        <div class="stat-subrow"><span>Classiques</span><span>${dj ? (dj.fautes || 0) : 0}</span></div>
+                        <div class="stat-subrow"><span>Offensives</span><span>${dj ? (dj.fautesOffensives || 0) : 0}</span></div>
+                        <div class="stat-subrow"><span>Techniques</span><span>${dj ? (dj.fautesTechniques || 0) : 0}</span></div>
+                        <div class="stat-subrow"><span>Disqualifiante</span><span>${dj ? (dj.fautesDisqualifiantes || 0) : 0}</span></div>
+                        <div class="stat-section-label">Saison</div>
+                        <div class="stat-row strong"><span>Points</span><span>${p.pts}</span></div>
+                        <div class="stat-row strong"><span>Fautes</span><span>${totalFautesSaisonJoueur}</span></div>
+                        <div class="stat-subrow"><span>Classiques</span><span>${p.fautes}</span></div>
+                        <div class="stat-subrow"><span>Offensives</span><span>${p.off}</span></div>
+                        <div class="stat-subrow"><span>Techniques</span><span>${p.tech}</span></div>
+                        <div class="stat-subrow"><span>Disqualifiante</span><span>${p.disq}</span></div>
+                    </div>`;
+                }).join('');
+            }
+
+            if (matchsListEl) {
+                matchsListEl.innerHTML = sorted.map(m => `
+                    <div class="match-row">
+                        <div class="match-date">${formatDateFr(m.date)}</div>
+                        <div class="match-teams" style="flex:1;">${m.adversaire ? 'vs ' + m.adversaire : 'Match'} — ${m.scoreEquipe ?? 0} / ${m.scoreAdversaire ?? 0}</div>
+                        <div class="day-event-actions">
+                            <button onclick="openStatsMatchModal('${m.id}')" aria-label="Modifier">✏️</button>
+                            <button onclick="deleteDoc('statsMatchs','${m.id}')" aria-label="Supprimer">🗑️</button>
+                        </div>
+                    </div>`).join('');
+            }
+        }
+
+        function loadInf() {
+            watch('infos', 'infos', s => {
+                if (s.docs.length === 0) {
+                    document.getElementById('infosGrid').innerHTML = '<p class="empty-msg">Aucune info publiée.</p>';
+                    return;
+                }
+                document.getElementById('infosGrid').innerHTML = s.docs.map(d => `<div class="player-card info-card"><h4>${d.data().titre}</h4><p>${d.data().texte}</p><button class="btn-ghost staff-only" style="margin-top:14px;" onclick="deleteDoc('infos','${d.id}')">Supprimer</button></div>`).join('');
+            });
+        }
+
+        function loadGallery() {
+            document.getElementById('galleryGrid').innerHTML = skeletonCards(4, 220);
+            watch('galerie', 'photos', s => {
+                if (s.docs.length === 0) {
+                    document.getElementById('galleryGrid').innerHTML = '<p class="empty-msg">Aucune photo pour le moment.</p>';
+                    return;
+                }
+                document.getElementById('galleryGrid').innerHTML = s.docs.map(d => `
+                    <div class="player-card gallery-card">
+                        <div class="player-img-container">
+                            <img src="${d.data().url || 'logo-alcf.png'}" class="player-img" alt="Photo galerie" onclick="window.open('${d.data().url || 'logo-alcf.png'}', '_blank')" onerror="this.src='logo-alcf.png'; this.onerror=null;">
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn-ghost admin-only" onclick="deleteDoc('photos','${d.id}')">Supprimer</button>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        async function saveJoueur() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const id = document.getElementById('joueurId').value;
+            const data = {
+                prenom: document.getElementById('joueurPrenom').value.trim(),
+                nom: document.getElementById('joueurNom').value.trim(),
+                dateNaissance: document.getElementById('joueurNaissance').value,
+                taille: parseInt(document.getElementById('joueurTaille').value) || 0,
+                rue: document.getElementById('joueurRue').value.trim(),
+                adresseNum: document.getElementById('joueurAdresseNum').value.trim(),
+                codePostal: document.getElementById('joueurCodePostal').value.trim(),
+                ville: document.getElementById('joueurVille').value.trim(),
+                numero: parseInt(document.getElementById('joueurNumero').value) || 0,
+                licence: document.getElementById('joueurLicence').value.trim(),
+                telephone: document.getElementById('joueurTelephone').value.trim(),
+                email: document.getElementById('joueurEmail').value.trim(),
+                poste: document.getElementById('joueurPoste').value,
+                photo: document.getElementById('joueurPhoto').value.trim()
+            };
+            if (!data.prenom || !data.nom) return toast('Prénom et nom sont obligatoires', 'error');
+            try {
+                if (id) await db.collection('joueurs').doc(id).update(data);
+                else await db.collection('joueurs').add(data);
+                closeModal('joueur');
+                toast('Joueur enregistré', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function saveMatch() {
+            if (!isAdmin && !isCoachUser) return toast('Accès refusé', 'error');
+            const id = document.getElementById('matchId').value;
+            const date = document.getElementById('matchDate').value;
+            const type = document.getElementById('matchType').value;
+            const titre = document.getElementById('matchAdv').value.trim();
+            const commentaire = document.getElementById('matchCommentaire').value.trim();
+
+            if (!date) return toast('La date est obligatoire', 'error');
+            if (type === 'match' && !titre) return toast('Le nom de l\'adversaire est obligatoire', 'error');
+            if ((type === 'anniversaire' || type === 'repas' || type === 'autre') && !commentaire) return toast('Le commentaire est obligatoire', 'error');
+
+            const data = {
+                date: date,
+                heure: document.getElementById('matchHeure').value,
+                type: type,
+                matchAdv: (type === 'match') ? titre : '',
+                commentaire: (type === 'anniversaire' || type === 'repas' || type === 'autre') ? commentaire : ''
+            };
+
+            try {
+                if (id) await db.collection('matchs').doc(id).update(data);
+                else await db.collection('matchs').add(data);
+                closeModal('match');
+                toast(id ? 'Événement modifié' : 'Événement ajouté', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function saveInfo() {
+            if (!isAdmin && !isCoachUser) return toast('Accès refusé', 'error');
+            const titre = document.getElementById('infoTitre').value.trim();
+            if (!titre) return toast('Le titre est obligatoire', 'error');
+            try {
+                await db.collection('infos').add({ titre: titre, texte: document.getElementById('infoTexte').value.trim() });
+                closeModal('info');
+                toast('Info publiée', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function savePhoto() {
+            if (!isAdmin) return toast('Accès refusé', 'error');
+            const url = document.getElementById('galUrl').value.trim();
+            if (!url) return toast('URL obligatoire', 'error');
+            try {
+                await db.collection('photos').add({ url: url });
+                closeModal('galerie');
+                toast('Photo ajoutée', 'success');
+            } catch (e) {
+                toast('Erreur : ' + e.message, 'error');
+            }
+        }
+
+        async function editJoueur(id) {
+            const doc = await db.collection('joueurs').doc(id).get();
+            if (!doc.exists) return;
+            const d = doc.data();
+            document.getElementById('joueurId').value = id;
+            document.getElementById('joueurPrenom').value = d.prenom || '';
+            document.getElementById('joueurNom').value = d.nom || '';
+            document.getElementById('joueurNaissance').value = d.dateNaissance || '';
+            document.getElementById('joueurTaille').value = d.taille || '';
+            document.getElementById('joueurRue').value = d.rue || '';
+            document.getElementById('joueurAdresseNum').value = d.adresseNum || '';
+            document.getElementById('joueurCodePostal').value = d.codePostal || '';
+            document.getElementById('joueurVille').value = d.ville || '';
+            document.getElementById('joueurNumero').value = d.numero || '';
+            document.getElementById('joueurLicence').value = d.licence || '';
+            document.getElementById('joueurTelephone').value = d.telephone || '';
+            document.getElementById('joueurEmail').value = d.email || '';
+            document.getElementById('joueurPoste').value = d.poste || 'Meneur';
+            document.getElementById('joueurPhoto').value = d.photo || '';
+            openModal('joueur');
+        }
+
+        async function deleteDoc(c, i) {
+            const staffCollections = ['statsMatchs', 'infos', 'matchs'];
+            const allowed = isAdmin || (isCoachUser && staffCollections.includes(c));
+            if (!allowed) return toast('Accès refusé', 'error');
+            if (confirm('Supprimer ?')) {
+                try {
+                    await db.collection(c).doc(i).delete();
+                    toast('Supprimé', 'success');
+                } catch (e) {
+                    toast('Erreur : ' + e.message, 'error');
+                }
+            }
+        }
+
+        function openModal(id) { document.getElementById('modal-' + id).classList.add('active'); }
+
+        function closeModal(id) {
+            document.getElementById('modal-' + id).classList.remove('active');
+            if (id === 'joueur') {
+                document.getElementById('joueurId').value = '';
+                document.getElementById('joueurPrenom').value = '';
+                document.getElementById('joueurNom').value = '';
+                document.getElementById('joueurNaissance').value = '';
+                document.getElementById('joueurTaille').value = '';
+                document.getElementById('joueurRue').value = '';
+                document.getElementById('joueurAdresseNum').value = '';
+                document.getElementById('joueurCodePostal').value = '';
+                document.getElementById('joueurVille').value = '';
+                document.getElementById('joueurNumero').value = '';
+                document.getElementById('joueurLicence').value = '';
+                document.getElementById('joueurTelephone').value = '';
+                document.getElementById('joueurEmail').value = '';
+                document.getElementById('joueurPoste').value = 'Meneur';
+                document.getElementById('joueurPhoto').value = '';
+            }
+            if (id === 'match') {
+                document.getElementById('matchId').value = '';
+                document.getElementById('matchModalTitle').textContent = 'Nouvel événement';
+                document.getElementById('matchDate').value = '';
+                document.getElementById('matchHeure').value = '';
+                document.getElementById('matchAdv').value = '';
+                document.getElementById('matchCommentaire').value = '';
+                document.getElementById('matchType').value = 'match';
+                toggleMatchFields();
+            }
+            if (id === 'statsMatch') {
+                document.getElementById('statsMatchId').value = '';
+                document.getElementById('statsMatchDate').value = '';
+                document.getElementById('statsMatchAdv').value = '';
+                document.getElementById('statsMatchScoreEquipe').value = '';
+                document.getElementById('statsMatchScoreAdv').value = '';
+                document.getElementById('statsMatchPlayersRows').innerHTML = '';
+            }
+            if (id === 'info') {
+                document.getElementById('infoTitre').value = '';
+                document.getElementById('infoTexte').value = '';
+            }
+            if (id === 'galerie') {
+                document.getElementById('galUrl').value = '';
+            }
+        }
+
+        async function doLogin() {
+            try {
+                await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+            } catch (e) {
+                toast('Erreur de connexion : ' + e.message, 'error');
+            }
+        }
+
+        function doLogout() { auth.signOut(); location.reload(); }
+
+        showPage('accueil');
+    </script>
+</body>
+</html>
