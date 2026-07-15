@@ -545,11 +545,11 @@
         .home-topbar-hidden .topbar { display: none !important; }
 
         .accueil-header {
-            background: url('fond.png') center center/cover no-repeat, #0e0c19;
-            min-height: 350px;
+            background: url('fond.png') top center/cover no-repeat, #0e0c19;
+            min-height: 280px;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
             position: relative;
-            padding: 40px 20px 30px;
+            padding: 20px 20px 20px;
         }
         .accueil-header::before {
             content: '';
@@ -704,7 +704,7 @@
             .calendar-day { min-height: 64px; font-size: 0.6rem; padding: 4px; }
             .form-grid { grid-template-columns: 1fr; }
             .container { padding: 20px 12px; }
-            .accueil-header { min-height: 280px; padding: 30px 16px 20px; }
+            .accueil-header { min-height: 200px; padding: 16px 16px 16px; }
             .header-nav-gold .gold-link { font-size: 0.65rem; padding: 5px 10px; }
             .accueil-content { padding: 24px 16px 16px; }
             .accueil-content h2 { font-size: 1rem; }
@@ -813,7 +813,7 @@
                 <button class="nav-link" onclick="showPage('infos')" id="nav-infos"><span class="ic">📰</span> Infos</button>
                 <button class="nav-link" onclick="showPage('messagerie')" id="nav-messagerie"><span class="ic">💬</span> Messagerie</button>
                 <button class="nav-link admin-only" onclick="showPage('membres')" id="nav-membres"><span class="ic">⚙️</span> Membres</button>
-                <button class="nav-link" onclick="if(!isAdmin)return toast('Accès réservé aux admins','error');openModal('ffbb')"><span class="ic">🔄</span> FFBB</button>
+                <button class="nav-link" onclick="if(!isAdmin)return toast('Accès réservé aux admins','error');openFFBB()"><span class="ic">🔄</span> FFBB</button>
             </nav>
             <div class="sidebar-footer">
                 <div class="sidebar-season-box"><strong>Saison 2025/2026</strong>PNM · Poule A</div>
@@ -916,8 +916,11 @@
                 </div>
                 <div class="champ-block" style="margin-top:20px; display:none;" id="ffbbAdminBlock">
                     <h3>🔄 Données FFBB</h3>
-                    <p style="font-size:0.78rem; color:var(--ink-soft); margin-bottom:14px; line-height:1.6;">Mets à jour le classement et les rencontres depuis le site FFBB.</p>
-                    <button class="btn btn-gold" onclick="openModal('ffbb')">Mettre à jour</button>
+                    <p style="font-size:0.78rem; color:var(--ink-soft); margin-bottom:14px; line-height:1.6;">Synchronise automatiquement ou modifie manuellement les données FFBB.</p>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-gold" onclick="syncFFBBData()" id="syncFFBBBtn" style="flex:1; justify-content:center;">⚡ Synchroniser</button>
+                        <button class="btn btn-outline" onclick="openFFBB()" style="flex:1; justify-content:center;">✏️ Éditer manuellement</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1060,17 +1063,12 @@
     <div class="modal-overlay" id="modal-galerie"><div class="modal"><button class="modal-close" onclick="closeModal('galerie')">×</button><h3>Ajouter une photo</h3><div class="field-block" style="margin-top:14px;"><label for="galUrl">URL de la photo</label><input type="text" id="galUrl" placeholder="https://..."></div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="savePhoto()">Ajouter</button></div></div>
 
     <div class="modal-overlay" id="modal-ffbb"><div class="modal" style="max-width:700px;"><button class="modal-close" onclick="closeModal('ffbb')">×</button><h3>🔄 Données FFBB</h3>
-        <p style="font-size:0.78rem; color:var(--ink-soft); margin-bottom:14px; line-height:1.5;">Colle ici les données récupérées depuis le site de la FFBB au format JSON.</p>
-        <div class="field-block" style="margin-top:12px;">
-            <label style="font-weight:600; font-size:0.85rem;">Classement</label>
-            <textarea id="ffbbPoule" rows="6" style="width:100%; padding:10px; background:var(--bg-deep); color:var(--text); border:1px solid var(--border); border-radius:var(--radius-sm); font-family:monospace; font-size:0.78rem; resize:vertical;" placeholder='{"classement":[{"position":1,"equipe":"ALCF Chazeau","gagnes":5,"perdus":1,"points":11},...]}'></textarea>
+        <p style="font-size:0.82rem; margin-bottom:14px; line-height:1.5;">Saisis le classement de la poule et les matchs (rencontres).<br>Les données actuelles sont chargées automatiquement.</p>
+        <div id="ffbbEditor">
+            <p style="color:var(--ink-soft); font-size:0.85rem;">Chargement…</p>
         </div>
-        <div class="field-block" style="margin-top:12px;">
-            <label style="font-weight:600; font-size:0.85rem;">Rencontres</label>
-            <textarea id="ffbbRencontres" rows="6" style="width:100%; padding:10px; background:var(--bg-deep); color:var(--text); border:1px solid var(--border); border-radius:var(--radius-sm); font-family:monospace; font-size:0.78rem; resize:vertical;" placeholder='{"matchs":[{"date":"2025-09-14","equipe1":"ALCF Chazeau","equipe2":"Clermont","joue":false},...]}'></textarea>
-        </div>
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <button class="btn btn-gold" style="flex:1; justify-content:center;" onclick="loadCurrentFFBB()">Charger données actuelles</button>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+            <button class="btn btn-gold" style="flex:1; justify-content:center;" onclick="addClassementRow()">+ Ajouter une ligne</button>
             <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="saveFFBB()">Sauvegarder</button>
         </div>
     </div></div>
@@ -2404,38 +2402,180 @@
             }
         }
 
+        // ---- FFBB sync (local script) ----
+        function syncFFBBData() {
+            toast('💻 Lance ceci dans PowerShell : node sync-ffbb-local.js (dossier functions)', 'info', 6000);
+        }
+
         // ---- FFBB data editor ----
-        async function loadCurrentFFBB() {
-            try {
-                const [pouleDoc, rencontresDoc] = await Promise.all([
-                    db.collection('ffbb').doc('poule').get(),
-                    db.collection('ffbb').doc('rencontres').get()
-                ]);
-                document.getElementById('ffbbPoule').value = pouleDoc.exists
-                    ? JSON.stringify(pouleDoc.data(), null, 2)
-                    : '';
-                document.getElementById('ffbbRencontres').value = rencontresDoc.exists
-                    ? JSON.stringify(rencontresDoc.data(), null, 2)
-                    : '';
-                toast('Données chargées', 'success');
-            } catch (e) {
-                toast('Erreur : ' + e.message, 'error');
+        function openFFBB() {
+            openModal('ffbb');
+            document.getElementById('ffbbEditor').innerHTML = '<p style="color:var(--ink-soft);font-size:0.85rem;">Chargement…</p>';
+            Promise.all([
+                db.collection('ffbb').doc('poule').get(),
+                db.collection('ffbb').doc('rencontres').get()
+            ]).then(([pouleDoc, rencontresDoc]) => {
+                const classement = (pouleDoc.exists && pouleDoc.data().classement) || [];
+                const matchs = (rencontresDoc.exists && rencontresDoc.data().matchs) || [];
+                renderFFBBEditor(classement, matchs);
+            }).catch(e => {
+                document.getElementById('ffbbEditor').innerHTML = '<p style="color:var(--red);">Erreur de chargement</p>';
+            });
+        }
+
+        function renderFFBBEditor(classement, matchs) {
+            let html = '<div style="margin-bottom:18px;"><label style="font-weight:700;font-size:0.82rem;margin-bottom:6px;display:block;">🏆 Classement</label>';
+            html += '<div style="display:grid;grid-template-columns:30px 1fr 50px 50px 50px;gap:6px;font-size:0.75rem;font-weight:700;color:var(--ink-soft);padding:0 4px 4px;"><span>#</span><span>Équipe</span><span>V</span><span>D</span><span>Pts</span></div>';
+            html += '<div id="ffbbClassementRows">';
+            classement.forEach((c, i) => {
+                html += ffbbClassementRowHtml(i, c);
+            });
+            if (classement.length === 0) {
+                html += '<p style="font-size:0.78rem;color:var(--ink-soft);padding:8px 4px;">Aucune équipe. Clique sur "+ Ajouter une ligne".</p>';
             }
+            html += '</div></div>';
+
+            html += '<div><label style="font-weight:700;font-size:0.82rem;margin-bottom:6px;display:block;">🏀 Rencontres</label>';
+            html += '<div id="ffbbRencontresRows">';
+            matchs.forEach((m, i) => {
+                html += ffbbRencontreRowHtml(i, m);
+            });
+            if (matchs.length === 0) {
+                html += '<p style="font-size:0.78rem;color:var(--ink-soft);padding:8px 4px;">Aucune rencontre.</p>';
+            }
+            html += '</div>';
+            html += '<button class="btn btn-ghost" style="margin-top:6px;" onclick="addRencontreRow()">+ Ajouter une rencontre</button>';
+            html += '</div>';
+
+            document.getElementById('ffbbEditor').innerHTML = html;
+        }
+
+        function ffbbClassementRowHtml(i, c) {
+            return `<div style="display:grid;grid-template-columns:30px 1fr 50px 50px 50px;gap:6px;margin-bottom:4px;">
+                <span style="font-size:0.75rem;font-weight:700;color:var(--ink-soft);display:flex;align-items:center;">${i+1}</span>
+                <input class="ffbb-input" data-idx="${i}" data-field="equipe" value="${(c.equipe||'').replace(/"/g,'&quot;')}" style="padding:5px 8px;font-size:0.78rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:4px;color:var(--text);">
+                <input class="ffbb-input" data-idx="${i}" data-field="gagnes" value="${c.gagnes??0}" style="padding:5px 8px;font-size:0.78rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:4px;color:var(--text);text-align:center;width:50px;">
+                <input class="ffbb-input" data-idx="${i}" data-field="perdus" value="${c.perdus??0}" style="padding:5px 8px;font-size:0.78rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:4px;color:var(--text);text-align:center;width:50px;">
+                <input class="ffbb-input" data-idx="${i}" data-field="points" value="${c.points??0}" style="padding:5px 8px;font-size:0.78rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:4px;color:var(--text);text-align:center;width:50px;">
+            </div>`;
+        }
+
+        function ffbbRencontreRowHtml(i, m) {
+            const joue = m.joue ? 'checked' : '';
+            return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr 60px 50px 50px 30px;gap:4px;margin-bottom:4px;align-items:center;">
+                <input class="ffbb-match" data-idx="${i}" data-field="date" value="${m.date||''}" placeholder="2025-09-14" style="padding:4px 6px;font-size:0.72rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:4px;color:var(--text);">
+                <input class="ffbb-match" data-idx="${i}" data-field="equipe1" value="${(m.equipe1||'').replace(/"/g,'&quot;')}" placeholder="Équipe 1" style="padding:4px 6px;font-size:0.72rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:4px;color:var(--text);">
+                <input class="ffbb-match" data-idx="${i}" data-field="equipe2" value="${(m.equipe2||'').replace(/"/g,'&quot;')}" placeholder="Équipe 2" style="padding:4px 6px;font-size:0.72rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:4px;color:var(--text);">
+                <label style="font-size:0.65rem;display:flex;align-items:center;gap:3px;color:var(--ink-soft);"><input type="checkbox" class="ffbb-joue" data-idx="${i}" ${joue}> Joué</label>
+                <input class="ffbb-score" data-idx="${i}" data-field="score1" value="${m.score1??''}" placeholder="-" style="padding:4px 6px;font-size:0.72rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:4px;color:var(--text);text-align:center;width:50px;">
+                <input class="ffbb-score" data-idx="${i}" data-field="score2" value="${m.score2??''}" placeholder="-" style="padding:4px 6px;font-size:0.72rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:4px;color:var(--text);text-align:center;width:50px;">
+                <button class="btn-ghost" style="padding:2px 6px;font-size:0.7rem;" onclick="removeRencontre(${i})">✕</button>
+            </div>`;
+        }
+
+        function addClassementRow() {
+            const container = document.getElementById('ffbbClassementRows');
+            const rows = container.querySelectorAll('.ffbb-input');
+            const maxIdx = rows.length > 0 ? Math.max(...Array.from(rows).map(r => parseInt(r.dataset.idx))) : -1;
+            const newIdx = maxIdx + 1;
+            const div = document.createElement('div');
+            div.innerHTML = ffbbClassementRowHtml(newIdx, { equipe: '', gagnes: 0, perdus: 0, points: 0 });
+            // remove empty message if present
+            const emptyMsg = container.querySelector('p');
+            if (emptyMsg) emptyMsg.remove();
+            container.insertAdjacentHTML('beforeend', div.innerHTML);
+        }
+
+        function addRencontreRow() {
+            const container = document.getElementById('ffbbRencontresRows');
+            const rows = container.querySelectorAll('.ffbb-match');
+            const maxIdx = rows.length > 0 ? Math.max(...Array.from(rows).map(r => parseInt(r.dataset.idx))) : -1;
+            const newIdx = maxIdx + 1;
+            const emptyMsg = container.querySelector('p');
+            if (emptyMsg) emptyMsg.remove();
+            container.insertAdjacentHTML('beforeend', ffbbRencontreRowHtml(newIdx, { date: '', equipe1: 'ALCF Chazeau', equipe2: '', joue: false, score1: null, score2: null }));
+        }
+
+        function removeRencontre(idx) {
+            const container = document.getElementById('ffbbRencontresRows');
+            const rows = container.querySelectorAll('[data-idx]');
+            if (rows.length <= 1) {
+                container.innerHTML = '<p style="font-size:0.78rem;color:var(--ink-soft);padding:8px 4px;">Aucune rencontre.</p>';
+                return;
+            }
+            const row = Array.from(rows).find(r => r.dataset.idx == idx);
+            if (row) {
+                const parent = row.closest('[style*="grid"]') || row.parentElement.closest('[style*="grid"]') || row.parentElement;
+                if (parent && parent !== container) parent.remove();
+            }
+        }
+
+        function gatherFFBBData() {
+            // Gather classement
+            const classement = [];
+            const inputs = document.querySelectorAll('#ffbbClassementRows .ffbb-input');
+            const seen = new Set();
+            inputs.forEach(inp => {
+                const idx = inp.dataset.idx;
+                if (seen.has(idx)) return;
+                seen.add(idx);
+                const group = document.querySelectorAll(`.ffbb-input[data-idx="${idx}"]`);
+                if (group.length === 0) return;
+                const getVal = (field) => {
+                    const el = Array.from(group).find(g => g.dataset.field === field);
+                    return el ? el.value : '';
+                };
+                classement.push({
+                    position: classement.length + 1,
+                    equipe: getVal('equipe'),
+                    gagnes: parseInt(getVal('gagnes')) || 0,
+                    perdus: parseInt(getVal('perdus')) || 0,
+                    points: parseInt(getVal('points')) || 0
+                });
+            });
+
+            // Gather rencontres
+            const matchs = [];
+            const matchEls = document.querySelectorAll('#ffbbRencontresRows .ffbb-match');
+            const seenMatch = new Set();
+            matchEls.forEach(inp => {
+                const idx = inp.dataset.idx;
+                if (seenMatch.has(idx)) return;
+                seenMatch.add(idx);
+                const group = document.querySelectorAll(`.ffbb-match[data-idx="${idx}"], .ffbb-score[data-idx="${idx}"], .ffbb-joue[data-idx="${idx}"]`);
+                const getVal = (field) => {
+                    const el = Array.from(group).find(g => g.dataset.field === field);
+                    return el ? el.value : '';
+                };
+                const joueEl = Array.from(group).find(g => g.classList.contains('ffbb-joue'));
+                const joue = joueEl ? joueEl.checked : false;
+                const s1 = getVal('score1');
+                const s2 = getVal('score2');
+                matchs.push({
+                    date: getVal('date'),
+                    equipe1: getVal('equipe1'),
+                    equipe2: getVal('equipe2'),
+                    joue: joue,
+                    score1: joue && s1 ? parseInt(s1) : null,
+                    score2: joue && s2 ? parseInt(s2) : null
+                });
+            });
+
+            return { classement, matchs };
         }
 
         async function saveFFBB() {
             if (!isAdmin) return toast('Accès refusé', 'error');
+            const data = gatherFFBBData();
             try {
-                const poule = JSON.parse(document.getElementById('ffbbPoule').value || '{}');
-                const rencontres = JSON.parse(document.getElementById('ffbbRencontres').value || '{}');
                 await Promise.all([
-                    db.collection('ffbb').doc('poule').set(poule),
-                    db.collection('ffbb').doc('rencontres').set(rencontres)
+                    db.collection('ffbb').doc('poule').set({ classement: data.classement }),
+                    db.collection('ffbb').doc('rencontres').set({ matchs: data.matchs })
                 ]);
                 closeModal('ffbb');
                 toast('Données FFBB sauvegardées', 'success');
             } catch (e) {
-                toast('Erreur JSON : ' + e.message, 'error');
+                toast('Erreur : ' + e.message, 'error');
             }
         }
 
