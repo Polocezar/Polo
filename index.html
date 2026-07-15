@@ -314,7 +314,8 @@
         .dash-match-teams { display: flex; align-items: center; gap: 8px; margin: 8px 0 6px; }
         .dash-match-teams > div { flex: 1; display: flex; align-items: center; gap: 6px; }
         .dash-match-teams > div:last-child { flex-direction: row-reverse; }
-        .dash-match-badge { width: 30px; height: 30px; border-radius: 50%; background: #1a1a2e; color: #f59e0b; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.6rem; flex-shrink: 0; }
+        .dash-match-badge { width: 30px; height: 30px; border-radius: 50%; background: #1a1a2e; color: #f59e0b; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.6rem; flex-shrink: 0; overflow: hidden; }
+        .dash-match-badge img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
         .dash-match-team { font-size: 0.75rem; font-weight: 600; color: #1a1a2e; }
         .dash-match-vs { font-size: 0.6rem; color: #9ca3af; font-weight: 700; letter-spacing: 0.05em; }
         .dash-match-loc { font-size: 0.65rem; color: #6b7280; margin-top: 2px; }
@@ -363,10 +364,12 @@
         .match-date { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; min-width: 66px; }
         .match-date strong { display: block; color: var(--text-soft); font-size: 0.72rem; }
         .match-teams { flex: 1; font-size: 0.82rem; }
-        .match-teams .team-line { display: flex; justify-content: space-between; }
+        .match-teams .team-line { display: flex; align-items: center; gap: 6px; }
         .match-teams .alcf { color: var(--amber); font-weight: 700; }
         .match-teams-scored { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-        .match-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.82rem; padding: 3px 8px; border-radius: 6px; }
+        .match-logo { width: 20px; height: 20px; border-radius: 50%; object-fit: contain; }
+        .match-line { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; padding: 3px 8px; border-radius: 6px; }
+        .match-line .score { margin-left: auto; }
         .match-line .alcf { color: var(--amber); font-weight: 700; }
         .match-line .score { font-weight: 700; min-width: 26px; text-align: right; font-family: var(--font-display); }
         .match-line.win { background: var(--green-bg); }
@@ -615,6 +618,7 @@
         .classement-gold tbody tr.row-alcf:hover { background: #eab308; }
         .classement-gold tbody tr:hover { background: rgba(245,158,11,0.04); }
         .classement-gold .col-equipe { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .classement-gold .team-logo { width: 22px; height: 22px; border-radius: 50%; object-fit: contain; vertical-align: middle; margin-right: 6px; }
         .classement-gold .col-num { width: 28px; color: #9ca3af; }
         .classement-gold .col-stat { width: 34px; }
         .classement-gold .btn-violet { display: block; width: 100%; border: none; background: none; color: #4f2385; font-family: 'Oswald', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 10px; cursor: pointer; border-top: 1px solid rgba(0,0,0,0.04); transition: background 0.2s; }
@@ -1507,14 +1511,15 @@
                 return;
             }
             const initials = s => (s || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+            const logo = (url, alt) => url ? `<img src="${url}" alt="${alt}" onerror="this.style.display='none'">` : '';
             el.innerHTML = `
                 <div class="dash-match-meta">${formatDateChamp(prochain.date)}${prochain.heure ? ' — ' + formatHeureChamp(prochain.heure) : ''}</div>
                 <div class="dash-match-teams">
-                    <div><div class="dash-match-badge">${initials(prochain.equipe1)}</div><div class="dash-match-team">${prochain.equipe1 || ''}</div></div>
+                    <div><div class="dash-match-badge">${logo(prochain.logo1, prochain.equipe1)}<span style="${prochain.logo1 ? 'display:none' : ''}">${initials(prochain.equipe1)}</span></div><div class="dash-match-team">${prochain.equipe1 || ''}</div></div>
                     <span class="dash-match-vs">VS</span>
-                    <div><div class="dash-match-badge">${initials(prochain.equipe2)}</div><div class="dash-match-team">${prochain.equipe2 || ''}</div></div>
+                    <div><div class="dash-match-badge">${logo(prochain.logo2, prochain.equipe2)}<span style="${prochain.logo2 ? 'display:none' : ''}">${initials(prochain.equipe2)}</span></div><div class="dash-match-team">${prochain.equipe2 || ''}</div></div>
                 </div>
-                <div class="dash-match-loc">📍 Gymnase — Firminy</div>`;
+                <div class="dash-match-loc">📍 ${prochain.salle || 'Gymnase'} — ${prochain.ville || 'Firminy'}</div>`;
         }
 
         function renderDashClassement(poule) {
@@ -1529,9 +1534,10 @@
                 <thead><tr><th>#</th><th style="text-align:left;padding-left:14px;">Équipe</th><th>MJ</th><th>V</th><th>D</th><th>Pts</th></tr></thead>
                 <tbody>${top.map(c => {
                     const total = (c.gagnes ?? 0) + (c.perdus ?? 0);
+                    const logoHtml = c.logo ? `<img class="team-logo" src="${c.logo}" onerror="this.style.display='none'">` : '';
                     return `<tr${isAlcf(c.equipe) ? ' class="row-alcf"' : ''}>
                         <td class="col-num">${c.position ?? ''}</td>
-                        <td style="text-align:left;padding-left:14px;font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.equipe || ''}</td>
+                        <td style="text-align:left;padding-left:14px;font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${logoHtml}${c.equipe || ''}</td>
                         <td class="col-stat">${total}</td>
                         <td class="col-stat">${c.gagnes ?? 0}</td>
                         <td class="col-stat">${c.perdus ?? 0}</td>
@@ -1605,7 +1611,7 @@
             tbody.innerHTML = classement.map(c => `
                 <tr${isAlcf(c.equipe) ? ' class="row-alcf"' : ''}>
                     <td><span class="pos-badge">${c.position ?? ''}</span></td>
-                    <td class="col-equipe" style="text-align:left;">${c.equipe || ''}</td>
+                    <td class="col-equipe" style="text-align:left;">${c.logo ? `<img class="team-logo" src="${c.logo}" onerror="this.style.display='none'">` : ''}${c.equipe || ''}</td>
                     <td class="col-hide">${c.joues ?? ''}</td>
                     <td class="col-hide">${c.gagnes ?? ''}</td>
                     <td class="col-hide">${c.perdus ?? ''}</td>
@@ -1640,6 +1646,7 @@
                 return '';
             };
 
+            const logoImg = url => url ? `<img class="match-logo" src="${url}" onerror="this.style.display='none'">` : '';
             const rowHtml = (m, showScore) => {
                 if (showScore && m.score1 != null && m.score2 != null) {
                     return `
@@ -1647,11 +1654,11 @@
                         <div class="match-date">${formatDateChamp(m.date)}</div>
                         <div class="match-teams-scored">
                             <div class="match-line ${lineClass(isAlcf(m.equipe1), m.score1, m.score2)}">
-                                <span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span>
+                                ${logoImg(m.logo1)}<span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span>
                                 <span class="score">${m.score1}</span>
                             </div>
                             <div class="match-line ${lineClass(isAlcf(m.equipe2), m.score2, m.score1)}">
-                                <span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span>
+                                ${logoImg(m.logo2)}<span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span>
                                 <span class="score">${m.score2}</span>
                             </div>
                         </div>
@@ -1661,8 +1668,8 @@
                 <div class="match-row">
                     <div class="match-date">${formatDateChamp(m.date)}${m.heure ? `<strong>${formatHeureChamp(m.heure)}</strong>` : ''}</div>
                     <div class="match-teams">
-                        <div class="team-line"><span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span></div>
-                        <div class="team-line"><span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span></div>
+                        <div class="team-line">${logoImg(m.logo1)}<span class="${isAlcf(m.equipe1) ? 'alcf' : ''}">${m.equipe1 || ''}</span></div>
+                        <div class="team-line">${logoImg(m.logo2)}<span class="${isAlcf(m.equipe2) ? 'alcf' : ''}">${m.equipe2 || ''}</span></div>
                     </div>
                     <span class="score-pill upcoming">${formatHeureChamp(m.heure) || 'à venir'}</span>
                 </div>`;
