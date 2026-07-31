@@ -1822,7 +1822,9 @@
                 body.innerHTML = all.map(m => {
                     const hl = m.equipe1 === ALCF_NAME || m.equipe2 === ALCF_NAME;
                     const score = m.joue ? '<strong>' + (m.score1 ?? '-') + ' - ' + (m.score2 ?? '-') + '</strong>' : '<strong>-</strong>';
-                    return '<tr' + (hl ? ' style="color:#e74c3c;font-weight:700;"' : '') + '><td>J' + (m.journee||'-') + '</td><td>' + formatDate(m.date) + '</td><td>' + (m.heure||'-') + '</td><td>' + m.equipe1 + '</td><td>' + score + '</td><td>' + m.equipe2 + '</td><td>' + (m.salle||'-') + '</td><td class="admin-only"></td></tr>';
+                    const j = parseInt(m.journee) || 0;
+                    const cls = (j % 2 === 1) ? 'jrn-light' : 'jrn-dark';
+                    return '<tr class="'+cls+'"' + (hl ? ' style="color:#e74c3c;font-weight:700;"' : '') + '><td>J' + (m.journee||'-') + '</td><td>' + formatDate(m.date) + '</td><td>' + (m.heure||'-') + '</td><td>' + m.equipe1 + '</td><td>' + score + '</td><td>' + m.equipe2 + '</td><td>' + (m.salle||'-') + '</td><td class="admin-only"></td></tr>';
                 }).join('');
             });
         }
