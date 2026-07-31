@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
 
     <style>
         :root {
@@ -116,6 +117,17 @@
             background: white;
             color: var(--violet) !important;
         }
+        .btn-sync {
+            background: var(--success) !important;
+            font-size: 0.8rem !important;
+            padding: 6px 14px !important;
+            opacity: 0.9;
+            display: none;
+        }
+        .btn-sync:hover { opacity: 1; transform: scale(1.05); }
+        .btn-sync.loading { pointer-events: none; opacity: 0.5; }
+        body.is-admin .btn-sync { display: inline-flex; }
+
         .btn-logout { 
             background: var(--danger) !important; 
             color: white !important; 
@@ -494,9 +506,8 @@
         .data-table tr:last-child td { border-bottom: none; }
 
         .classement-row.highlight td {
-            background: #fdf6ec !important;
             font-weight: 700;
-            color: var(--violet);
+            color: #e74c3c !important;
         }
 
         /* ==================== PLAYERS GRID (EFFECTIF) ==================== */
@@ -856,6 +867,27 @@
             z-index: 1;
         }
 
+        .dash-card-primary {
+            border: 2px solid rgba(245,166,35,0.35) !important;
+        }
+        .dash-card-primary .card-head {
+            font-size: 1.15rem;
+            padding: 18px 20px;
+            letter-spacing: 0.03em;
+            background: rgba(245,166,35,0.12);
+        }
+        .dash-card-primary .card-body {
+            padding: 20px;
+        }
+        .dash-card-primary .jrn-teams,
+        .dash-card-primary .jrn-score {
+            font-size: 1.15rem !important;
+            font-weight: 800 !important;
+        }
+        .dash-card-primary .jrn-date {
+            font-size: 0.85rem !important;
+        }
+
         .dash-card .card-body .empty-state {
             padding: 20px 10px;
             font-size: 0.85rem;
@@ -982,6 +1014,7 @@
             <a onclick="showPage('messagerie')" id="nav-messagerie">Messagerie</a>
             
             <span class="user-info" id="userInfo" style="display:none"></span>
+            <a class="btn btn-nav btn-sync" id="btnSyncFFBB" onclick="doSyncFFBB()">🔄 Sync FFBB</a>
             <a class="btn btn-nav btn-connexion" onclick="showPage('login')" id="btnLogin">Connexion</a>
             <a class="btn btn-nav btn-logout" onclick="doLogout()" id="btnLogout" style="display:none">Déconnexion</a>
         </div>
@@ -1045,9 +1078,25 @@
                 <h2 class="section-title">Tableau de bord</h2>
                 <p class="section-subtitle">Suis l'actualité de l'équipe en temps réel.</p>
                 <div class="dash-cards">
-                    <!-- Rangée 1 -->
+                    <!-- Rangée 1 : blocs ALCF prioritaires -->
+                    <div class="dash-card accueil-card dash-card-primary">
+                        <div class="card-head card-head-big">🏀 MATCH ALCF</div>
+                        <div class="card-body" id="dashNextMatch"><div class="empty-state">Chargement...</div></div>
+                    </div>
+
+                    <div class="dash-card accueil-card dash-card-primary">
+                        <div class="card-head card-head-big">✅ RÉSULTAT ALCF</div>
+                        <div class="card-body" id="dashLastResult"><div class="empty-state">Chargement...</div></div>
+                    </div>
+
                     <div class="dash-card accueil-card">
-                        <div class="card-head">📅 Prochaines journées</div>
+                        <div class="card-head">📈 Stats équipe</div>
+                        <div class="card-body" id="dashStats"><div class="empty-state">Chargement...</div></div>
+                    </div>
+
+                    <!-- Rangée 2 : toutes les équipes -->
+                    <div class="dash-card accueil-card">
+                        <div class="card-head">📅 Prochaine journée</div>
                         <div class="card-body" id="dashJournees"><div class="empty-state">Chargement...</div></div>
                     </div>
 
@@ -1059,22 +1108,6 @@
                     <div class="dash-card accueil-card">
                         <div class="card-head">🥇 Classement</div>
                         <div class="card-body" id="dashClassement"><div class="empty-state">Chargement...</div></div>
-                    </div>
-
-                    <!-- Rangée 2 -->
-                    <div class="dash-card accueil-card">
-                        <div class="card-head">🏀 Prochain match ALCF</div>
-                        <div class="card-body" id="dashNextMatch"><div class="empty-state">Chargement...</div></div>
-                    </div>
-
-                    <div class="dash-card accueil-card">
-                        <div class="card-head">✅ Résultat dernier match</div>
-                        <div class="card-body" id="dashLastResult"><div class="empty-state">Chargement...</div></div>
-                    </div>
-
-                    <div class="dash-card accueil-card">
-                        <div class="card-head">📈 Stats équipe</div>
-                        <div class="card-body" id="dashStats"><div class="empty-state">Chargement...</div></div>
                     </div>
                 </div>
             </section>
@@ -1459,6 +1492,7 @@
 
         // Emails autorisés à administrer
         const ADMIN_EMAILS = ["polocezar@gmail.com"];
+        const ALCF_NAME = 'FIRMINY CHAZEAU-FAYOL AL';
 
         let currentUser = null;
         let isAdmin = false;
@@ -1525,6 +1559,25 @@
             showPage('accueil');
         }
 
+        async function doSyncFFBB() {
+            const btn = document.getElementById('btnSyncFFBB');
+            if (btn.classList.contains('loading')) return;
+            btn.classList.add('loading');
+            btn.textContent = '⏳ Sync…';
+            try {
+                const syncFn = firebase.functions().httpsCallable('syncFFBB');
+                const result = await syncFn();
+                showToast(`✅ Sync OK — ${result.data.classement} équipes, ${result.data.matchs} matchs`, 'success');
+                loadData();
+            } catch (err) {
+                console.error('Sync FFBB error:', err);
+                showToast('❌ Échec sync : ' + err.message, 'error');
+            } finally {
+                btn.classList.remove('loading');
+                btn.textContent = '🔄 Sync FFBB';
+            }
+        }
+
         // NAVIGATION DYNAMIQUE (SPA)
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1582,42 +1635,59 @@
         }
 
         function renderDashJournees() {
-            const today = new Date().toISOString().split('T')[0];
-            db.collection('matchs').where('date', '>=', today).orderBy('date', 'asc').limit(10).get().then(snap => {
+            db.collection('ffbb').doc('rencontres').get().then(docSnap => {
                 const el = document.getElementById('dashJournees');
-                if (snap.empty) {
+                if (!docSnap.exists || !docSnap.data().matchs || docSnap.data().matchs.length === 0) {
                     el.innerHTML = '<div class="empty-state">Aucune journée à venir</div>';
                     return;
                 }
-                el.innerHTML = snap.docs.map(doc => {
-                    const m = doc.data();
-                    return '<div class="jrn-item"><span class="jrn-date">' + formatDate(m.date) + ' — ' + (m.heure||'20:00') + 'h</span><span class="jrn-teams">' + (m.lieu==='Domicile'?'🏠 ':'🚗 ') + 'ALCF vs <strong>' + m.adversaire + '</strong></span></div>';
-                }).join('');
+                const today = new Date().toISOString().split('T')[0];
+                const all = docSnap.data().matchs.slice().sort((a, b) => (a.date + a.heure) < (b.date + b.heure) ? -1 : 1);
+                const upcoming = all.filter(m => m.date >= today);
+                if (upcoming.length === 0) {
+                    el.innerHTML = '<div class="empty-state">Aucune journée à venir</div>';
+                    return;
+                }
+                const nextJournee = upcoming[0].journee;
+                const jm = all.filter(m => m.journee === nextJournee);
+                el.innerHTML = '<div class="jrn-date" style="margin-bottom:6px;">🏆 Journée ' + nextJournee + '</div>' +
+                    jm.map(m => {
+                        return '<div class="jrn-item"><span class="jrn-teams">' + m.equipe1 + ' <strong>vs</strong> ' + m.equipe2 + '</span><span style="font-size:0.7rem;color:rgba(255,255,255,0.5);">' + (m.heure||'') + ' · ' + (m.salle||'') + '</span></div>';
+                    }).join('');
             }).catch(() => {
                 document.getElementById('dashJournees').innerHTML = '<div class="empty-state">Erreur de chargement</div>';
             });
         }
 
         function renderDashResultatsJournee() {
-            db.collection('resultats').orderBy('date', 'desc').limit(5).get().then(snap => {
+            db.collection('ffbb').doc('rencontres').get().then(docSnap => {
                 const el = document.getElementById('dashResultatsJournee');
-                if (snap.empty) {
+                if (!docSnap.exists || !docSnap.data().matchs || docSnap.data().matchs.length === 0) {
                     el.innerHTML = '<div class="empty-state">Aucun résultat récent</div>';
                     return;
                 }
-                el.innerHTML = snap.docs.map(doc => {
-                    const r = doc.data();
-                    const cls = r.scoreALCF > r.scoreAdv ? 'win' : (r.scoreALCF < r.scoreAdv ? 'loss' : '');
-                    const label = r.scoreALCF > r.scoreAdv ? '🟢 V' : (r.scoreALCF < r.scoreAdv ? '🔴 D' : '🟡 N');
-                    return '<div class="jrn-item"><span class="jrn-date">' + formatDate(r.date) + '</span><span class="jrn-teams">ALCF vs <strong>' + r.adversaire + '</strong></span><span class="jrn-score">' + r.scoreALCF + ' - ' + r.scoreAdv + '</span> <span class="jrn-result ' + cls + '">' + label + '</span></div>';
-                }).join('');
+                const all = docSnap.data().matchs;
+                const played = all.filter(m => m.joue);
+                if (played.length === 0) {
+                    el.innerHTML = '<div class="empty-state">Aucun résultat pour le moment</div>';
+                    return;
+                }
+                const sorted = played.slice().sort((a, b) => (a.date + a.heure) > (b.date + b.heure) ? -1 : 1);
+                const lastJournee = sorted[0].journee;
+                const jm = all.filter(m => m.journee === lastJournee);
+                el.innerHTML = '<div class="jrn-date" style="margin-bottom:6px;">🏆 Journée ' + lastJournee + '</div>' +
+                    jm.map(m => {
+                        if (!m.joue) return '<div class="jrn-item"><span class="jrn-teams">' + m.equipe1 + ' <strong>vs</strong> ' + m.equipe2 + '</span><span class="jrn-result" style="color:#888;">À venir</span></div>';
+                        const s1 = m.score1, s2 = m.score2;
+                        return '<div class="jrn-item"><span class="jrn-teams"><strong>' + (s1 > s2 ? '🟢' : (s1 < s2 ? '🔴' : '🟡')) + '</strong> ' + m.equipe1 + ' <span class="jrn-score">' + s1 + ' - ' + s2 + '</span> ' + m.equipe2 + '</span></div>';
+                    }).join('');
             }).catch(() => {
                 document.getElementById('dashResultatsJournee').innerHTML = '<div class="empty-state">Erreur de chargement</div>';
             });
         }
 
         function renderDashClassement() {
-            db.collection('classement').orderBy('position', 'asc').limit(5).get().then(snap => {
+            db.collection('classement').orderBy('position', 'asc').limit(6).get().then(snap => {
                 const el = document.getElementById('dashClassement');
                 if (snap.empty) {
                     el.innerHTML = '<div class="empty-state">Classement non disponible</div>';
@@ -1627,7 +1697,7 @@
                     const c = doc.data();
                     const hl = (c.equipe||'').toLowerCase().includes('alcf') || (c.equipe||'').toLowerCase().includes('chazeau');
                     const logoHtml = c.logo ? '<img src="' + c.logo + '" style="height:24px;width:24px;object-fit:contain;vertical-align:middle;margin-right:6px;display:inline;" onerror="this.style.display=\'none\'">' : '';
-                    return '<div class="jrn-item" style="' + (hl?'background:#fdf6ec;border-radius:6px;padding:6px 4px;':'') + '"><span class="jrn-teams"><strong>' + c.position + '.</strong> ' + logoHtml + (hl?'🏀 ':'') + c.equipe + ' — <strong>' + (c.points||0) + '</strong> pts</span></div>';
+                    return '<div class="jrn-item"><span class="jrn-teams"><strong>' + c.position + '.</strong> ' + logoHtml + '<span style="' + (hl?'color:#e74c3c !important;font-weight:700;':'') + '">' + (hl?'🏀 ':'') + c.equipe + '</span> — <strong>' + (c.points||0) + '</strong> pts</span></div>';
                 }).join('');
             }).catch(() => {
                 document.getElementById('dashClassement').innerHTML = '<div class="empty-state">Erreur de chargement</div>';
@@ -1643,36 +1713,43 @@
                     return;
                 }
                 const m = snap.docs[0].data();
-                el.innerHTML = '<div class="jrn-item"><span class="jrn-date">' + formatDate(m.date) + ' — ' + (m.heure||'20:00') + 'h</span><span class="jrn-teams">ALCF vs <strong>' + m.adversaire + '</strong></span><span style="font-size:0.7rem;color:#888;">' + (m.lieu==='Domicile'?'🏠 Domicile — ':'🚗 Extérieur — ') + (m.salle||'Salle GM4 Firminy') + '</span></div>';
+                const isHome = m.equipe1 === ALCF_NAME;
+                el.innerHTML = '<div class="jrn-item"><span class="jrn-date">' + formatDate(m.date) + ' — ' + (m.heure||'20:00') + 'h</span><span class="jrn-teams">' + (isHome?'🏠 ':'🚗 ') + '<strong>' + (isHome ? m.equipe2 : m.equipe1) + '</strong></span><span style="font-size:0.8rem;color:#ffd700;font-weight:600;">' + (isHome?'Domicile':'Extérieur') + ' · ' + (m.salle||'Salle GM4 Firminy') + '</span></div>';
             }).catch(() => {
                 document.getElementById('dashNextMatch').innerHTML = '<div class="empty-state">Erreur de chargement</div>';
             });
         }
 
         function renderDashLastMatchResult() {
-            db.collection('resultats').orderBy('date', 'desc').limit(1).get().then(snap => {
+            db.collection('matchs').where('joue', '==', true).orderBy('date', 'desc').limit(1).get().then(snap => {
                 const el = document.getElementById('dashLastResult');
                 if (snap.empty) {
                     el.innerHTML = '<div class="empty-state">Aucun résultat pour le moment</div>';
                     return;
                 }
-                const r = snap.docs[0].data();
-                const cls = r.scoreALCF > r.scoreAdv ? 'win' : (r.scoreALCF < r.scoreAdv ? 'loss' : '');
-                const label = r.scoreALCF > r.scoreAdv ? '🟢 Victoire' : (r.scoreALCF < r.scoreAdv ? '🔴 Défaite' : '🟡 Nul');
-                el.innerHTML = '<div class="jrn-item"><span class="jrn-date">' + formatDate(r.date) + '</span><span class="jrn-teams">ALCF vs <strong>' + r.adversaire + '</strong></span><span class="jrn-score">' + r.scoreALCF + ' - ' + r.scoreAdv + '</span><span class="jrn-result ' + cls + '">' + label + '</span></div>';
+                const m = snap.docs[0].data();
+                const isHome = m.equipe1 === ALCF_NAME;
+                const sAlcf = isHome ? m.score1 : m.score2;
+                const sAdv = isHome ? m.score2 : m.score1;
+                const cls = sAlcf > sAdv ? 'win' : (sAlcf < sAdv ? 'loss' : '');
+                const label = sAlcf > sAdv ? '🟢 Victoire' : (sAlcf < sAdv ? '🔴 Défaite' : '🟡 Nul');
+                el.innerHTML = '<div class="jrn-item"><span class="jrn-date">' + formatDate(m.date) + '</span><span class="jrn-teams">' + (isHome?'🏠 ':'🚗 ') + '<strong>' + (isHome ? m.equipe2 : m.equipe1) + '</strong></span><span class="jrn-score">' + sAlcf + ' - ' + sAdv + '</span><span class="jrn-result ' + cls + '">' + label + '</span></div>';
             }).catch(() => {
                 document.getElementById('dashLastResult').innerHTML = '<div class="empty-state">Erreur de chargement</div>';
             });
         }
 
         function renderDashStats() {
-            db.collection('resultats').get().then(snap => {
+            db.collection('matchs').where('joue', '==', true).get().then(snap => {
                 const el = document.getElementById('dashStats');
                 let v = 0, d = 0, pts = 0;
                 snap.docs.forEach(doc => {
-                    const r = doc.data();
-                    if (r.scoreALCF > r.scoreAdv) v++; else d++;
-                    pts += (r.scoreALCF||0);
+                    const m = doc.data();
+                    const isHome = m.equipe1 === ALCF_NAME;
+                    const sAlcf = isHome ? m.score1 : m.score2;
+                    const sAdv = isHome ? m.score2 : m.score1;
+                    if (sAlcf > sAdv) v++; else d++;
+                    pts += (sAlcf||0);
                 });
                 const total = snap.size;
                 el.innerHTML = '<div class="dash-stat-item"><span class="label">Matchs joués</span><span class="value">' + total + '</span></div><div class="dash-stat-item"><span class="label">Victoires</span><span class="value">' + v + '</span></div><div class="dash-stat-item"><span class="label">Défaites</span><span class="value">' + d + '</span></div><div class="dash-stat-item"><span class="label">Moy. points/match</span><span class="value">' + (total > 0 ? (pts/total).toFixed(1) : '-') + '</span></div>';
@@ -1727,15 +1804,17 @@
         }
 
         function loadChampionnat() {
-            db.collection('matchs').orderBy('date', 'asc').onSnapshot(snap => {
+            db.collection('ffbb').doc('rencontres').onSnapshot(docSnap => {
                 const body = document.getElementById('championnatBody');
-                if (snap.empty) { 
+                if (!docSnap.exists || !docSnap.data().matchs || docSnap.data().matchs.length === 0) { 
                     body.innerHTML = '<tr><td colspan="8"><div class="empty-state"><span class="emoji">🏆</span>Aucun match au championnat</div></td></tr>'; 
                     return; 
                 }
-                body.innerHTML = snap.docs.map(doc => {
-                    const m = doc.data();
-                    return '<tr><td>—</td><td>'+formatDate(m.date)+'</td><td>'+(m.heure||'-')+'</td><td>'+(m.lieu==='Domicile'?'<strong>ALCF</strong>':'<span style="color:#888;">'+m.adversaire+'</span>')+'</td><td><strong>-</strong></td><td>'+(m.lieu==='Extérieur'?'<strong>ALCF</strong>':'<span style="color:#888;">'+m.adversaire+'</span>')+'</td><td>'+(m.salle||'-')+'</td><td class="admin-only"><button class="btn btn-small btn-gold" style="padding:5px 10px;" onclick="editMatch(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" style="padding:5px 10px;" onclick="deleteDoc(\'matchs\',\''+doc.id+'\')">🗑️</button></td></tr>';
+                const all = docSnap.data().matchs.slice().sort((a, b) => (a.date + a.heure) < (b.date + b.heure) ? -1 : 1);
+                body.innerHTML = all.map(m => {
+                    const hl = m.equipe1 === ALCF_NAME || m.equipe2 === ALCF_NAME;
+                    const score = m.joue ? '<strong>' + (m.score1 ?? '-') + ' - ' + (m.score2 ?? '-') + '</strong>' : '<strong>-</strong>';
+                    return '<tr' + (hl ? ' style="color:#e74c3c;font-weight:700;"' : '') + '><td>J' + (m.journee||'-') + '</td><td>' + formatDate(m.date) + '</td><td>' + (m.heure||'-') + '</td><td>' + m.equipe1 + '</td><td>' + score + '</td><td>' + m.equipe2 + '</td><td>' + (m.salle||'-') + '</td><td class="admin-only"></td></tr>';
                 }).join('');
             });
         }
