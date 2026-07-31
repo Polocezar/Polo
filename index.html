@@ -505,6 +505,11 @@
 
         .data-table tr:last-child td { border-bottom: none; }
 
+        .data-table tr.jrn-light td { background: #f3ecfa; }
+        .data-table tr.jrn-dark td { background: #e0cff0; }
+        .data-table tr.jrn-light:hover td,
+        .data-table tr.jrn-dark:hover td { background: #fdfaf2; }
+
         .classement-row.highlight td {
             font-weight: 700;
             color: #e74c3c !important;
@@ -1125,6 +1130,7 @@
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th>Journée</th>
                             <th>Date</th>
                             <th>Heure</th>
                             <th>Adversaire</th>
@@ -1134,7 +1140,7 @@
                         </tr>
                     </thead>
                     <tbody id="calendrierBody">
-                        <tr><td colspan="6"><div class="empty-state"><span class="emoji">📅</span>Chargement...</div></td></tr>
+                        <tr><td colspan="7"><div class="empty-state"><span class="emoji">📅</span>Chargement...</div></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1767,7 +1773,9 @@
                 }
                 body.innerHTML = snap.docs.map(doc => {
                     const m = doc.data();
-                    return '<tr><td>'+formatDate(m.date)+'</td><td>'+(m.heure||'-')+'</td><td><strong>'+m.adversaire+'</strong></td><td>'+(m.lieu==='Domicile'?'🏠 Dom.':'🚗 Ext.')+'</td><td>'+(m.salle||'-')+'</td><td class="admin-only"><button class="btn btn-small btn-gold" style="padding:5px 10px;" onclick="editMatch(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" style="padding:5px 10px;" onclick="deleteDoc(\'matchs\',\''+doc.id+'\')">🗑️</button></td></tr>';
+                    const j = parseInt(m.journee) || 0;
+                    const cls = (j % 2 === 1) ? 'jrn-light' : 'jrn-dark';
+                    return '<tr class="'+cls+'"><td><strong>J'+(m.journee||'-')+'</strong></td><td>'+formatDate(m.date)+'</td><td>'+(m.heure||'-')+'</td><td><strong>'+m.adversaire+'</strong></td><td>'+(m.lieu==='Domicile'?'🏠 Dom.':'🚗 Ext.')+'</td><td>'+(m.salle||'-')+'</td><td class="admin-only"><button class="btn btn-small btn-gold" style="padding:5px 10px;" onclick="editMatch(\''+doc.id+'\')">✏️</button> <button class="btn btn-small btn-danger" style="padding:5px 10px;" onclick="deleteDoc(\'matchs\',\''+doc.id+'\')">🗑️</button></td></tr>';
                 }).join('');
             });
         }
