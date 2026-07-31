@@ -1019,7 +1019,7 @@
             <a onclick="showPage('messagerie')" id="nav-messagerie">Messagerie</a>
             
             <span class="user-info" id="userInfo" style="display:none"></span>
-            <a class="btn btn-nav btn-sync" id="btnSyncFFBB" onclick="doSyncFFBB()">🔄 Sync FFBB</a>
+            <a class="btn btn-nav btn-sync admin-only" id="btnSyncFFBB" onclick="doSyncFFBB()">🔄 Sync FFBB</a>
             <a class="btn btn-nav btn-connexion" onclick="showPage('login')" id="btnLogin">Connexion</a>
             <a class="btn btn-nav btn-logout" onclick="doLogout()" id="btnLogout" style="display:none">Déconnexion</a>
         </div>
@@ -1566,15 +1566,30 @@
         }
 
         async function doSyncFFBB() {
+            if (!currentUser || !ADMIN_EMAILS.includes(currentUser.email)) {
+                showToast('⛔ Réservé aux administrateurs', 'error');
+                return;
+            }
             const btn = document.getElementById('btnSyncFFBB');
             if (btn.classList.contains('loading')) return;
             btn.classList.add('loading');
             btn.textContent = '⏳ Sync…';
             try {
-                const syncFn = firebase.functions().httpsCallable('syncFFBB');
-                const result = await syncFn();
-                showToast(`✅ Sync OK — ${result.data.classement} équipes, ${result.data.matchs} matchs`, 'success');
-                loadData();
+                const cfg = await db.collection('config').doc('github').get();
+                const token = cfg.exists ? cfg.data().token : null;
+                if (!token) throw new Error('Token GitHub manquant');
+                const res = await fetch('https://api.github.com/repos/Polocezar/Polo/actions/workflows/ffbb-sync.yml/dispatches', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ ref: 'main' })
+                });
+                if (!res.ok) throw new Error('GitHub API ' + res.status);
+                showToast('✅ Sync déclenchée — mise à jour dans ~1 min', 'success');
+                waitForSync();
             } catch (err) {
                 console.error('Sync FFBB error:', err);
                 showToast('❌ Échec sync : ' + err.message, 'error');
@@ -1582,6 +1597,29 @@
                 btn.classList.remove('loading');
                 btn.textContent = '🔄 Sync FFBB';
             }
+        }
+
+        function waitForSync() {
+            const start = new Date().getTime();
+            let last = 0;
+            db.collection('ffbb').doc('rencontres').get().then(doc => {
+                if (doc.exists && doc.data().updatedAt) last = doc.data().updatedAt.toDate().getTime();
+            }).catch(() => {}).then(() => {
+                const check = () => {
+                    if (new Date().getTime() - start > 120000) return;
+                    db.collection('ffbb').doc('rencontres').get().then(doc => {
+                        const t = doc.exists && doc.data().updatedAt ? doc.data().updatedAt.toDate().getTime() : 0;
+                        if (t > 0 && t !== last) {
+                            showToast('✅ Données mises à jour !', 'success');
+                            const active = document.querySelector('.page.active');
+                            if (active) loadData(active.id.replace('page-', ''));
+                        } else {
+                            setTimeout(check, 5000);
+                        }
+                    }).catch(() => setTimeout(check, 5000));
+                };
+                setTimeout(check, 5000);
+            });
         }
 
         // NAVIGATION DYNAMIQUE (SPA)
