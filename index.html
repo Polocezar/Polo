@@ -751,7 +751,7 @@
     <!-- PLANNING MATCHS -->
     <div id="page-planning" class="page">
         <div class="container">
-            <div class="page-header"><h2>Calendrier des matchs</h2><button class="btn btn-gold staff-only" onclick="newPlanningMatch()">+ Ajouter un match</button></div>
+            <div class="page-header"><h2>Calendrier des matchs</h2><span style="color:var(--ink-soft); font-size:0.78rem;">Synchronisé automatiquement depuis la FFBB — complète juste la salle</span></div>
             <div class="table-responsive">
                 <table class="data-table">
                     <thead><tr><th>Journée</th><th style="text-align:left;">Date</th><th>Heure</th><th style="text-align:left;">Adversaire</th><th>Lieu</th><th style="text-align:left;">Salle</th><th class="staff-only">Actions</th></tr></thead>
@@ -851,14 +851,9 @@
 
     <div class="modal-overlay" id="modal-day-details"><div class="modal"><button class="modal-close" onclick="closeModal('day-details')">×</button><h3 id="dayDetailsTitle">Jour</h3><div id="dayDetailsList" style="margin-top:18px;"></div><button class="btn btn-gold staff-only" style="width:100%; margin-top:12px; justify-content:center;" onclick="openMatchModalForDate(currentDayDate)">+ Ajouter un événement ce jour</button></div></div>
 
-    <div class="modal-overlay" id="modal-planningMatch"><div class="modal"><button class="modal-close" onclick="closeModal('planningMatch')">×</button><h3 id="planningMatchModalTitle">📅 Match</h3><input type="hidden" id="planningMatchId"><div class="form-grid">
-        <div class="field-block"><label for="planningJournee">Journée (facultatif)</label><input type="text" id="planningJournee" placeholder="Ex : J1"></div>
-        <div class="field-block"><label for="planningDate">Date</label><input type="date" id="planningDate"></div>
-        <div class="field-block"><label for="planningHeure">Heure</label><input type="time" id="planningHeure" value="20:00"></div>
-        <div class="field-block"><label for="planningAdversaire">Adversaire</label><input type="text" id="planningAdversaire" placeholder="Ex : Saint-Chamond"></div>
-        <div class="field-block"><label for="planningLieu">Lieu</label><select id="planningLieu"><option value="domicile">🏠 Domicile</option><option value="exterieur">🚗 Extérieur</option></select></div>
-        <div class="field-block"><label for="planningSalle">Salle</label><input type="text" id="planningSalle" placeholder="Ex : Salle GM4 Firminy"></div>
-    </div><button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="savePlanningMatch()">💾 Enregistrer</button></div></div>
+    <div class="modal-overlay" id="modal-planningMatch"><div class="modal"><button class="modal-close" onclick="closeModal('planningMatch')">×</button><h3 id="planningMatchModalTitle">📍 Salle</h3><input type="hidden" id="planningMatchId">
+        <div class="field-block" style="margin-top:14px;"><label for="planningSalle">Salle</label><input type="text" id="planningSalle" placeholder="Ex : Salle GM4 Firminy"></div>
+    <button class="btn btn-gold" style="width:100%; margin-top:22px; justify-content:center;" onclick="savePlanningMatch()">💾 Enregistrer</button></div></div>
 
     <div class="modal-overlay" id="modal-message"><div class="modal"><button class="modal-close" onclick="closeModal('message')">×</button><h3>Nouveau message</h3>
         <div class="field-block full-width">
@@ -1811,100 +1806,76 @@
             }
         }
 
-        // ---- Calendrier des matchs : liste structurée du planning officiel de saison (saisie manuelle) ----
-        let planningCache = [];
+        // ---- Calendrier des matchs : liste structurée, alimentée automatiquement depuis la FFBB (comme Championnat) ----
+        // Seule la "salle" est saisie manuellement, rattachée à chaque match via une clé stable (date + adversaire).
+        let planningFfbbMatchs = [];
+        let planningSalles = {};
+
+        function planningKey(date, adversaire) {
+            return (date + '_' + (adversaire || '')).replace(/[^a-zA-Z0-9_-]/g, '');
+        }
+
         function loadPlanning() {
-            watch('planning', 'planningMatchs', snap => {
-                planningCache = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-                    .sort((a, b) => new Date(a.date) - new Date(b.date));
+            if (activeListeners['planning']) activeListeners['planning']();
+            const unsubRencontres = db.collection('ffbb').doc('rencontres').onSnapshot(doc => {
+                const data = doc.exists ? doc.data() : null;
+                planningFfbbMatchs = ((data && data.matchs) || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
                 renderPlanningTable();
-            });
+            }, err => { console.error('Erreur Firestore ffbb/rencontres (planning)', err); toast('Impossible de charger le calendrier des matchs.', 'error'); });
+
+            const unsubSalles = db.collection('planningMatchs').onSnapshot(snap => {
+                planningSalles = {};
+                snap.docs.forEach(d => { planningSalles[d.id] = d.data().salle || ''; });
+                renderPlanningTable();
+            }, err => { console.error('Erreur Firestore planningMatchs', err); });
+
+            activeListeners['planning'] = () => { unsubRencontres(); unsubSalles(); };
         }
 
         function renderPlanningTable() {
             const tbody = document.getElementById('planningTableBody');
-            if (planningCache.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Aucun match programmé pour le moment.</td></tr>';
+            if (planningFfbbMatchs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Aucun match synchronisé pour le moment.</td></tr>';
                 return;
             }
-            tbody.innerHTML = planningCache.map((m, idx) => {
-                const lieuIcon = m.lieu === 'exterieur' ? '🚗 Ext.' : '🏠 Dom.';
+            tbody.innerHTML = planningFfbbMatchs.map((m, idx) => {
+                const alcf1 = isAlcf(m.equipe1);
+                const adversaire = alcf1 ? m.equipe2 : m.equipe1;
+                const lieuIcon = alcf1 ? '🏠 Dom.' : '🚗 Ext.';
+                const key = planningKey(m.date, adversaire);
+                const salle = planningSalles[key] || '';
                 return `<tr>
-                    <td>${m.journee || ('J' + (idx + 1))}</td>
-                    <td style="text-align:left;">${formatDateFr(m.date)}</td>
-                    <td>${m.heure || '-'}</td>
-                    <td style="text-align:left;"><strong>${m.adversaire || ''}</strong></td>
+                    <td>J${idx + 1}</td>
+                    <td style="text-align:left;">${formatDateChamp(m.date)}</td>
+                    <td>${m.heure ? formatHeureChamp(m.heure) : '-'}</td>
+                    <td style="text-align:left;"><strong>${adversaire || ''}</strong></td>
                     <td>${lieuIcon}</td>
-                    <td style="text-align:left;">${m.salle || ''}</td>
+                    <td style="text-align:left;">${salle || '<span style="color:var(--ink-soft);">—</span>'}</td>
                     <td class="staff-only">
                         <div class="day-event-actions" style="justify-content:center;">
-                            <button onclick="editPlanningMatch('${m.id}')" aria-label="Modifier">✏️</button>
-                            <button onclick="deletePlanningMatch('${m.id}')" aria-label="Supprimer">🗑️</button>
+                            <button onclick="editSalle('${key}', '${(adversaire || '').replace(/'/g, "\\'")}')" aria-label="Renseigner la salle">✏️</button>
                         </div>
                     </td>
                 </tr>`;
             }).join('');
         }
 
-        function newPlanningMatch() {
-            document.getElementById('planningMatchId').value = '';
-            document.getElementById('planningMatchModalTitle').textContent = '📅 Nouveau match';
-            document.getElementById('planningJournee').value = '';
-            document.getElementById('planningDate').value = '';
-            document.getElementById('planningHeure').value = '20:00';
-            document.getElementById('planningAdversaire').value = '';
-            document.getElementById('planningLieu').value = 'domicile';
-            document.getElementById('planningSalle').value = '';
-            openModal('planningMatch');
-        }
-
-        function editPlanningMatch(id) {
-            const m = planningCache.find(x => x.id === id);
-            if (!m) return;
-            document.getElementById('planningMatchId').value = id;
-            document.getElementById('planningMatchModalTitle').textContent = '📅 Modifier le match';
-            document.getElementById('planningJournee').value = m.journee || '';
-            document.getElementById('planningDate').value = m.date || '';
-            document.getElementById('planningHeure').value = m.heure || '20:00';
-            document.getElementById('planningAdversaire').value = m.adversaire || '';
-            document.getElementById('planningLieu').value = m.lieu || 'domicile';
-            document.getElementById('planningSalle').value = m.salle || '';
+        function editSalle(key, adversaireLabel) {
+            document.getElementById('planningMatchId').value = key;
+            document.getElementById('planningMatchModalTitle').textContent = '📍 Salle — vs ' + adversaireLabel;
+            document.getElementById('planningSalle').value = planningSalles[key] || '';
             openModal('planningMatch');
         }
 
         async function savePlanningMatch() {
             if (!isAdmin && !isCoachUser) return toast('Accès refusé', 'error');
-            const id = document.getElementById('planningMatchId').value;
-            const date = document.getElementById('planningDate').value;
-            const adversaire = document.getElementById('planningAdversaire').value.trim();
-            if (!date) return toast('La date est obligatoire', 'error');
-            if (!adversaire) return toast('Le nom de l\'adversaire est obligatoire', 'error');
-
-            const data = {
-                journee: document.getElementById('planningJournee').value.trim(),
-                date: date,
-                heure: document.getElementById('planningHeure').value,
-                adversaire: adversaire,
-                lieu: document.getElementById('planningLieu').value,
-                salle: document.getElementById('planningSalle').value.trim()
-            };
-
+            const key = document.getElementById('planningMatchId').value;
+            const salle = document.getElementById('planningSalle').value.trim();
+            if (!key) return;
             try {
-                if (id) await db.collection('planningMatchs').doc(id).update(data);
-                else await db.collection('planningMatchs').add(data);
+                await db.collection('planningMatchs').doc(key).set({ salle }, { merge: true });
                 closeModal('planningMatch');
-                toast(id ? 'Match modifié' : 'Match ajouté', 'success');
-            } catch (e) {
-                toast('Erreur : ' + e.message, 'error');
-            }
-        }
-
-        async function deletePlanningMatch(id) {
-            if (!isAdmin && !isCoachUser) return toast('Accès refusé', 'error');
-            if (!confirm('Supprimer ce match ?')) return;
-            try {
-                await db.collection('planningMatchs').doc(id).delete();
-                toast('Match supprimé', 'success');
+                toast('Salle enregistrée', 'success');
             } catch (e) {
                 toast('Erreur : ' + e.message, 'error');
             }
@@ -2337,11 +2308,6 @@
             }
             if (id === 'planningMatch') {
                 document.getElementById('planningMatchId').value = '';
-                document.getElementById('planningJournee').value = '';
-                document.getElementById('planningDate').value = '';
-                document.getElementById('planningHeure').value = '20:00';
-                document.getElementById('planningAdversaire').value = '';
-                document.getElementById('planningLieu').value = 'domicile';
                 document.getElementById('planningSalle').value = '';
             }
             if (id === 'info') {
