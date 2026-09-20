@@ -769,7 +769,7 @@
             <div class="page-header"><h2>Calendrier des matchs</h2><span style="color:var(--ink-soft); font-size:0.78rem;">Synchronisé automatiquement depuis la FFBB — complète juste la salle</span></div>
             <div class="table-responsive">
                 <table class="data-table">
-                    <thead><tr><th>Journée</th><th style="text-align:left;">Date</th><th>Heure</th><th style="text-align:left;">Adversaire</th><th>Lieu</th><th style="text-align:left;">Salle</th><th class="staff-only">Actions</th></tr></thead>
+                    <thead><tr><th>Journée</th><th style="text-align:left;">Date</th><th>Heure</th><th style="text-align:left;">Adversaire</th><th>Résultat</th><th>Lieu</th><th style="text-align:left;">Salle</th><th class="staff-only">Actions</th></tr></thead>
                     <tbody id="planningTableBody"><tr><td colspan="7" class="empty-msg">Chargement…</td></tr></tbody>
                 </table>
             </div>
@@ -1899,7 +1899,7 @@
             // On ne garde que les matchs d'ALCF (la synchro FFBB renvoie toute la poule)
             const matchsAlcf = planningFfbbMatchs.filter(m => isAlcf(m.equipe1) || isAlcf(m.equipe2));
             if (matchsAlcf.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Aucun match synchronisé pour le moment.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-msg">Aucun match synchronisé pour le moment.</td></tr>';
                 return;
             }
             tbody.innerHTML = matchsAlcf.map((m, idx) => {
@@ -1909,18 +1909,20 @@
                 const key = planningKey(m.date, adversaire);
                 const salle = planningSalles[key] || '';
                 const journee = m.journee ? ('J' + m.journee) : ('J' + (idx + 1));
-                let scoreHtml = '';
+                let scoreHtml = '<span style="color:var(--ink-soft);">—</span>';
                 if (m.joue && m.score1 != null && m.score2 != null) {
                     const sAlcf = alcf1 ? m.score1 : m.score2;
                     const sAdv = alcf1 ? m.score2 : m.score1;
                     const cls = sAlcf > sAdv ? 'var(--success)' : (sAlcf < sAdv ? 'var(--danger)' : 'var(--ink-soft)');
-                    scoreHtml = ` <span style="color:${cls}; font-weight:700;">${sAlcf}-${sAdv}</span>`;
+                    const verdict = sAlcf > sAdv ? 'V' : (sAlcf < sAdv ? 'D' : 'N');
+                    scoreHtml = `<strong style="color:${cls};">${sAlcf}-${sAdv}</strong> <span style="color:${cls}; font-size:0.7rem; font-weight:700;">(${verdict})</span>`;
                 }
                 return `<tr>
                     <td>${journee}</td>
                     <td style="text-align:left;">${formatDateChamp(m.date)}</td>
                     <td>${m.heure ? formatHeureChamp(m.heure) : '-'}</td>
-                    <td style="text-align:left;"><strong>${adversaire || ''}</strong>${scoreHtml}</td>
+                    <td style="text-align:left;"><strong>${adversaire || ''}</strong></td>
+                    <td>${scoreHtml}</td>
                     <td>${lieuIcon}</td>
                     <td style="text-align:left;">${salle || '<span style="color:var(--ink-soft);">—</span>'}</td>
                     <td class="staff-only">
