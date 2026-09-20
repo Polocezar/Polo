@@ -224,7 +224,7 @@
 
         /* Dernier résultat (gros) + prochain match (petit) */
         .dash-last-result { text-align: center; padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
-        .dash-last-result .lbl { font-size: 0.62rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
+        .dash-last-result .lbl { font-size: 0.95rem; letter-spacing: 0.02em; text-transform: none; color: var(--ink); font-weight: 700; }
         .dash-last-result .score { font-family: 'Oswald', sans-serif; font-size: 2.6rem; font-weight: 700; line-height: 1.05; color: var(--violet-deep); margin: 2px 0; }
         .dash-last-result .score.win { color: var(--success); }
         .dash-last-result .score.loss { color: var(--danger); }
@@ -233,7 +233,7 @@
         .dash-last-result .verdict.loss { background: rgba(224,85,63,0.15); color: #b8382f; }
         .dash-last-result .opp { font-size: 0.82rem; font-weight: 700; color: var(--ink); margin-top: 8px; }
         .dash-last-result .meta { font-size: 0.7rem; color: var(--ink-soft); margin-top: 2px; }
-        .dash-next-mini .lbl { display: block; font-size: 0.62rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin-bottom: 5px; }
+        .dash-next-mini .lbl { display: block; font-size: 0.95rem; letter-spacing: 0.02em; text-transform: none; color: var(--ink); font-weight: 700; margin-bottom: 6px; }
         .dash-next-mini .opp { font-size: 0.86rem; font-weight: 700; color: var(--ink); }
         .dash-next-mini .meta { font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
 
@@ -682,7 +682,7 @@
 
         <div class="dash-row">
             <div class="dash-card">
-                <div class="dash-card-head"><span class="ic">📅</span> Prochain match</div>
+                <div class="dash-card-head"><span class="ic">📅</span> Résultat dernier match</div>
                 <div id="dashProchainMatch"><p class="dash-empty">Chargement…</p></div>
             </div>
             <div class="dash-card">
@@ -1339,7 +1339,6 @@
                 const verdict = sAlcf > sAdv ? 'Victoire' : (sAlcf < sAdv ? 'Défaite' : 'Match nul');
                 html += `
                 <div class="dash-last-result">
-                    <div class="lbl">Dernier résultat</div>
                     <div class="score ${cls}">${sAlcf} - ${sAdv}</div>
                     ${cls ? `<span class="verdict ${cls}">${verdict}</span>` : ''}
                     <div class="opp">${alcf1 ? '🏠' : '🚗'} vs ${adv || ''}</div>
@@ -1897,21 +1896,31 @@
 
         function renderPlanningTable() {
             const tbody = document.getElementById('planningTableBody');
-            if (planningFfbbMatchs.length === 0) {
+            // On ne garde que les matchs d'ALCF (la synchro FFBB renvoie toute la poule)
+            const matchsAlcf = planningFfbbMatchs.filter(m => isAlcf(m.equipe1) || isAlcf(m.equipe2));
+            if (matchsAlcf.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" class="empty-msg">Aucun match synchronisé pour le moment.</td></tr>';
                 return;
             }
-            tbody.innerHTML = planningFfbbMatchs.map((m, idx) => {
+            tbody.innerHTML = matchsAlcf.map((m, idx) => {
                 const alcf1 = isAlcf(m.equipe1);
                 const adversaire = alcf1 ? m.equipe2 : m.equipe1;
                 const lieuIcon = alcf1 ? '🏠 Dom.' : '🚗 Ext.';
                 const key = planningKey(m.date, adversaire);
                 const salle = planningSalles[key] || '';
+                const journee = m.journee ? ('J' + m.journee) : ('J' + (idx + 1));
+                let scoreHtml = '';
+                if (m.joue && m.score1 != null && m.score2 != null) {
+                    const sAlcf = alcf1 ? m.score1 : m.score2;
+                    const sAdv = alcf1 ? m.score2 : m.score1;
+                    const cls = sAlcf > sAdv ? 'var(--success)' : (sAlcf < sAdv ? 'var(--danger)' : 'var(--ink-soft)');
+                    scoreHtml = ` <span style="color:${cls}; font-weight:700;">${sAlcf}-${sAdv}</span>`;
+                }
                 return `<tr>
-                    <td>J${idx + 1}</td>
+                    <td>${journee}</td>
                     <td style="text-align:left;">${formatDateChamp(m.date)}</td>
                     <td>${m.heure ? formatHeureChamp(m.heure) : '-'}</td>
-                    <td style="text-align:left;"><strong>${adversaire || ''}</strong></td>
+                    <td style="text-align:left;"><strong>${adversaire || ''}</strong>${scoreHtml}</td>
                     <td>${lieuIcon}</td>
                     <td style="text-align:left;">${salle || '<span style="color:var(--ink-soft);">—</span>'}</td>
                     <td class="staff-only">
