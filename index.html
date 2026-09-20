@@ -222,6 +222,21 @@
         .dash-match-meta { font-size: 0.76rem; color: var(--ink-soft); text-align: center; margin-bottom: 4px; }
         .dash-match-loc { font-size: 0.72rem; color: var(--ink-soft); text-align: center; margin-bottom: 14px; }
 
+        /* Dernier résultat (gros) + prochain match (petit) */
+        .dash-last-result { text-align: center; padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+        .dash-last-result .lbl { font-size: 0.62rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
+        .dash-last-result .score { font-family: 'Oswald', sans-serif; font-size: 2.6rem; font-weight: 700; line-height: 1.05; color: var(--violet-deep); margin: 2px 0; }
+        .dash-last-result .score.win { color: var(--success); }
+        .dash-last-result .score.loss { color: var(--danger); }
+        .dash-last-result .verdict { display: inline-block; font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 3px 12px; border-radius: 999px; }
+        .dash-last-result .verdict.win { background: rgba(63,166,106,0.15); color: #1f7a4d; }
+        .dash-last-result .verdict.loss { background: rgba(224,85,63,0.15); color: #b8382f; }
+        .dash-last-result .opp { font-size: 0.82rem; font-weight: 700; color: var(--ink); margin-top: 8px; }
+        .dash-last-result .meta { font-size: 0.7rem; color: var(--ink-soft); margin-top: 2px; }
+        .dash-next-mini .lbl { display: block; font-size: 0.62rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin-bottom: 5px; }
+        .dash-next-mini .opp { font-size: 0.86rem; font-weight: 700; color: var(--ink); }
+        .dash-next-mini .meta { font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
+
         .dash-mini-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
         .dash-mini-table th { text-align: left; color: var(--ink-soft); font-weight: 600; padding: 4px 6px; font-size: 0.68rem; text-transform: uppercase; }
         .dash-mini-table td { padding: 7px 6px; border-top: 1px solid var(--line); }
@@ -772,7 +787,7 @@
             </div>
 
             <div class="champ-block" style="margin-bottom:32px;">
-                <h3>📅 Saison 2025-2026 — Équipe</h3>
+                <h3>📅 Saison <span id="statsSaisonLabel">2025-2026</span> — Équipe</h3>
                 <div id="statsSaisonEquipe"><p class="empty-msg" style="padding:16px 0;">Chargement…</p></div>
             </div>
 
@@ -1282,24 +1297,70 @@
             }
         }
 
+        // ---- Saison en cours : du 1er septembre au 31 août ----
+        function saisonStartISO() {
+            const now = new Date();
+            const y = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+            return y + '-09-01';
+        }
+        function saisonLabel() {
+            const start = parseInt(saisonStartISO().slice(0, 4), 10);
+            return start + '-' + (start + 1);
+        }
+        function estSaisonEnCours(dateStr) {
+            return !!dateStr && String(dateStr) >= saisonStartISO();
+        }
+
+        // Carte accueil : dernier résultat ALCF en grand, puis le prochain match en petit
         function renderDashProchainMatch(rencontres) {
-            const matchs = (rencontres && rencontres.matchs) || [];
-            const aVenir = matchs.filter(m => !m.joue).sort((a, b) => new Date(a.date) - new Date(b.date));
-            const prochain = aVenir[0];
             const el = document.getElementById('dashProchainMatch');
-            if (!prochain) {
+            const matchs = ((rencontres && rencontres.matchs) || [])
+                .filter(m => isAlcf(m.equipe1) || isAlcf(m.equipe2));
+
+            const joues = matchs.filter(m => m.joue && m.score1 != null && m.score2 != null)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            const aVenir = matchs.filter(m => !m.joue).sort((a, b) => new Date(a.date) - new Date(b.date));
+            const dernier = joues[0];
+            const prochain = aVenir[0];
+
+            if (!dernier && !prochain) {
                 el.innerHTML = '<p class="dash-empty">Aucun match programmé pour le moment.</p>';
                 return;
             }
-            const initials = s => (s || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-            el.innerHTML = `
-                <div class="dash-match-meta">${formatDateChamp(prochain.date)}${prochain.heure ? ' — ' + formatHeureChamp(prochain.heure) : ''}</div>
-                <div class="dash-match-teams">
-                    <div><div class="dash-match-badge">${initials(prochain.equipe1)}</div><div class="dash-match-team">${prochain.equipe1 || ''}</div></div>
-                    <span class="dash-match-vs">VS</span>
-                    <div><div class="dash-match-badge">${initials(prochain.equipe2)}</div><div class="dash-match-team">${prochain.equipe2 || ''}</div></div>
-                </div>
-                <div class="dash-match-loc">📍 Gymnase — Firminy</div>`;
+
+            let html = '';
+
+            if (dernier) {
+                const alcf1 = isAlcf(dernier.equipe1);
+                const sAlcf = alcf1 ? dernier.score1 : dernier.score2;
+                const sAdv = alcf1 ? dernier.score2 : dernier.score1;
+                const adv = alcf1 ? dernier.equipe2 : dernier.equipe1;
+                const cls = sAlcf > sAdv ? 'win' : (sAlcf < sAdv ? 'loss' : '');
+                const verdict = sAlcf > sAdv ? 'Victoire' : (sAlcf < sAdv ? 'Défaite' : 'Match nul');
+                html += `
+                <div class="dash-last-result">
+                    <div class="lbl">Dernier résultat</div>
+                    <div class="score ${cls}">${sAlcf} - ${sAdv}</div>
+                    ${cls ? `<span class="verdict ${cls}">${verdict}</span>` : ''}
+                    <div class="opp">${alcf1 ? '🏠' : '🚗'} vs ${adv || ''}</div>
+                    <div class="meta">${formatDateChamp(dernier.date)}</div>
+                </div>`;
+            }
+
+            if (prochain) {
+                const alcf1p = isAlcf(prochain.equipe1);
+                const advP = alcf1p ? prochain.equipe2 : prochain.equipe1;
+                html += `
+                <div class="dash-next-mini">
+                    <span class="lbl">Prochain match</span>
+                    <div class="opp">${alcf1p ? '🏠' : '🚗'} vs ${advP || ''}</div>
+                    <div class="meta">${formatDateChamp(prochain.date)}${prochain.heure ? ' — ' + formatHeureChamp(prochain.heure) : ''} · ${alcf1p ? 'Domicile' : 'Extérieur'}</div>
+                </div>`;
+            } else {
+                html += '<div class="dash-next-mini"><span class="lbl">Prochain match</span><div class="meta">Aucun match programmé.</div></div>';
+            }
+
+            el.innerHTML = html;
         }
 
         function renderDashClassement(poule) {
@@ -1316,10 +1377,12 @@
             </table>`;
         }
 
-        function renderDashStatsEquipe(statsMatchs) {
+        function renderDashStatsEquipe(statsMatchsTous) {
             const el = document.getElementById('dashStatsEquipe');
+            // On ne compte que les matchs de la saison en cours (les saisons passées restent archivées)
+            const statsMatchs = (statsMatchsTous || []).filter(m => estSaisonEnCours(m.date));
             if (statsMatchs.length === 0) {
-                el.innerHTML = '<p class="dash-empty">Aucune statistique enregistrée.</p>';
+                el.innerHTML = `<p class="dash-empty">Aucun match enregistré pour la saison ${saisonLabel()}.</p>`;
                 return;
             }
             const nb = statsMatchs.length;
@@ -1972,6 +2035,8 @@
         }
 
         function loadStats() {
+            const lbl = document.getElementById('statsSaisonLabel');
+            if (lbl) lbl.textContent = saisonLabel();
             document.getElementById('statsDernierMatch').innerHTML = '<p class="empty-msg" style="padding:16px 0;">Chargement…</p>';
             document.getElementById('statsSaisonEquipe').innerHTML = '<p class="empty-msg" style="padding:16px 0;">Chargement…</p>';
             document.getElementById('statsPlayersGrid').innerHTML = skeletonCards(4, 0);
@@ -1997,15 +2062,36 @@
             const playersGridEl = document.getElementById('statsPlayersGrid');
             const matchsListEl = document.getElementById('statsMatchsList');
 
-            if (allStatsMatchsCache.length === 0) {
-                dernierMatchEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">Aucun match enregistré pour le moment.</p>';
-                saisonEquipeEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">Aucun match enregistré pour le moment.</p>';
-                playersGridEl.innerHTML = '<p class="empty-msg">Aucune statistique pour le moment.</p>';
-                if (matchsListEl) matchsListEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">Aucun match enregistré.</p>';
+            // Tous les matchs enregistrés (toutes saisons) pour la liste admin…
+            const tousLesMatchs = [...allStatsMatchsCache].sort((a, b) => new Date(b.date) - new Date(a.date));
+            // …mais les statistiques ne portent que sur la saison en cours
+            const sorted = tousLesMatchs.filter(m => estSaisonEnCours(m.date));
+
+            const renderMatchsList = () => {
+                if (!matchsListEl) return;
+                if (tousLesMatchs.length === 0) {
+                    matchsListEl.innerHTML = '<p class="empty-msg" style="padding:16px 0;">Aucun match enregistré.</p>';
+                    return;
+                }
+                matchsListEl.innerHTML = tousLesMatchs.map(m => `
+                    <div class="match-row"${estSaisonEnCours(m.date) ? '' : ' style="opacity:0.55;"'}>
+                        <div class="match-date">${formatDateFr(m.date)}</div>
+                        <div class="match-teams" style="flex:1;">${m.adversaire ? 'vs ' + m.adversaire : 'Match'} — ${m.scoreEquipe ?? 0} / ${m.scoreAdversaire ?? 0}${estSaisonEnCours(m.date) ? '' : ' <span style="font-size:0.68rem; color:var(--ink-soft);">(saison précédente)</span>'}</div>
+                        <div class="day-event-actions">
+                            <button onclick="openStatsMatchModal('${m.id}')" aria-label="Modifier">✏️</button>
+                            <button onclick="deleteDoc('statsMatchs','${m.id}')" aria-label="Supprimer">🗑️</button>
+                        </div>
+                    </div>`).join('');
+            };
+
+            if (sorted.length === 0) {
+                const msg = `Aucun match enregistré pour la saison ${saisonLabel()}.`;
+                dernierMatchEl.innerHTML = `<p class="empty-msg" style="padding:16px 0;">${msg}</p>`;
+                saisonEquipeEl.innerHTML = `<p class="empty-msg" style="padding:16px 0;">${msg}</p>`;
+                playersGridEl.innerHTML = `<p class="empty-msg">${msg}</p>`;
+                renderMatchsList();
                 return;
             }
-
-            const sorted = [...allStatsMatchsCache].sort((a, b) => new Date(b.date) - new Date(a.date));
             const dernier = sorted[0];
             const dFouls = foulTotalsForMatch(dernier);
             const totalFautesDernier = dFouls.fautes + dFouls.off + dFouls.tech;
@@ -2102,17 +2188,7 @@
                 }).join('');
             }
 
-            if (matchsListEl) {
-                matchsListEl.innerHTML = sorted.map(m => `
-                    <div class="match-row">
-                        <div class="match-date">${formatDateFr(m.date)}</div>
-                        <div class="match-teams" style="flex:1;">${m.adversaire ? 'vs ' + m.adversaire : 'Match'} — ${m.scoreEquipe ?? 0} / ${m.scoreAdversaire ?? 0}</div>
-                        <div class="day-event-actions">
-                            <button onclick="openStatsMatchModal('${m.id}')" aria-label="Modifier">✏️</button>
-                            <button onclick="deleteDoc('statsMatchs','${m.id}')" aria-label="Supprimer">🗑️</button>
-                        </div>
-                    </div>`).join('');
-            }
+            renderMatchsList();
         }
 
         function loadInf() {
